@@ -104,3 +104,13 @@ Priorité en cas de conflit : `BRIEF.md` > `docs/ui.md` / `docs/conception.md` >
 - **D-094 — Lignes de liste en container queries** : une même ligne d'exécution s'adapte à la largeur de sa liste (pleine page, vue d'ensemble, détail d'agent), pas à celle de la fenêtre.
 - **D-095 — Référence E2E = build de production** (Caddy, port 8080) ; le serveur de dev ne sert qu'à itérer. Les parcours lisent les vrais e-mails dans Mailpit et exécutent les vrais agents via le worker (modèle scripté hors ligne).
 
+## Stabilisation (phase 5)
+
+- **D-096 — Langues chargées à la demande** : chaque langue est un chunk récupéré avant le premier affichage (pas de clés visibles) ; une langue prise en charge n'a pas de repli (les deux sont complètes), toute autre langue retombe sur l'anglais. Chunk principal : 547 → 232 Ko.
+- **D-097 — Trace virtualisée au-delà de 120 éléments** (TanStack Virtual, lignes mesurées), avec suivi automatique du dernier pas tant que l'utilisateur n'a pas remonté ; en dessous, chaque événement garde son animation d'entrée.
+- **D-098 — Référence API auto-hébergée** : Swagger UI 5.33.1 (`swagger-ui-dist`, Apache-2.0) est embarqué dans l'API, servi sous une CSP « scripts de même origine uniquement » ; ReDoc (CDN) est retiré. Aucune ressource tierce n'est chargée par le produit.
+- **D-099 — Production** : Caddy est le seul service publié (HTTPS automatique, HSTS, HTTP/3) et sert l'interface et l'API sur la même origine ; PostgreSQL et Valkey sont sur un réseau interne sans accès extérieur ; conteneurs en lecture seule, sans capacité Linux ni élévation de privilèges ; port de santé interne pour Caddy.
+- **D-100 — SMTP authentifié et chiffré** (`SMTP_SECURITY` starttls/ssl), refusé en clair en production ; Resend refusé sans clé.
+- **D-101 — Sauvegardes** au format personnalisé de `pg_dump`, vérifiées juste après l'écriture ; la restauration arrête les écrivains, restaure en une transaction, migre puis redémarre. `ENCRYPTION_KEYS` se conserve à part.
+- **D-102 — Illustrations animées décoratives exclues d'axe** (`data-decorative`, `aria-hidden`, décrites par une phrase) : leur texte fictif passe par des fondus ; tout le reste de l'interface reste audité.
+

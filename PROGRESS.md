@@ -4,8 +4,8 @@
 
 ## État
 
-- **Phases 1 à 4 terminées** (backend + interface, critères de sortie vérifiés par E2E). Phase 6 : backend terminé, écrans à faire. Phase 7 : backend des workflows commencé (graphe, modèles, schémas — non commités).
-- **Tâche suivante :** phase 5 (stabilisation : site public, découpage du bundle, docs, audit sécurité, prod compose), puis écrans Évaluations (S) et suite de la phase 7.
+- **Phases 1 à 5 terminées** (le socle est stabilisé et vérifié par la boucle de la section 9). Phase 6 : backend terminé, écrans à faire. Phase 7 : backend des workflows commencé (graphe, modèles, schémas — non commités).
+- **Tâche suivante :** écrans Évaluations (S) pour clore la phase 6, puis phase 7 (workflows, éditeur visuel, bac à sable).
 
 ## Brief mis à jour — 2026-10-11 03:56 (relu en entier)
 
@@ -40,7 +40,7 @@
 | 2 | Identité | **fait** (2026-10-11) | Tests des flux + isolation inter-workspace verts |
 | 3 | Agent simple | **fait** (2026-10-11) | Une exécution réelle, tracée de bout en bout |
 | 4 | Exploitation | **fait** (2026-10-11) | Diagnostic d'un échec depuis l'UI |
-| 5 | Stabilisation du socle | à faire | Section 9 du brief validée sur le socle |
+| 5 | Stabilisation du socle | **fait** (2026-10-11) | Section 9 du brief validée sur le socle |
 | 6 | Évaluations | backend **fait** (comparaison v1/v2 vérifiée par l'API) ; web à faire | Comparaison de deux versions d'agent |
 | 7 | Workflows | à faire | Workflow multi-étapes exécuté et visualisé en direct |
 | 8 | Automatisation | à faire | Tâche planifiée et webhook signé testés |
@@ -49,8 +49,6 @@
 
 ## Problèmes ouverts
 
-- Swagger UI (`/api/docs`) charge ses assets depuis un CDN : à auto-héberger (phase 5).
-- Bundle web : chunk principal 548 Ko (171 Ko gzip) — découpage à faire en phase 5 (espaces de noms i18n et librairies chargés à la demande).
 - `pandoc`, `stripe` CLI absents du système : pandoc récupéré via `pypandoc_binary` (lien `~/.local/bin/pandoc`) ; Stripe CLI à télécharger (phase 9).
 
 ## Journal de vérification
@@ -90,4 +88,19 @@
 - E2E (Playwright, build de production, vraie pile) : **28/28** — 7 parcours identité (e-mails lus dans Mailpit), 3 parcours « construire & exploiter », 18 audits axe (chaque écran × 3 largeurs × 2 thèmes : 0 violation grave ou critique, aucun défilement horizontal).
 - Critère phase 3 (UI) : fournisseur hors ligne connecté, agent créé dans l'éditeur, exécution suivie en direct jusqu'au succès (appel d'outil, résultat 7006652) ✔. Critère phase 4 : échec diagnostiqué depuis l'UI (cause, action, code, « relancer peut fonctionner ») ✔.
 - Bugs réels trouvés par la boucle et corrigés : compteurs de tokens masqués dans les traces (D-090) ; garde « modifications non enregistrées » qui bloquait la sortie après enregistrement ; outil intégré sans réglage ouvrant le formulaire d'hôtes ; listes déroulantes sans nom accessible dans un `Controller` ; tableau pour lecteur d'écran élargissant la page mobile ; variable i18n `context` (réservée par i18next).
+
+
+
+### Phase 5 (stabilisation) — 2026-10-11
+- Livré : site public animé (hero cinétique, salle de contrôle en perspective, sections au défilement), langues à la demande (chunk principal 232 Ko / 73 Ko gzip), trace virtualisée (135 étapes → 18 nœuds DOM), référence API auto-hébergée sous CSP stricte, `docker-compose.prod.yml` + `deploy/Caddyfile`, SMTP authentifié, `scripts/backup` / `scripts/restore`, README avec captures, `docs/architecture.md`, `docs/operations.md`, `docs/security-review.md`, SECURITY / CONTRIBUTING / CODE_OF_CONDUCT / CHANGELOG.
+- Boucle section 9 :
+  1. ruff, mypy strict (121 fichiers), eslint strict + jsx-a11y, prettier, tsc : 0 erreur ;
+  2. backend 263 tests ✔ (PostgreSQL et Valkey réels), couverture **87 %** ; web 30 tests ✔ ;
+  3. `docker compose up` à froid sur volumes vides : tout prêt en 48 s (migrations, démo avec 2 exécutions DeepSeek réelles) ;
+  4. Playwright sur la pile neuve : **28/28** (parcours identité, construire & exploiter, critères phases 3 et 4) ;
+  5. captures revues (desktop, tablette, mobile × clair, sombre) : défauts corrigés (fondu du verbe du hero, carte flottante masquant un titre, compteurs mobiles, tableau élargissant la page) ;
+  6. axe : 0 violation grave ou critique sur chaque écran, 3 largeurs × 2 thèmes ;
+  7. `pip-audit` (dépendances de production) et `pnpm audit` : aucune vulnérabilité ;
+  8. revue sécurité section 10 : `docs/security-review.md` (points ouverts rattachés aux phases 7–9).
+- Production vérifiée en local (`DOMAIN=localhost`) : redirection 308, HTTPS, `/readyz`, en-têtes, conteneurs durcis, contrôle d'origine (403 depuis une origine étrangère). Sauvegarde → restauration vérifiée (mêmes comptes, même schéma).
 
