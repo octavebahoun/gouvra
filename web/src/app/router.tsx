@@ -259,6 +259,28 @@ export const router = createBrowserRouter([
                         Component: m.ComparePage,
                       })),
                   },
+                  // T — workflows
+                  {
+                    path: "workflows",
+                    lazy: () =>
+                      import("@/features/workflows/workflows-page").then((m) => ({
+                        Component: m.WorkflowsPage,
+                      })),
+                  },
+                  {
+                    path: "workflows/runs/:runId",
+                    lazy: () =>
+                      import("@/features/workflows/run-page").then((m) => ({
+                        Component: m.WorkflowRunPage,
+                      })),
+                  },
+                  {
+                    path: "workflows/:workflowId",
+                    lazy: () =>
+                      import("@/features/workflows/workflow-page").then((m) => ({
+                        Component: m.WorkflowPage,
+                      })),
+                  },
                   // O — providers
                   {
                     path: "providers",

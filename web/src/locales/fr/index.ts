@@ -11,6 +11,7 @@ import frShell from "./shell.json";
 import frSite from "./site.json";
 import frTools from "./tools.json";
 import frUsage from "./usage.json";
+import frWorkflows from "./workflows.json";
 
 /** Every namespace of this language, loaded as one chunk when the language is used. */
 const bundle = {
@@ -27,6 +28,7 @@ const bundle = {
   site: frSite,
   tools: frTools,
   usage: frUsage,
+  workflows: frWorkflows,
 };
 
 export default bundle;

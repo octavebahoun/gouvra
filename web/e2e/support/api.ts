@@ -256,3 +256,48 @@ export async function waitForRun(owner: SeededUser, runId: string, timeoutMs = 4
   }
   throw new Error(`Run ${runId} did not finish within ${timeoutMs} ms`);
 }
+
+type SeededWorkflow = { id: string; name: string };
+type SeededWorkflowRun = { id: string; status: string };
+
+export async function createWorkflow(
+  owner: SeededUser,
+  workspaceId: string,
+  body: Record<string, unknown>,
+) {
+  return call<SeededWorkflow>("POST", `/workspaces/${workspaceId}/workflows`, {
+    body,
+    cookies: owner.cookies,
+  });
+}
+
+export async function publishWorkflow(owner: SeededUser, workflowId: string, note?: string) {
+  return call<unknown>("POST", `/workflows/${workflowId}/publish`, {
+    body: { note: note ?? null },
+    cookies: owner.cookies,
+  });
+}
+
+export async function startWorkflowRun(
+  owner: SeededUser,
+  workflowId: string,
+  body: Record<string, unknown>,
+) {
+  return call<SeededWorkflowRun>("POST", `/workflows/${workflowId}/runs`, {
+    body,
+    cookies: owner.cookies,
+  });
+}
+
+/** Wait until every step of a workflow run has settled. */
+export async function waitForWorkflowRun(owner: SeededUser, runId: string, timeoutMs = 45_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const run = await call<SeededWorkflowRun>("GET", `/workflow-runs/${runId}`, {
+      cookies: owner.cookies,
+    });
+    if (run.status !== "running") return run;
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
+  throw new Error(`Workflow run ${runId} did not finish within ${timeoutMs} ms`);
+}

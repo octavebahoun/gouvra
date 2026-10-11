@@ -1,0 +1,132 @@
+/* React Flow, drawn with Gouvra's tokens (light and dark follow the theme variables). */
+.gv-flow .react-flow {
+  --xy-background-color: transparent;
+  --xy-attribution-background-color: transparent;
+}
+
+.gv-flow .react-flow__pane {
+  cursor: default;
+}
+
+.gv-flow .react-flow__pane.dragging {
+  cursor: grabbing;
+}
+
+.gv-flow .react-flow__node {
+  border-radius: 12px;
+}
+
+.gv-flow .react-flow__node:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 3px;
+}
+
+.gv-flow .react-flow__edge:focus-visible .react-flow__edge-path {
+  stroke: var(--color-focus) !important;
+}
+
+.gv-flow .gv-handle {
+  width: 11px;
+  height: 11px;
+  border-radius: 9999px;
+  background: var(--color-surface);
+  border: 2px solid var(--color-line-strong);
+  transition:
+    border-color 150ms,
+    transform 150ms;
+}
+
+.gv-flow .react-flow__node:hover .gv-handle,
+.gv-flow .gv-handle.connectingfrom,
+.gv-flow .gv-handle.connectingto {
+  border-color: var(--color-brand);
+}
+
+.gv-flow .gv-handle.valid {
+  border-color: var(--color-success);
+  transform: translate(-50%, 50%) scale(1.25);
+}
+
+.gv-flow .gv-handle-true {
+  border-color: var(--color-success);
+}
+
+.gv-flow .gv-handle-false {
+  border-color: var(--color-muted);
+}
+
+.gv-flow .react-flow__connection-path {
+  stroke: var(--color-brand);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+
+/* Data flowing into the step that is running. */
+.gv-flow .react-flow__edge.animated path.react-flow__edge-path {
+  stroke-dasharray: 7 5;
+  animation: gv-flow-dash 0.7s linear infinite;
+}
+
+@keyframes gv-flow-dash {
+  to {
+    stroke-dashoffset: -12;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gv-flow .react-flow__edge.animated path.react-flow__edge-path {
+    animation: none;
+  }
+}
+
+.gv-flow .react-flow__controls {
+  border: 1px solid var(--color-line);
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--color-surface);
+  box-shadow: var(--gv-shadow-sm, 0 1px 2px rgb(0 0 0 / 0.06));
+}
+
+.gv-flow .react-flow__controls-button {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface);
+  color: var(--color-ink);
+}
+
+.gv-flow .react-flow__controls-button:last-child {
+  border-bottom: 0;
+}
+
+.gv-flow .react-flow__controls-button:hover {
+  background: var(--color-surface-2);
+}
+
+.gv-flow .react-flow__controls-button svg {
+  fill: currentColor;
+  max-width: 12px;
+  max-height: 12px;
+}
+
+.gv-flow .react-flow__controls-button:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: -2px;
+}
+
+.gv-flow .react-flow__attribution {
+  font-size: 10px;
+  padding: 0 4px;
+  color: var(--color-muted);
+}
+
+/* A comfortable target (WCAG 2.5.8), kept discreet. */
+.gv-flow .react-flow__attribution a {
+  display: inline-block;
+  min-height: 24px;
+  min-width: 24px;
+  line-height: 24px;
+  padding: 0 4px;
+  color: inherit;
+}

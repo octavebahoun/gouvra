@@ -26,6 +26,7 @@ export const namespaces = [
   "usage",
   "site",
   "evaluations",
+  "workflows",
 ] as const satisfies readonly (keyof Resources)[];
 
 export const languageNames: Record<Language, string> = { en: "English", fr: "Français" };

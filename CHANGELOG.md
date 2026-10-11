@@ -21,5 +21,10 @@ All notable changes are documented here. The format follows
 - Evaluations: suites, cases (with JSON import), graders (exact, contains, regex, JSON Schema, LLM
   judge) with a live try-out, runs on a version or a variant (model, provider, instructions) with
   results arriving live, and a case-by-case comparison of two runs.
+- Workflows: a visual editor (agents, tools, conditions, transforms, outputs) with checked
+  templates, autosave with conflict detection, undo and redo; draft test runs, published versions
+  and restores; runs drawn live on the graph, step by step, with each step's input and output.
+- Code tools (Python, JavaScript) run in a separate sandbox service: one throwaway container per
+  call, without network, read-only, unprivileged and limited, through a filtered Docker socket.
 - Public site, English and French interface, light and dark themes, accessibility audits.
 - Production deployment with automatic HTTPS, backups and restores, secret rotation commands.

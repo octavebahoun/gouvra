@@ -7,15 +7,19 @@ import {
   createBuiltinTool,
   createScriptedProvider,
   createSuite,
+  createWorkflow,
   importCases,
   createVerifiedUser,
   createWorkspace,
   launchExecution,
+  publishWorkflow,
   signIn,
   startRun,
+  startWorkflowRun,
   updateAgent,
   waitForExecution,
   waitForRun,
+  waitForWorkflowRun,
   type SeededUser,
   type SeededWorkspace,
 } from "./support/api";
@@ -32,6 +36,8 @@ type Ids = {
   suite: string;
   runA: string;
   runB: string;
+  workflow: string;
+  workflowRun: string;
 };
 type Screen = {
   name: string;
@@ -114,6 +120,17 @@ const SIGNED_IN: Screen[] = [
     path: (w, ids) => `/w/${w.slug}/evaluations/compare?base=${ids.runA}&candidate=${ids.runB}`,
     ready: "Comparison",
   },
+  { name: "workflows", path: (w) => `/w/${w.slug}/workflows`, ready: "Workflows" },
+  {
+    name: "workflow",
+    path: (w, ids) => `/w/${w.slug}/workflows/${ids.workflow}`,
+    ready: "Ticket routing",
+  },
+  {
+    name: "workflow-run",
+    path: (w, ids) => `/w/${w.slug}/workflows/runs/${ids.workflowRun}`,
+    ready: "Ticket routing",
+  },
 ];
 
 let owner: SeededUser;
@@ -154,7 +171,53 @@ test.beforeAll(async () => {
   await updateAgent(owner, agent.id, { instructions: "Be brief." });
   const runB = await startRun(owner, { suite_id: suite.id, agent_id: agent.id, label: "After" });
   await waitForRun(owner, runB.id);
+  const workflow = await createWorkflow(owner, workspace.id, {
+    name: "Ticket routing",
+    description: "Answers, then escalates urgent tickets.",
+    graph: {
+      nodes: [
+        { id: "input", type: "start", label: "Ticket", position: { x: 0, y: 0 } },
+        {
+          id: "answer",
+          type: "agent",
+          label: "Answer",
+          agent_id: agent.id,
+          position: { x: 0, y: 124 },
+        },
+        {
+          id: "check",
+          type: "condition",
+          label: "Urgent?",
+          value: "{{steps.answer.output}}",
+          operand: "urgent",
+          position: { x: 0, y: 248 },
+        },
+        {
+          id: "escalate",
+          type: "transform",
+          label: "Escalate",
+          template: "Escalated: {{steps.answer.output}}",
+          position: { x: -140, y: 372 },
+        },
+        { id: "output", type: "end", label: "Reply", position: { x: 0, y: 496 } },
+      ],
+      edges: [
+        { id: "a", source: "input", target: "answer" },
+        { id: "b", source: "answer", target: "check" },
+        { id: "c", source: "check", target: "escalate", branch: "true" },
+        { id: "d", source: "escalate", target: "output" },
+        { id: "e", source: "check", target: "output", branch: "false" },
+      ],
+    },
+  });
+  await publishWorkflow(owner, workflow.id, "First version");
+  const workflowRun = await startWorkflowRun(owner, workflow.id, {
+    input: "This is urgent: the export fails",
+  });
+  await waitForWorkflowRun(owner, workflowRun.id);
   ids = {
+    workflow: workflow.id,
+    workflowRun: workflowRun.id,
     tool: tool.id,
     agent: agent.id,
     succeeded: succeeded.id,
