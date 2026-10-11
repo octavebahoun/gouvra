@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+# Runs the same checks as .github/workflows/ci.yml on this machine.
+# Needs the local stack's postgres + valkey (docker compose up -d postgres valkey).
+#   scripts/ci-local          # api + web + contract
+#   scripts/ci-local --e2e    # also run Playwright against http://localhost:8080
+set -euo pipefail
+ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+STEP() { printf '\n\033[1;34m▶ %s\033[0m\n' "$*"; }
+
+STEP "API — format, lint, types"
+cd "$ROOT/api"
+uv sync --locked -q
+uv run ruff format --check .
+uv run ruff check .
+uv run mypy
+
+STEP "API — tests (real PostgreSQL + Valkey) with coverage"
+uv run coverage run -m pytest
+uv run coverage report --fail-under=80
+
+STEP "API — dependency audit"
+uv export --frozen --no-dev --no-emit-project --format requirements-txt > /tmp/gouvra-req.txt
+uv run pip-audit --strict -r /tmp/gouvra-req.txt
+
+STEP "API contract — OpenAPI in sync"
+APP_ENV=test uv run gouvra export-openapi --output ../docs/api/openapi.json >/dev/null
+git -C "$ROOT" diff --exit-code -- docs/api/openapi.json || {
+  echo "OpenAPI changed: commit docs/api/openapi.json and regenerate web types (pnpm api:types)"; exit 1; }
+
+STEP "Web — format, lint, types, tests, build, audit"
+cd "$ROOT/web"
+pnpm install --frozen-lockfile --silent
+pnpm api:types >/dev/null
+pnpm format:check
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build >/dev/null
+pnpm audit --audit-level high --prod
+
+if [[ "${1:-}" == "--e2e" ]]; then
+  STEP "End-to-end — Playwright"
+  E2E_BASE_URL="${E2E_BASE_URL:-http://localhost:8080}" pnpm e2e --project=desktop
+fi
+
+printf '\n\033[1;32m✔ CI checks passed\033[0m\n'

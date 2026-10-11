@@ -1,0 +1,143 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API — lint, types, tests, audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: api
+    services:
+      postgres:
+        image: postgres:17.11-alpine
+        env:
+          POSTGRES_USER: gouvra
+          POSTGRES_PASSWORD: gouvra
+          POSTGRES_DB: gouvra
+        ports: ["55432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U gouvra" --health-interval 5s --health-timeout 3s --health-retries 20
+      valkey:
+        image: valkey/valkey:8.1-alpine
+        ports: ["56379:6379"]
+        options: >-
+          --health-cmd "valkey-cli ping" --health-interval 5s --health-timeout 3s --health-retries 20
+    env:
+      POSTGRES_PASSWORD: gouvra
+      TEST_REDIS_URL: redis://localhost:56379/15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.22"
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Format
+        run: uv run ruff format --check .
+      - name: Lint
+        run: uv run ruff check .
+      - name: Types
+        run: uv run mypy
+      - name: Tests (real PostgreSQL + Valkey) with coverage
+        run: uv run coverage run -m pytest && uv run coverage report --fail-under=80
+      - name: Dependency audit
+        run: uv export --frozen --no-dev --no-emit-project --format requirements-txt > /tmp/req.txt && uv run pip-audit --strict -r /tmp/req.txt
+
+  web:
+    name: Web — lint, types, tests, build, audit
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - run: pnpm install --frozen-lockfile
+      - name: Format
+        run: pnpm format:check
+      - name: Lint
+        run: pnpm lint
+      - name: Types
+        run: pnpm typecheck
+      - name: Unit tests
+        run: pnpm test
+      - name: Build
+        run: pnpm build
+      - name: Dependency audit (high and critical)
+        run: pnpm audit --audit-level high --prod
+
+  contract:
+    name: API contract — OpenAPI and web types in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: "0.11.22"
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: cd api && uv sync --locked && APP_ENV=test uv run gouvra export-openapi --output ../docs/api/openapi.json
+      - run: cd web && pnpm install --frozen-lockfile && pnpm api:types
+      - name: Fail if the committed contract or generated types are stale
+        run: git diff --exit-code -- docs/api/openapi.json web/src/lib/api/schema.d.ts
+
+  e2e:
+    name: End-to-end (docker compose + Playwright)
+    runs-on: ubuntu-latest
+    needs: [api, web]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Generate secrets
+        run: cp .env.example .env && scripts/gen-secrets
+      - name: Start the stack
+        run: docker compose up -d --build --wait
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: cd web && pnpm install --frozen-lockfile && pnpm exec playwright install --with-deps chromium
+      - name: Playwright
+        run: cd web && pnpm e2e --project=desktop
+        env:
+          E2E_BASE_URL: http://localhost:8080
+      - if: failure()
+        run: docker compose logs --no-color > compose.log
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            web/playwright-report
+            compose.log
+
+  images:
+    name: Docker images build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t gouvra/api:ci api && docker build -t gouvra/web:ci web

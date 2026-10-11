@@ -1,0 +1,133 @@
+# Gouvra — local stack. `scripts/gen-secrets && docker compose up -d` then open http://localhost:8080
+# Mailpit (captured e-mails): http://localhost:8025 — API docs: http://localhost:8080/api/docs
+name: gouvra
+
+x-app: &app
+  image: gouvra/api:local
+  build:
+    context: ./api
+  restart: unless-stopped
+  environment: &app-env
+    APP_ENV: ${APP_ENV:-development}
+    APP_URL: ${APP_URL:-http://localhost:8080}
+    LOG_FORMAT: json
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    DATABASE_URL: postgresql+asyncpg://gouvra:${POSTGRES_PASSWORD:?run scripts/gen-secrets}@postgres:5432/gouvra
+    REDIS_URL: redis://:${VALKEY_PASSWORD:?run scripts/gen-secrets}@valkey:6379/0
+    SESSION_SECRET: ${SESSION_SECRET:?run scripts/gen-secrets}
+    ENCRYPTION_KEYS: ${ENCRYPTION_KEYS:?run scripts/gen-secrets}
+    COOKIE_SECURE: ${COOKIE_SECURE:-true}
+    SIGNUP_ENABLED: ${SIGNUP_ENABLED:-true}
+    EMAIL_PROVIDER: ${EMAIL_PROVIDER:-smtp}
+    EMAIL_FROM: ${EMAIL_FROM:-Gouvra <no-reply@localhost>}
+    RESEND_API_KEY: ${RESEND_API_KEY:-}
+    SMTP_HOST: mailpit
+    SMTP_PORT: "1025"
+    DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+    ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+    GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+    GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    BILLING_PROVIDER: ${BILLING_PROVIDER:-none}
+    STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+    STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+    STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    SANDBOX_URL: http://sandbox:8090
+    SANDBOX_TOKEN: ${SANDBOX_TOKEN:?run scripts/gen-secrets}
+    TRUSTED_PROXY_HOPS: "1"
+
+services:
+  postgres:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gouvra
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run scripts/gen-secrets}
+      POSTGRES_DB: gouvra
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "127.0.0.1:55432:5432" # local tooling and tests only
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gouvra -d gouvra"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  valkey:
+    image: valkey/valkey:8.1-alpine
+    restart: unless-stopped
+    command: ["valkey-server", "--requirepass", "${VALKEY_PASSWORD:?run scripts/gen-secrets}", "--appendonly", "yes"]
+    volumes:
+      - valkeydata:/data
+    ports:
+      - "127.0.0.1:56379:6379"
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$$VALKEY_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD}
+
+  mailpit:
+    image: axllent/mailpit:v1.31
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["gouvra", "migrate"]
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      valkey:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  worker:
+    <<: *app
+    command: ["python", "-m", "gouvra.worker"]
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,sys,time; p=os.environ['WORKER_HEARTBEAT_FILE']; sys.exit(0 if time.time()-os.path.getmtime(p) < 45 else 1)"]
+      interval: 15s
+      timeout: 4s
+      start_period: 20s
+      retries: 3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      valkey:
+        condition: service_healthy
+
+  web:
+    image: gouvra/web:local
+    build:
+      context: ./web
+    restart: unless-stopped
+    environment:
+      API_UPSTREAM: api:8000
+    ports:
+      - "8080:8080"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  valkeydata:
