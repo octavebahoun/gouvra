@@ -23,8 +23,8 @@ language. When it shows a cost, the number comes from the provider or from a pub
 - **Model providers** — DeepSeek (official API), Anthropic, any OpenAI-compatible API, and an
   offline scripted model for demos and tests. Keys are encrypted at rest and never shown again.
 - **Safe tools** — built-ins (calculator, clock, dates, JSON, text, HTTP to allow-listed hosts),
-  custom HTTP tools with strict JSON Schemas and server-side credentials, a test console and a
-  call history.
+  custom HTTP tools with strict JSON Schemas and server-side credentials, code tools (Python,
+  JavaScript) run in a throwaway container without network, a test console and a call history.
 - **Live executions** — asynchronous runs with limits (turns, tool calls, tokens, cost, time),
   cancellation, retries, a trace that builds itself as it happens, plain-language failure
   diagnosis and JSON export.

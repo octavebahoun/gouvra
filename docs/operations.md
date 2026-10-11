@@ -25,7 +25,7 @@ upgrade and diagnose. Commands are run from the repository root.
 ```bash
 cp .env.example .env     # optional: add a DeepSeek key, e-mail or OAuth credentials
 scripts/gen-secrets      # writes every internal secret to .env (never overwrites)
-docker compose up -d     # postgres, valkey, mailpit, migrate, seed, api, worker, web
+docker compose up -d     # postgres, valkey, mailpit, migrate, seed, api, worker, sandbox, web
 ```
 
 | What | Where |
@@ -58,6 +58,9 @@ All settings are environment variables, documented in [`.env.example`](../.env.e
 | `DEEPSEEK_API_KEY` | Used by the demo seed and the real-provider tests. Workspaces store their own keys, encrypted. |
 | `BILLING_PROVIDER`, `STRIPE_*` | Billing (Stripe test or live mode); `none` disables billing. |
 | `SIGNUP_ENABLED` | `false` closes public sign-up (invitations still work). |
+| `DOCKER_SOCKET` | Docker socket given (read-only) to the filtering proxy used by the code sandbox. Default `/var/run/docker.sock`; rootless Docker: `$XDG_RUNTIME_DIR/docker.sock`. |
+| `SANDBOX_ALLOW_NETWORK` | `true` lets code tools that ask for it reach the network (default: no network at all). |
+| `SANDBOX_RUNTIME` | Container runtime for code tools, e.g. `runsc` when gVisor is installed. |
 
 Check a configuration without revealing any value:
 
@@ -74,6 +77,9 @@ docker compose run --rm api gouvra check-config --live   # plus a read-only call
   redirect, HSTS, a strict Content-Security-Policy, HTTP/3; it serves the interface and proxies
   `/api` on the same origin (no CORS, `SameSite` cookies).
 - **API and worker as separate processes** (executions, e-mails and evaluations never run in the API).
+- **A code sandbox** that runs code tools in throwaway containers through a Docker socket proxy
+  limited to the containers and images API (see [Architecture](architecture.md#code-sandbox)).
+  It downloads its two runtime images (Python, Node.js) at first start.
 - **PostgreSQL and Valkey on a network without outside access**; persistent volumes for data and
   certificates; JSON logs rotated by Docker.
 

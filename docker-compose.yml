@@ -134,6 +134,47 @@ services:
       valkey:
         condition: service_healthy
 
+  # Runs code tools in throwaway containers. It holds no application secret and reaches the
+  # Docker daemon only through the filtering proxy below.
+  sandbox:
+    image: gouvra/api:local
+    restart: unless-stopped
+    command: ["gouvra", "sandbox"]
+    environment:
+      SANDBOX_TOKEN: ${SANDBOX_TOKEN:?run scripts/gen-secrets}
+      SANDBOX_DOCKER_URL: http://docker-proxy:2375
+      SANDBOX_ALLOW_NETWORK: ${SANDBOX_ALLOW_NETWORK:-false}
+      SANDBOX_RUNTIME: ${SANDBOX_RUNTIME:-}
+      SANDBOX_LOG_FORMAT: json
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8090/healthz', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 4s
+      retries: 5
+    depends_on:
+      docker-proxy:
+        condition: service_started
+    networks: [default, docker]
+
+  # Only the API sections the sandbox needs (containers, images), never exec, volumes or swarm.
+  docker-proxy:
+    image: tecnativa/docker-socket-proxy:v0.5.0
+    restart: unless-stopped
+    security_opt: ["no-new-privileges:true"]
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      POST: 1
+      ALLOW_START: 1
+      ALLOW_RESTARTS: 1
+      EVENTS: 0
+    volumes:
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: [/tmp, /run] # HAProxy renders its configuration there at start
+    networks: [docker]
+
   web:
     image: gouvra/web:local
     build:
@@ -150,3 +191,9 @@ services:
 volumes:
   pgdata:
   valkeydata:
+
+networks:
+  default:
+  # Between the sandbox and the Docker socket proxy only.
+  docker:
+    internal: true

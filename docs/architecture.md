@@ -17,6 +17,9 @@ flowchart LR
   valkey -- live traces (SSE) --> api
   worker -- model calls --> providers[(DeepSeek, Anthropic, OpenAI-compatible)]
   worker -- e-mails --> email[(Resend / SMTP)]
+  worker -- code tools, token --> sandbox[Sandbox service]
+  sandbox -- containers & images only --> proxy[Docker socket proxy]
+  proxy --> docker[(Docker: one throwaway container per call)]
 ```
 
 ## Repository
@@ -80,6 +83,31 @@ A run creates one ordinary execution per case (trigger `evaluation`, lower prior
 with run-only overrides (model, provider, instructions). The worker grades each finished case
 (exact, contains, time-boxed regex, JSON Schema, LLM judge metered separately) and keeps the run
 summary up to date; two runs compare case by case.
+
+## Workflows
+
+A workflow is a directed acyclic graph of steps — input, agent, tool, condition, transform,
+output — edited as a draft (each save names the revision it started from) and published as
+immutable versions. A run freezes the graph it executes and advances as a state machine in
+PostgreSQL: the worker locks the run, records finished steps, then walks the graph once in
+topological order. A step waits until all its inputs are settled and runs when at least one
+incoming link is active (a successful source, the matching branch of a condition, or a failure
+allowed to continue); otherwise it is skipped, so paths rejoin naturally after a condition.
+Agent steps are ordinary executions (same queue, limits and trace) linked to the run; tool steps
+run outside the lock. Data moves through checked templates (`{{input.x}}`,
+`{{steps.id.output}}`), never through code. Each change publishes the whole run state, which the
+interface draws live.
+
+## Code sandbox
+
+Code tools never run in the API or the worker. The worker calls the **sandbox** service (its own
+process, holding no application secret) with a shared token; the sandbox starts one container
+per call through a **Docker socket proxy** that only exposes the containers and images API.
+Each container: no network (unless the instance allows it and the tool asks), read-only root,
+a small non-executable `/tmp`, user `nobody`, every capability dropped, `no-new-privileges`,
+memory without swap, CPU, process and time limits; it is removed after the call, and anything
+a crash leaves behind is reaped once expired. The code defines `main(args)`; its result comes
+back as JSON, with what it printed.
 
 ## Interface
 

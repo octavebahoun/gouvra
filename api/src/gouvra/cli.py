@@ -73,6 +73,27 @@ def cmd_seed_demo(args: argparse.Namespace) -> int:
     return asyncio.run(seed_demo(with_real_runs=not args.offline))
 
 
+def cmd_sandbox(args: argparse.Namespace) -> int:
+    """Serve the code sandbox (its own process and container: see gouvra.sandbox)."""
+    import uvicorn
+
+    from gouvra.core.logging import configure_logging
+    from gouvra.sandbox.app import create_sandbox_app
+    from gouvra.sandbox.settings import get_sandbox_settings
+
+    settings = get_sandbox_settings()
+    configure_logging(settings.log_level, settings.log_format)
+    uvicorn.run(
+        create_sandbox_app(settings),
+        host=args.host,
+        port=args.port,
+        log_config=None,
+        server_header=False,
+        timeout_graceful_shutdown=130,  # a run may take up to 120 s
+    )
+    return 0
+
+
 def cmd_check_config(args: argparse.Namespace) -> int:
     from gouvra.core.config_check import main as check_main
 
@@ -110,6 +131,11 @@ def main(argv: list[str] | None = None) -> int:
     check = sub.add_parser("check-config", help="Verify configuration (never prints secret values)")
     check.add_argument("--live", action="store_true", help="also call providers (read-only)")
     check.set_defaults(func=cmd_check_config)
+
+    sandbox = sub.add_parser("sandbox", help="Serve the code sandbox (needs Docker access)")
+    sandbox.add_argument("--host", default="0.0.0.0")  # noqa: S104 - inside its container
+    sandbox.add_argument("--port", type=int, default=8090)
+    sandbox.set_defaults(func=cmd_sandbox)
 
     args = parser.parse_args(argv)
     result: int = args.func(args)

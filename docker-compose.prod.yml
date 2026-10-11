@@ -62,7 +62,7 @@ x-app: &app
     # Caddy is the only proxy in front of the API.
     TRUSTED_PROXY_HOPS: "1"
     CORS_ORIGINS: ""
-  networks: [data, edge]
+  networks: [data, edge, sandbox]
 
 services:
   postgres:
@@ -135,6 +135,54 @@ services:
       valkey:
         condition: service_healthy
 
+  # Runs code tools in throwaway containers (no network, read-only, unprivileged, limited).
+  # It holds no application secret and reaches Docker only through the filtering proxy.
+  sandbox:
+    image: gouvra/api:${GOUVRA_VERSION:-latest}
+    restart: unless-stopped
+    logging: *logging
+    <<: *hardening
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: [/tmp]
+    command: ["gouvra", "sandbox"]
+    stop_grace_period: 130s
+    environment:
+      SANDBOX_TOKEN: ${SANDBOX_TOKEN:?run scripts/gen-secrets}
+      SANDBOX_DOCKER_URL: http://docker-proxy:2375
+      SANDBOX_ALLOW_NETWORK: ${SANDBOX_ALLOW_NETWORK:-false}
+      SANDBOX_RUNTIME: ${SANDBOX_RUNTIME:-}
+      SANDBOX_LOG_FORMAT: json
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8090/healthz', timeout=3).status == 200 else 1)"]
+      interval: 15s
+      timeout: 4s
+      retries: 5
+    depends_on:
+      docker-proxy:
+        condition: service_started
+    networks: [sandbox, docker]
+
+  # Exposes only the Docker API sections the sandbox needs: containers and images.
+  docker-proxy:
+    image: tecnativa/docker-socket-proxy:v0.5.0
+    restart: unless-stopped
+    logging: *logging
+    <<: *hardening
+    environment:
+      CONTAINERS: 1
+      IMAGES: 1
+      POST: 1
+      ALLOW_START: 1
+      ALLOW_RESTARTS: 1
+      EVENTS: 0
+    volumes:
+      - ${DOCKER_SOCKET:-/var/run/docker.sock}:/var/run/docker.sock:ro
+    cap_drop: [ALL]
+    read_only: true
+    tmpfs: [/tmp, /run] # HAProxy renders its configuration there at start
+    networks: [docker]
+
   # Caddy: TLS certificates, the static interface and the API, on one origin.
   web:
     image: gouvra/web:${GOUVRA_VERSION:-latest}
@@ -182,3 +230,9 @@ networks:
   # Caddy, the API and the worker: published ports (Caddy only) and outbound calls to model,
   # e-mail and OAuth providers.
   edge:
+  # The API and the worker call the sandbox; the sandbox reaches nothing else from there.
+  sandbox:
+    internal: true
+  # The sandbox and the Docker socket proxy only.
+  docker:
+    internal: true
