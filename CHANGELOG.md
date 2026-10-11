@@ -31,5 +31,12 @@ All notable changes are documented here. The format follows
   control and automatic pause after repeated failures.
 - Connectors (Slack, Discord, GitHub, signed outgoing webhooks) whose operations become tools,
   and a registry of models and tools with prices and usage.
+- Plans and billing for running Gouvra as a service: Free, Team and Business plans with monthly
+  run quotas and resource limits, Stripe Checkout and customer portal (test mode supported), a
+  simulated mode without any card, and an unlimited Self-hosted plan when billing is off.
+- Monthly budgets with alert thresholds and an optional hard stop, quota and payment alerts by
+  e-mail, data retention per workspace, configuration export without secrets and CSV exports.
+- Instance administration for super-admins: totals, workspaces (suspend, grant a plan), accounts
+  (disable) and the instance-wide audit log.
 - Public site, English and French interface, light and dark themes, accessibility audits.
 - Production deployment with automatic HTTPS, backups and restores, secret rotation commands.

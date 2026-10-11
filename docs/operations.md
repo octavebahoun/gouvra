@@ -10,6 +10,8 @@ upgrade and diagnose. Commands are run from the repository root.
 - [Backups and restores](#backups-and-restores)
 - [Rotating secrets](#rotating-secrets)
 - [Upgrading](#upgrading)
+- [Billing, quotas and budgets](#billing-quotas-and-budgets)
+- [Instance administration](#instance-administration)
 - [Monitoring and diagnosis](#monitoring-and-diagnosis)
 - [Administration commands](#administration-commands)
 
@@ -148,6 +150,73 @@ for it). `/readyz` reports `migrations: up_to_date` once done. Read the `CHANGEL
 release before upgrading. To roll back: restore the backup taken before the upgrade, then start
 the previous version (or, when the release notes allow it, `gouvra migrate --down <revision>`
 before starting the previous images).
+
+## Billing, quotas and budgets
+
+A self-hosted instance has no billing by default (`BILLING_PROVIDER=none`): every workspace gets
+the **Self-hosted** plan, without quotas. To run Gouvra as a service:
+
+| `BILLING_PROVIDER` | Behaviour |
+|---|---|
+| `none` | No plans, no quotas, no billing screens (default). |
+| `simulated` | Plans and quotas apply; "paying" activates a plan for 30 days without any card. For demos and tests. |
+| `stripe` | Stripe Checkout and the Stripe customer portal. Test keys (`sk_test_…`) show a test-mode banner. |
+
+Plans (`api/src/gouvra/modules/billing/plans.py`): **Free** (1,000 runs a month, 5 agents,
+3 members, 3 automations, 2 concurrent runs, 30 days of history), **Team** ($49: 20,000 runs,
+50 agents, 20 members, 50 automations, 10 concurrent runs, 180 days) and **Business** ($249:
+200,000 runs, no other limit, 50 concurrent runs, 2 years). Runs are counted per calendar month
+(UTC). A request beyond a limit answers `402 plan_limit`; nothing existing is ever deleted when a
+workspace moves to a smaller plan.
+
+### Stripe
+
+1. Put the secret and publishable keys in `.env` (`STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`)
+   and set `BILLING_PROVIDER=stripe`. Prices are created on first use, found again by their
+   lookup keys `gouvra_team_monthly` and `gouvra_business_monthly` (edit them in Stripe if you
+   want other amounts; the plan limits stay in the code).
+2. Events: in production, add an endpoint `https://<domain>/api/v1/billing/stripe/webhook` in the
+   Stripe dashboard for `checkout.session.completed`, `customer.subscription.created`,
+   `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.paid` and
+   `invoice.payment_failed`, and copy its signing secret into `STRIPE_WEBHOOK_SECRET`.
+   In development, relay them with the [Stripe CLI](https://docs.stripe.com/stripe-cli):
+
+   ```bash
+   stripe listen --api-key "$STRIPE_SECRET_KEY" --print-secret   # → STRIPE_WEBHOOK_SECRET
+   stripe listen --api-key "$STRIPE_SECRET_KEY" \
+     --forward-to http://localhost:8000/api/v1/billing/stripe/webhook \
+     --events checkout.session.completed,customer.subscription.created,customer.subscription.updated,customer.subscription.deleted,invoice.paid,invoice.payment_failed
+   ```
+
+3. A plan changes only when Stripe's signed event arrives — never on the redirect back from
+   Checkout. Each event is applied once (its ID is recorded), and the subscription is read back
+   from Stripe rather than trusted from the payload.
+4. Test with the card `4242 4242 4242 4242`, any future expiry date and any CVC.
+
+### Budgets, alerts and retention
+
+- **Budgets** (Usage page, owners and admins): a monthly amount in US dollars compared with the
+  real cost of the month's runs, alert thresholds, and optionally a hard stop of new runs at 100%.
+- **Alerts** (budget thresholds, 80% and 100% of the plan's runs, failed payments) appear on the
+  Usage page and are e-mailed once to owners and admins. The worker evaluates them every minute.
+- **Retention** (Settings → Data): run content, workflow runs, automation fires and alerts are
+  deleted after the chosen delay (up to the plan's maximum); the audit log keeps at least 90 days.
+  Usage and costs are always kept, without content. The worker purges hourly.
+- **Exports** (Settings → Data, Usage page): the configuration as JSON without any secret, runs
+  and usage as CSV (formulas neutralised). Every export is audited.
+
+## Instance administration
+
+Grant instance administration from the command line (never over HTTP):
+
+```bash
+docker compose exec api gouvra create-superadmin ops@example.com
+```
+
+Administrators get **Instance administration** in their account menu (`/admin`): totals, every
+workspace (suspend or restore, grant a plan), every account (disable or enable) and the
+instance-wide audit log. A suspended workspace stays readable but nothing can run or change; a
+disabled account is signed out everywhere. Anyone else gets a 404 on `/admin` and its API.
 
 ## Monitoring and diagnosis
 

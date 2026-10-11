@@ -40,6 +40,9 @@ language. When it shows a cost, the number comes from the provider or from a pub
   judge; run them on a version or a variant and compare two runs case by case.
 - **Teams** — workspaces, roles (owner, admin, member, viewer), invitations, service keys, audit
   log; isolation between workspaces tested on every route.
+- **Ready to run as a service** — plans with monthly quotas, Stripe Checkout and billing portal
+  (test mode included), budgets with alerts and a hard stop, data retention, exports without
+  secrets, and an instance administration console. Billing is off by default when self-hosting.
 - **Yours** — self-hosted with one command, Apache-2.0, documented REST API, English and French
   interface, light and dark themes, accessible (WCAG 2.2 AA) and responsive.
 

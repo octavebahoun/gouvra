@@ -54,6 +54,27 @@ Last review: 2026-10-11 (end of phase 5 — foundation stabilised).
   returned; requests built server-side from schema-checked arguments (e.g. `owner/name` patterns
   block path tricks), sent only to the connector's hosts, public addresses only, bounded answers;
   Discord mentions disabled. Credentials are erased when a connection is removed.
+- **Billing (Stripe)**: the webhook endpoint takes no cookie and trusts nothing it is not signed
+  for — `stripe.Webhook.construct_event` checks `Stripe-Signature` (HMAC-SHA256, 5-minute window)
+  against `STRIPE_WEBHOOK_SECRET`; a forged or stale event is refused (400) before any processing.
+  Each event ID is recorded and applied once; the subscription is read back from Stripe rather
+  than taken from the payload, and is matched to a workspace through metadata set server-side at
+  checkout. The return from Checkout changes nothing (the plan follows the verified event only).
+  Checkout and the portal are owner-only (`billing:manage`); the simulated mode uses a one-hour
+  HMAC token bound to the workspace and plan. No card data ever reaches Gouvra.
+- **Quotas and budgets**: checked server-side on every launch path (API, workflows, automations,
+  draft tests) and on resource creation (agents, invitations, automations); a hard-stopped budget
+  refuses new runs with `402`. Alerts are unique per workspace, month and threshold, so a busy
+  workspace cannot flood owners with e-mails.
+- **Retention and exports**: purges never touch usage records (kept without content), so cost
+  history cannot be erased through retention. Exports require `exports:create`, never contain a
+  secret (provider keys, tool secrets, connector credentials, webhook URLs and secrets — checked by
+  a test), neutralise spreadsheet formulas in CSV cells (`= + - @` tab, carriage return), and are
+  audited.
+- **Instance administration**: the super-admin flag is granted only by the `gouvra
+  create-superadmin` command; every `/admin` route answers 404 to anyone else. Suspension blocks
+  writes and launches through the central authorization layer; disabling an account revokes its
+  sessions; an administrator cannot disable themselves. Every action is audited.
 - **Dependencies**: `pip-audit` (production requirements) and `pnpm audit` report no known
   vulnerability on 2026-10-11.
 
@@ -61,5 +82,4 @@ Last review: 2026-10-11 (end of phase 5 — foundation stabilised).
 
 | Item | Closes in |
 |---|---|
-| Stripe webhook signature verification, budgets, quotas, retention policies | Phase 9 |
 | Full re-review of the finished product | Phase 10 |
