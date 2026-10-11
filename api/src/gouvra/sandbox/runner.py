@@ -222,6 +222,9 @@ async def run(docker: DockerClient, settings: SandboxSettings, request: RunReque
     )
 
 
+SIGKILL_EXIT = 128 + 9
+
+
 def _failure(
     request: RunRequest,
     *,
@@ -233,7 +236,9 @@ def _failure(
     """Why a run failed, in words the tool's author can act on — or (None, None)."""
     if timed_out:
         return f"The code ran longer than {request.timeout_ms} ms and was stopped.", "timeout"
-    if state.get("OOMKilled"):
+    # Docker does not always flag an out-of-memory kill (cgroup v2): a SIGKILL (exit 137) that
+    # did not come from the timeout above can only come from the kernel's OOM killer.
+    if state.get("OOMKilled") or exit_code == SIGKILL_EXIT:
         return (
             f"The code used more than {request.memory_mb} MB of memory and was stopped.",
             "memory",

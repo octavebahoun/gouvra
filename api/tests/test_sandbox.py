@@ -163,6 +163,29 @@ async def service(docker: Any, **extra: Any) -> AsyncIterator[httpx.AsyncClient]
             yield client
 
 
+def test_failure_explanations() -> None:
+    req = request(memory_mb=64)
+    fail = runner._failure  # the wording users read is part of the contract
+    assert fail(req, timed_out=True, state={}, verdict=None, exit_code=None)[1] == "timeout"
+    assert fail(req, timed_out=False, state={"OOMKilled": True}, verdict=None, exit_code=137) == (
+        "The code used more than 64 MB of memory and was stopped.",
+        "memory",
+    )
+    # cgroup v2: Docker may not flag the OOM kill, but the kernel's SIGKILL still shows.
+    assert fail(req, timed_out=False, state={}, verdict=None, exit_code=137)[1] == "memory"
+    assert fail(req, timed_out=False, state={}, verdict=None, exit_code=1) == (
+        "The code stopped without returning a result (exit code 1).",
+        "no_result",
+    )
+    assert fail(
+        req, timed_out=False, state={}, verdict={"ok": False, "error": "Boom"}, exit_code=1
+    ) == (
+        "Boom",
+        "code_error",
+    )
+    assert fail(req, timed_out=False, state={}, verdict={"ok": True}, exit_code=0) == (None, None)
+
+
 def test_service_refuses_to_start_without_a_strong_token() -> None:
     with pytest.raises(RuntimeError, match="SANDBOX_TOKEN"):
         create_sandbox_app(SandboxSettings(token=SecretStr("short")), FakeDocker())  # type: ignore[arg-type]
