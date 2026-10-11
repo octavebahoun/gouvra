@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 Identifier = Annotated[
     str, StringConstraints(strip_whitespace=True, pattern=r"^[a-z][a-z0-9_]{1,63}$")
@@ -101,6 +101,9 @@ class ToolTestIn(BaseModel):
 
 
 class ToolTestOut(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     ok: bool
     output: Any = None
     error_code: str | None = None

@@ -19,6 +19,28 @@ _SENSITIVE_KEY = re.compile(
     r"credential|private[_-]?key|ciphertext|set-cookie|x-csrf)",
     re.IGNORECASE,
 )
+# Usage counters contain "token" but are metrics, not secrets: never mask them.
+_METRIC_KEYS = frozenset(
+    {
+        "input_tokens",
+        "output_tokens",
+        "cached_tokens",
+        "cached_input_tokens",
+        "reasoning_tokens",
+        "total_tokens",
+        "prompt_tokens",
+        "completion_tokens",
+        "max_tokens",
+        "max_output_tokens",
+        "max_total_tokens",
+    }
+)
+
+
+def _is_sensitive_key(key: str) -> bool:
+    return key.lower() not in _METRIC_KEYS and _SENSITIVE_KEY.search(key) is not None
+
+
 # Values that look like credentials, wherever they appear.
 _SECRET_VALUE_PATTERNS = [
     re.compile(r"\b(sk|pk|rk)_(live|test)_[A-Za-z0-9]{8,}"),  # Stripe
@@ -48,9 +70,7 @@ def redact(value: Any, *, depth: int = 0) -> Any:
         out: dict[str, Any] = {}
         for key, item in value.items():
             key_str = str(key)
-            out[key_str] = (
-                REDACTED if _SENSITIVE_KEY.search(key_str) else redact(item, depth=depth + 1)
-            )
+            out[key_str] = REDACTED if _is_sensitive_key(key_str) else redact(item, depth=depth + 1)
         return out
     if isinstance(value, list | tuple | set):
         return [redact(item, depth=depth + 1) for item in value]
@@ -63,7 +83,7 @@ def _redaction_processor(_: WrappedLogger, __: str, event_dict: EventDict) -> Ev
             if key == "event" and isinstance(event_dict[key], str):
                 event_dict[key] = redact_text(event_dict[key])
             continue
-        if _SENSITIVE_KEY.search(key):
+        if _is_sensitive_key(key):
             event_dict[key] = REDACTED
         else:
             event_dict[key] = redact(event_dict[key])

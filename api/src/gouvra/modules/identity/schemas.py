@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, EmailStr, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
 
 Locale = Literal["en", "fr"]
 Theme = Literal["light", "dark", "system"]
@@ -58,6 +58,9 @@ class EmailChangeIn(BaseModel):
 
 
 class Accepted(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     status: Literal["accepted"] = "accepted"
     message: str
 

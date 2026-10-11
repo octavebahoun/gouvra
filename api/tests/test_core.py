@@ -161,9 +161,13 @@ def test_redaction_of_keys_values_and_emails() -> None:
         "headers": [{"Authorization": "Bearer abc.def"}],
         "user": "jane.doe@example.com",
         "stripe": "sk_test_51ABCDEFGHijklmnop",
+        "usage": {"input_tokens": 12, "output_tokens": 3},
+        "refresh_token": "opaque-refresh-value",
     }
     out = redact(data)
     assert out["password"] == REDACTED
+    assert out["usage"] == {"input_tokens": 12, "output_tokens": 3}  # metrics, not secrets
+    assert out["refresh_token"] == REDACTED
     assert out["nested"]["api_key"] == REDACTED
     assert "sk-abc" not in out["nested"]["note"]
     assert out["headers"][0]["Authorization"] == REDACTED

@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, EmailStr, StringConstraints
+from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints
 
 WorkspaceName = Annotated[
     str, StringConstraints(strip_whitespace=True, min_length=2, max_length=80)
@@ -93,6 +93,9 @@ class InvitationPreviewOut(BaseModel):
 
 
 class OnboardingStep(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     key: str
     done: bool
     optional: bool = False

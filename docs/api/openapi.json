@@ -4733,6 +4733,7 @@
         },
         "type": "object",
         "required": [
+          "status",
           "message"
         ],
         "title": "Accepted"
@@ -4771,7 +4772,7 @@
             "title": "Model"
           },
           "parameters": {
-            "$ref": "#/components/schemas/AgentParameters"
+            "$ref": "#/components/schemas/AgentParameters-Input"
           },
           "tool_ids": {
             "items": {
@@ -4930,6 +4931,13 @@
           }
         },
         "type": "object",
+        "required": [
+          "max_steps",
+          "max_tool_calls",
+          "timeout_s",
+          "max_total_tokens",
+          "max_cost_usd"
+        ],
         "title": "AgentLimits"
       },
       "AgentOut": {
@@ -5028,7 +5036,7 @@
         ],
         "title": "AgentOut"
       },
-      "AgentParameters": {
+      "AgentParameters-Input": {
         "properties": {
           "temperature": {
             "anyOf": [
@@ -5093,6 +5101,80 @@
           }
         },
         "type": "object",
+        "title": "AgentParameters"
+      },
+      "AgentParameters-Output": {
+        "properties": {
+          "temperature": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 2.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Temperature"
+          },
+          "top_p": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top P"
+          },
+          "max_output_tokens": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 400000.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Output Tokens"
+          },
+          "reasoning": {
+            "type": "string",
+            "enum": [
+              "auto",
+              "off",
+              "low",
+              "medium",
+              "high",
+              "max"
+            ],
+            "title": "Reasoning",
+            "default": "auto"
+          },
+          "response_format": {
+            "type": "string",
+            "enum": [
+              "text",
+              "json"
+            ],
+            "title": "Response Format",
+            "default": "text"
+          }
+        },
+        "type": "object",
+        "required": [
+          "temperature",
+          "top_p",
+          "max_output_tokens",
+          "reasoning",
+          "response_format"
+        ],
         "title": "AgentParameters"
       },
       "AgentRef": {
@@ -5257,7 +5339,7 @@
           "parameters": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/AgentParameters"
+                "$ref": "#/components/schemas/AgentParameters-Input"
               },
               {
                 "type": "null"
@@ -5360,7 +5442,7 @@
             "title": "Model"
           },
           "parameters": {
-            "$ref": "#/components/schemas/AgentParameters"
+            "$ref": "#/components/schemas/AgentParameters-Output"
           },
           "tools": {
             "items": {
@@ -5829,6 +5911,10 @@
         },
         "type": "object",
         "required": [
+          "agent_id",
+          "agent_name",
+          "provider_kind",
+          "model",
           "input_tokens",
           "output_tokens",
           "cost",
@@ -6660,7 +6746,9 @@
         "type": "object",
         "required": [
           "code",
-          "message"
+          "message",
+          "retryable",
+          "details"
         ],
         "title": "ErrorOut"
       },
@@ -7831,7 +7919,8 @@
         "type": "object",
         "required": [
           "key",
-          "done"
+          "done",
+          "optional"
         ],
         "title": "OnboardingStep"
       },
@@ -7969,7 +8058,9 @@
         },
         "type": "object",
         "required": [
-          "data"
+          "data",
+          "next_cursor",
+          "has_more"
         ],
         "title": "Page[AgentOut]"
       },
@@ -8001,7 +8092,9 @@
         },
         "type": "object",
         "required": [
-          "data"
+          "data",
+          "next_cursor",
+          "has_more"
         ],
         "title": "Page[AuditEventOut]"
       },
@@ -8033,7 +8126,9 @@
         },
         "type": "object",
         "required": [
-          "data"
+          "data",
+          "next_cursor",
+          "has_more"
         ],
         "title": "Page[ExecutionSummary]"
       },
@@ -8065,7 +8160,9 @@
         },
         "type": "object",
         "required": [
-          "data"
+          "data",
+          "next_cursor",
+          "has_more"
         ],
         "title": "Page[RunOut]"
       },
@@ -9383,6 +9480,25 @@
           }
         },
         "type": "object",
+        "required": [
+          "cases",
+          "pending",
+          "passed",
+          "failed",
+          "errored",
+          "cancelled",
+          "pass_rate",
+          "avg_score",
+          "cost_amount",
+          "cost_currency",
+          "cost_source",
+          "cost_partial",
+          "judge_cost_amount",
+          "avg_duration_ms",
+          "p95_duration_ms",
+          "input_tokens",
+          "output_tokens"
+        ],
         "title": "RunSummary"
       },
       "RunSummaryRef": {
@@ -10264,6 +10380,9 @@
         "type": "object",
         "required": [
           "ok",
+          "output",
+          "error_code",
+          "error_message",
           "duration_ms",
           "truncated"
         ],

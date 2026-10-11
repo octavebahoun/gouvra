@@ -7,13 +7,16 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 AgentName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
 MAX_INSTRUCTIONS = 32_000
 
 
 class AgentParameters(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     temperature: float | None = Field(default=None, ge=0, le=2)
     top_p: float | None = Field(default=None, gt=0, le=1)
     max_output_tokens: int | None = Field(default=None, ge=1, le=400_000)
@@ -22,6 +25,9 @@ class AgentParameters(BaseModel):
 
 
 class AgentLimits(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     max_steps: int = Field(default=8, ge=1, le=50, description="Model turns per execution")
     max_tool_calls: int = Field(default=20, ge=0, le=200)
     timeout_s: int = Field(default=120, ge=5, le=3600)

@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from gouvra.modules.evaluations.graders import GraderSpec
 
@@ -76,6 +76,9 @@ class CaseOut(BaseModel):
 
 
 class RunSummary(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     cases: int = 0
     pending: int = 0
     passed: int = 0

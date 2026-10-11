@@ -8,7 +8,7 @@ from decimal import Decimal
 from typing import Annotated, Literal
 
 from fastapi import APIRouter, Query
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import func, select
 
 from gouvra.core.authz import (
@@ -80,6 +80,9 @@ class TimePoint(BaseModel):
 
 
 class BreakdownRow(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     agent_id: uuid.UUID | None = None
     agent_name: str | None = None
     provider_kind: str | None = None

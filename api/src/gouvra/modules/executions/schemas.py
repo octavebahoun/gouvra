@@ -7,7 +7,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 Status = Literal["queued", "running", "succeeded", "failed", "cancelled", "timed_out"]
 
@@ -21,6 +21,9 @@ class ExecutionLaunchIn(BaseModel):
 
 
 class ErrorOut(BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     code: str
     message: str
     retryable: bool = False

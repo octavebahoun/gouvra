@@ -10,7 +10,7 @@ from typing import Annotated, Any
 
 import orjson
 from fastapi import Query
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from sqlalchemy import Select, and_, or_
 from sqlalchemy.orm import InstrumentedAttribute
 
@@ -20,6 +20,9 @@ MAX_LIMIT = 100
 
 
 class Page[T](BaseModel):
+    # Responses always carry these fields: mark them required in the OpenAPI output schema.
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     data: list[T]
     next_cursor: str | None = None
     has_more: bool = False
