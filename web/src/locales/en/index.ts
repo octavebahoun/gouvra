@@ -2,6 +2,7 @@ import enAccount from "./account.json";
 import enAgents from "./agents.json";
 import enAuth from "./auth.json";
 import enCommon from "./common.json";
+import enEvaluations from "./evaluations.json";
 import enExecutions from "./executions.json";
 import enOnboarding from "./onboarding.json";
 import enProviders from "./providers.json";
@@ -17,6 +18,7 @@ const bundle = {
   agents: enAgents,
   auth: enAuth,
   common: enCommon,
+  evaluations: enEvaluations,
   executions: enExecutions,
   onboarding: enOnboarding,
   providers: enProviders,

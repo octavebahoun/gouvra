@@ -204,3 +204,55 @@ export async function waitForExecution(owner: SeededUser, executionId: string, t
   }
   throw new Error(`Execution ${executionId} did not finish within ${timeoutMs} ms`);
 }
+
+// ---------------------------------------------------------------- evaluations
+
+export type SeededSuite = { id: string; name: string };
+export type SeededRun = { id: string; status: string; summary: { pass_rate: number | null } };
+
+export async function updateAgent(
+  owner: SeededUser,
+  agentId: string,
+  body: Record<string, unknown>,
+) {
+  return call<SeededAgent>("PATCH", `/agents/${agentId}`, { body, cookies: owner.cookies });
+}
+
+export async function createSuite(
+  owner: SeededUser,
+  workspaceId: string,
+  body: Record<string, unknown>,
+) {
+  return call<SeededSuite>("POST", `/workspaces/${workspaceId}/evaluations/suites`, {
+    body,
+    cookies: owner.cookies,
+  });
+}
+
+export async function importCases(
+  owner: SeededUser,
+  suiteId: string,
+  cases: Record<string, unknown>[],
+) {
+  return call<unknown[]>("POST", `/evaluations/suites/${suiteId}/cases/import`, {
+    body: { cases },
+    cookies: owner.cookies,
+  });
+}
+
+export async function startRun(owner: SeededUser, body: Record<string, unknown>) {
+  return call<SeededRun>("POST", "/evaluations/runs", { body, cookies: owner.cookies });
+}
+
+/** Wait until the worker has run and graded every case. */
+export async function waitForRun(owner: SeededUser, runId: string, timeoutMs = 45_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const run = await call<SeededRun>("GET", `/evaluations/runs/${runId}`, {
+      cookies: owner.cookies,
+    });
+    if (run.status !== "running") return run;
+    await new Promise((resolve) => setTimeout(resolve, 400));
+  }
+  throw new Error(`Run ${runId} did not finish within ${timeoutMs} ms`);
+}

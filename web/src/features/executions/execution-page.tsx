@@ -190,7 +190,7 @@ function Header({
   const terminal = isTerminalStatus(execution.status);
   const canCancel = can(permissions, "executions:cancel") && !terminal;
   const canRetry = can(permissions, "executions:launch") && terminal && execution.agent !== null;
-  const canExport = permissions?.permissions.includes("exports:create") ?? false;
+  const canExport = can(permissions, "exports:create");
   const cancelling = Boolean(execution.cancel_requested_at) && !terminal;
 
   return (

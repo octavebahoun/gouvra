@@ -18,7 +18,19 @@ export type Permission =
   | "executions:read"
   | "executions:launch"
   | "executions:cancel"
-  | "usage:read";
+  | "usage:read"
+  | "evaluations:read"
+  | "evaluations:write"
+  | "workflows:read"
+  | "workflows:write"
+  | "automations:read"
+  | "automations:manage"
+  | "connectors:manage"
+  | "budgets:manage"
+  | "retention:manage"
+  | "exports:create"
+  | "billing:read"
+  | "billing:manage";
 
 /**
  * UI helper to show, hide or disable actions with an explanation. It never replaces the server

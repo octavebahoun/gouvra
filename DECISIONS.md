@@ -113,4 +113,6 @@ Priorité en cas de conflit : `BRIEF.md` > `docs/ui.md` / `docs/conception.md` >
 - **D-100 — SMTP authentifié et chiffré** (`SMTP_SECURITY` starttls/ssl), refusé en clair en production ; Resend refusé sans clé.
 - **D-101 — Sauvegardes** au format personnalisé de `pg_dump`, vérifiées juste après l'écriture ; la restauration arrête les écrivains, restaure en une transaction, migre puis redémarre. `ENCRYPTION_KEYS` se conserve à part.
 - **D-102 — Illustrations animées décoratives exclues d'axe** (`data-decorative`, `aria-hidden`, décrites par une phrase) : leur texte fictif passe par des fondus ; tout le reste de l'interface reste audité.
+- **D-103 — Une migration commitée n'est jamais modifiée** (leçon de l'incident de la phase 6) ; une correction devient une nouvelle migration. Le retour arrière est explicite : `gouvra migrate --down <révision>` ou `-1`.
+- **D-104 — Comparaison d'évaluations orientée verdict** : une phrase (« la candidate fait mieux / moins bien / pareil ») avant les chiffres ; deltas colorés selon le sens utile (un coût ou une durée qui baisse est une amélioration) ; la plus ancienne des deux exécutions sélectionnées sert de référence.
 

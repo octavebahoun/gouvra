@@ -140,7 +140,8 @@ docker compose -f docker-compose.prod.yml up -d --build
 The `migrate` service applies schema migrations before the API and the worker start (they wait
 for it). `/readyz` reports `migrations: up_to_date` once done. Read the `CHANGELOG.md` entry of the
 release before upgrading. To roll back: restore the backup taken before the upgrade, then start
-the previous version.
+the previous version (or, when the release notes allow it, `gouvra migrate --down <revision>`
+before starting the previous images).
 
 ## Monitoring and diagnosis
 
@@ -162,7 +163,7 @@ Run inside the API image: `docker compose run --rm api gouvra <command>`.
 
 | Command | Purpose |
 |---|---|
-| `migrate` | Apply database migrations (run automatically by the `migrate` service). |
+| `migrate [revision] [--down]` | Apply database migrations (run automatically by the `migrate` service); `--down <revision>` or `-1` rolls back explicitly. |
 | `check-config [--live]` | Verify the configuration without printing any value. |
 | `create-superadmin <email>` | Grant instance administration to an existing account. |
 | `rotate-secrets` | Re-encrypt stored secrets with the first key of `ENCRYPTION_KEYS`. |

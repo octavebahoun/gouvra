@@ -230,6 +230,35 @@ export const router = createBrowserRouter([
                         Component: m.UsagePage,
                       })),
                   },
+                  // S — evaluations
+                  {
+                    path: "evaluations",
+                    lazy: () =>
+                      import("@/features/evaluations/evaluations-page").then((m) => ({
+                        Component: m.EvaluationsPage,
+                      })),
+                  },
+                  {
+                    path: "evaluations/suites/:suiteId",
+                    lazy: () =>
+                      import("@/features/evaluations/suite-page").then((m) => ({
+                        Component: m.SuitePage,
+                      })),
+                  },
+                  {
+                    path: "evaluations/runs/:runId",
+                    lazy: () =>
+                      import("@/features/evaluations/run-page").then((m) => ({
+                        Component: m.RunPage,
+                      })),
+                  },
+                  {
+                    path: "evaluations/compare",
+                    lazy: () =>
+                      import("@/features/evaluations/compare-page").then((m) => ({
+                        Component: m.ComparePage,
+                      })),
+                  },
                   // O — providers
                   {
                     path: "providers",

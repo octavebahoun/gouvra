@@ -4,8 +4,8 @@
 
 ## État
 
-- **Phases 1 à 5 terminées** (le socle est stabilisé et vérifié par la boucle de la section 9). Phase 6 : backend terminé, écrans à faire. Phase 7 : backend des workflows commencé (graphe, modèles, schémas — non commités).
-- **Tâche suivante :** écrans Évaluations (S) pour clore la phase 6, puis phase 7 (workflows, éditeur visuel, bac à sable).
+- **Phases 1 à 6 terminées.** Phase 7 : backend des workflows commencé (graphe, modèles, schémas — non commités).
+- **Tâche suivante :** phase 7 — service, orchestrateur et API des workflows, bac à sable des outils « code », éditeur visuel et visualisation d'exécution en direct.
 
 ## Brief mis à jour — 2026-10-11 03:56 (relu en entier)
 
@@ -41,7 +41,7 @@
 | 3 | Agent simple | **fait** (2026-10-11) | Une exécution réelle, tracée de bout en bout |
 | 4 | Exploitation | **fait** (2026-10-11) | Diagnostic d'un échec depuis l'UI |
 | 5 | Stabilisation du socle | **fait** (2026-10-11) | Section 9 du brief validée sur le socle |
-| 6 | Évaluations | backend **fait** (comparaison v1/v2 vérifiée par l'API) ; web à faire | Comparaison de deux versions d'agent |
+| 6 | Évaluations | **fait** (2026-10-11) | Comparaison de deux versions d'agent |
 | 7 | Workflows | à faire | Workflow multi-étapes exécuté et visualisé en direct |
 | 8 | Automatisation | à faire | Tâche planifiée et webhook signé testés |
 | 9 | SaaS | à faire | Parcours d'abonnement testé en mode test |
@@ -103,4 +103,10 @@
   7. `pip-audit` (dépendances de production) et `pnpm audit` : aucune vulnérabilité ;
   8. revue sécurité section 10 : `docs/security-review.md` (points ouverts rattachés aux phases 7–9).
 - Production vérifiée en local (`DOMAIN=localhost`) : redirection 308, HTTPS, `/readyz`, en-têtes, conteneurs durcis, contrôle d'origine (403 depuis une origine étrangère). Sauvegarde → restauration vérifiée (mêmes comptes, même schéma).
+
+### Phase 6 (interface) — 2026-10-11
+- Écran S : suites (cartes avec dernier taux de réussite), exécutions récentes avec sélection de deux runs à comparer, suite (cas avec import JSON, critères par défaut, exécutions, réglages), éditeur de critères avec essai immédiat des critères déterministes, lancement sur une version ou une variante (modèle, fournisseur, instructions), run en direct (anneau de réussite, barre de résultats, détails par cas, lien vers la trace), comparaison (verdict, deltas, filtres améliorés / dégradés / inchangés).
+- Critère de sortie **dans l'interface** (Playwright) : suite créée, 3 cas importés, run sur v1 (3 échecs), agent passé en JSON (v2), run sur v2 (3 réussites), comparaison « La candidate fait mieux », 3 améliorés, 0 dégradé ✔.
+- E2E : **47/47** sur le build de production (identité, construire & exploiter, évaluations, audits axe de chaque écran à 3 largeurs × 2 thèmes).
+- Incident local corrigé : la base de dev avait reçu une version antérieure de la migration 0004 (modifiée avant son commit) ; migration rejouée (`-1` puis `head`). Ajout de `gouvra migrate --down <révision>` : un retour arrière n'est plus jamais implicite.
 

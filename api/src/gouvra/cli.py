@@ -21,7 +21,8 @@ def alembic_config() -> Config:
 
 def cmd_migrate(args: argparse.Namespace) -> int:
     cfg = alembic_config()
-    if args.revision.startswith("-"):
+    # Rolling back is always explicit: `--down <revision>` or a relative step such as `-1`.
+    if args.down or args.revision.startswith("-"):
         command.downgrade(cfg, args.revision)
     else:
         command.upgrade(cfg, args.revision)
@@ -84,6 +85,9 @@ def main(argv: list[str] | None = None) -> int:
 
     migrate = sub.add_parser("migrate", help="Apply (or roll back) database migrations")
     migrate.add_argument("revision", nargs="?", default="head", help="'head', a revision, or '-1'")
+    migrate.add_argument(
+        "--down", action="store_true", help="roll back to REVISION (e.g. before an upgrade)"
+    )
     migrate.set_defaults(func=cmd_migrate)
 
     export = sub.add_parser("export-openapi", help="Write the OpenAPI schema to a file")

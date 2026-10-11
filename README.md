@@ -26,7 +26,7 @@ tool calls, tokens, costs and errors. When something fails, Gouvra tells you why
 - **Honest costs** — reported by the provider, estimated from published prices, or marked
   unavailable; never an invented number. Usage by period, agent and model.
 - **Evaluations** — suites of cases graded by exact match, keywords, regex, JSON Schema or an LLM
-  judge; compare two agent versions case by case (API; interface in progress).
+  judge; run them on a version or a variant and compare two runs case by case.
 - **Teams** — workspaces, roles (owner, admin, member, viewer), invitations, service keys, audit
   log; isolation between workspaces tested on every route.
 - **Yours** — self-hosted with one command, Apache-2.0, documented REST API, English and French

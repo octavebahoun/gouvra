@@ -2,6 +2,7 @@ import frAccount from "./account.json";
 import frAgents from "./agents.json";
 import frAuth from "./auth.json";
 import frCommon from "./common.json";
+import frEvaluations from "./evaluations.json";
 import frExecutions from "./executions.json";
 import frOnboarding from "./onboarding.json";
 import frProviders from "./providers.json";
@@ -17,6 +18,7 @@ const bundle = {
   agents: frAgents,
   auth: frAuth,
   common: frCommon,
+  evaluations: frEvaluations,
   executions: frExecutions,
   onboarding: frOnboarding,
   providers: frProviders,

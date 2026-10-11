@@ -6,11 +6,16 @@ import {
   createApiKey,
   createBuiltinTool,
   createScriptedProvider,
+  createSuite,
+  importCases,
   createVerifiedUser,
   createWorkspace,
   launchExecution,
   signIn,
+  startRun,
+  updateAgent,
   waitForExecution,
+  waitForRun,
   type SeededUser,
   type SeededWorkspace,
 } from "./support/api";
@@ -19,7 +24,15 @@ import {
  * Every screen, at the width of the running project (desktop, tablet, mobile) and in both
  * themes: no serious or critical axe violation (WCAG 2.2 AA) and no sideways scrolling.
  */
-type Ids = { tool: string; agent: string; succeeded: string; failed: string };
+type Ids = {
+  tool: string;
+  agent: string;
+  succeeded: string;
+  failed: string;
+  suite: string;
+  runA: string;
+  runB: string;
+};
 type Screen = {
   name: string;
   path: (w: SeededWorkspace, ids: Ids) => string;
@@ -85,6 +98,22 @@ const SIGNED_IN: Screen[] = [
     ready: "Support triage",
   },
   { name: "usage", path: (w) => `/w/${w.slug}/usage`, ready: "Usage" },
+  { name: "evaluations", path: (w) => `/w/${w.slug}/evaluations`, ready: "Evaluations" },
+  {
+    name: "suite",
+    path: (w, ids) => `/w/${w.slug}/evaluations/suites/${ids.suite}`,
+    ready: "Answers",
+  },
+  {
+    name: "run",
+    path: (w, ids) => `/w/${w.slug}/evaluations/runs/${ids.runB}`,
+    ready: "After",
+  },
+  {
+    name: "compare",
+    path: (w, ids) => `/w/${w.slug}/evaluations/compare?base=${ids.runA}&candidate=${ids.runB}`,
+    ready: "Comparison",
+  },
 ];
 
 let owner: SeededUser;
@@ -115,7 +144,25 @@ test.beforeAll(async () => {
   const failed = await launchExecution(owner, agent.id, "Quota [fail:provider_rate_limited]");
   await waitForExecution(owner, succeeded.id);
   await waitForExecution(owner, failed.id);
-  ids = { tool: tool.id, agent: agent.id, succeeded: succeeded.id, failed: failed.id };
+  const suite = await createSuite(owner, workspace.id, { name: "Answers", agent_id: agent.id });
+  await importCases(owner, suite.id, [
+    { name: "Greeting", input: "hello", expected: "Echo: hello" },
+    { name: "Thanks", input: "thanks", expected: "Echo: thanks" },
+  ]);
+  const runA = await startRun(owner, { suite_id: suite.id, agent_id: agent.id, label: "Before" });
+  await waitForRun(owner, runA.id);
+  await updateAgent(owner, agent.id, { instructions: "Be brief." });
+  const runB = await startRun(owner, { suite_id: suite.id, agent_id: agent.id, label: "After" });
+  await waitForRun(owner, runB.id);
+  ids = {
+    tool: tool.id,
+    agent: agent.id,
+    succeeded: succeeded.id,
+    failed: failed.id,
+    suite: suite.id,
+    runA: runA.id,
+    runB: runB.id,
+  };
 });
 
 async function audit(page: Page, screen: Screen, label: string): Promise<void> {
@@ -133,10 +180,17 @@ for (const scheme of ["light", "dark"] as const) {
       for (const screen of PUBLIC) await audit(page, screen, `${screen.name} (${scheme})`);
     });
 
-    test("signed-in screens", async ({ context, page }) => {
-      await signIn(context, owner);
-      for (const screen of SIGNED_IN) await audit(page, screen, `${screen.name} (${scheme})`);
-    });
+    // Signed-in screens in groups of five, so each test stays short and failures point at a group.
+    for (let start = 0; start < SIGNED_IN.length; start += 5) {
+      const group = SIGNED_IN.slice(start, start + 5);
+      test(`signed-in screens: ${group.map((screen) => screen.name).join(", ")}`, async ({
+        context,
+        page,
+      }) => {
+        await signIn(context, owner);
+        for (const screen of group) await audit(page, screen, `${screen.name} (${scheme})`);
+      });
+    }
 
     test("onboarding", async ({ context, page }) => {
       await signIn(context, newcomer);

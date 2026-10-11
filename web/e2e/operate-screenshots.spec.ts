@@ -4,11 +4,16 @@ import {
   createAgent,
   createBuiltinTool,
   createScriptedProvider,
+  createSuite,
   createVerifiedUser,
   createWorkspace,
+  importCases,
   launchExecution,
   signIn,
+  startRun,
+  updateAgent,
   waitForExecution,
+  waitForRun,
 } from "./support/api";
 
 /**
@@ -64,6 +69,42 @@ test("capture build & operate screens", async ({ browser }) => {
   await waitForExecution(owner, ok.id);
   await waitForExecution(owner, failed.id);
 
+  // Evaluations: one suite run before and after switching the agent to JSON answers.
+  const suite = await createSuite(owner, workspace.id, {
+    name: "JSON answers",
+    description: "Replies must be JSON objects with an answer field.",
+    agent_id: triage.id,
+    default_graders: [
+      {
+        type: "json_schema",
+        schema: {
+          type: "object",
+          required: ["answer"],
+          properties: { answer: { type: "string" } },
+        },
+      },
+    ],
+  });
+  await importCases(owner, suite.id, [
+    { name: "Refund request", input: "I want a refund for order 12", tags: ["billing"] },
+    { name: "Invoice copy", input: "Send me an invoice copy", tags: ["billing"] },
+    { name: "Bug report", input: "The export button does nothing", tags: ["bug"] },
+    { name: "Plan question", input: "Which plan includes SSO?", tags: ["question"] },
+  ]);
+  const before = await startRun(owner, {
+    suite_id: suite.id,
+    agent_id: triage.id,
+    label: "Text answers",
+  });
+  await waitForRun(owner, before.id);
+  await updateAgent(owner, triage.id, { parameters: { response_format: "json" } });
+  const after = await startRun(owner, {
+    suite_id: suite.id,
+    agent_id: triage.id,
+    label: "JSON mode",
+  });
+  await waitForRun(owner, after.id);
+
   const base = `/w/${workspace.slug}`;
   const screens: {
     name: string;
@@ -104,6 +145,14 @@ test("capture build & operate screens", async ({ browser }) => {
     { name: "execution-succeeded", path: `${base}/executions/${ok.id}`, ready: "Support triage" },
     { name: "execution-failed", path: `${base}/executions/${failed.id}`, ready: "Support triage" },
     { name: "usage", path: `${base}/usage`, ready: "Usage" },
+    { name: "evaluations", path: `${base}/evaluations`, ready: "Evaluations" },
+    { name: "suite", path: `${base}/evaluations/suites/${suite.id}`, ready: "JSON answers" },
+    { name: "eval-run", path: `${base}/evaluations/runs/${after.id}`, ready: "JSON mode" },
+    {
+      name: "eval-compare",
+      path: `${base}/evaluations/compare?base=${before.id}&candidate=${after.id}`,
+      ready: "Comparison",
+    },
   ];
 
   for (const [viewportName, viewport] of Object.entries(VIEWPORTS)) {

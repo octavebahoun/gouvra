@@ -18,7 +18,8 @@ All notable changes are documented here. The format follows
 - Executions: asynchronous queue with leases, limits, cancellation, retries, live traces over
   Server-Sent Events with token streaming, failure diagnosis and JSON export.
 - Overview and usage with cost provenance (reported, estimated, unavailable), by agent and model.
-- Evaluations API: suites, cases, graders (exact, contains, regex, JSON Schema, LLM judge), runs
-  on versions or variants, case-by-case comparison.
+- Evaluations: suites, cases (with JSON import), graders (exact, contains, regex, JSON Schema, LLM
+  judge) with a live try-out, runs on a version or a variant (model, provider, instructions) with
+  results arriving live, and a case-by-case comparison of two runs.
 - Public site, English and French interface, light and dark themes, accessibility audits.
 - Production deployment with automatic HTTPS, backups and restores, secret rotation commands.
