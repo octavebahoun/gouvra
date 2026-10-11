@@ -1,0 +1,51 @@
+{
+  "title": "Connectors",
+  "description": "Connect services your agents can act on. Credentials are encrypted and never shown again; each operation becomes a tool you allow per agent.",
+  "readOnly": "You can see connections. Adding and changing them needs the admin role.",
+  "category": {
+    "messaging": "Messaging",
+    "developer": "Developer",
+    "custom": "Custom"
+  },
+  "connections": {
+    "title": "Your connections",
+    "empty": "No connection yet: pick a service below.",
+    "agents_one": "Used by {{count}} agent",
+    "agents_other": "Used by {{count}} agents",
+    "check": "Check",
+    "edit": "Edit",
+    "remove": "Remove",
+    "removeTitle": "Remove “{{name}}”?",
+    "removeBody_one": "Its credentials are erased and its tools archived; {{count}} agent loses them.",
+    "removeBody_other": "Its credentials are erased and its tools archived; {{count}} agents lose them.",
+    "removed": "Connection removed"
+  },
+  "status": {
+    "ok": "Working",
+    "error": "Problem",
+    "unverified": "Not verified yet"
+  },
+  "library": {
+    "title": "Library",
+    "description": "Ready-made integrations. Requests are built by Gouvra from checked arguments and sent only to the service's own hosts.",
+    "connect": "Connect",
+    "docs": "How to get the credentials",
+    "readOnly": "read-only"
+  },
+  "connect": {
+    "title": "Connect {{name}}",
+    "description": "The credentials are encrypted at rest and never shown again.",
+    "name": "Name",
+    "nameHelp": "Shown in tool names, e.g. “Support Slack”.",
+    "submit": "Connect",
+    "created_one": "“{{name}}” connected: {{count}} tool added",
+    "created_other": "“{{name}}” connected: {{count}} tools added",
+    "tools": "Tools added: {{tools}}. Allow them for an agent in its settings."
+  },
+  "edit": {
+    "title": "Edit “{{name}}”",
+    "replace": "Replace the credentials",
+    "replaceHelp": "Leave empty to keep the current ones (they are never displayed).",
+    "saved": "Connection saved"
+  }
+}

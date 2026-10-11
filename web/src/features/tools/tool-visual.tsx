@@ -1,13 +1,14 @@
-import { Braces, Globe, Sparkles, WifiOff } from "lucide-react";
+import { Braces, Globe, Plug, Sparkles, WifiOff } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { Badge } from "@/components/ui/badge";
 
-const ICONS = { builtin: Sparkles, http: Globe, code: Braces } as const;
+const ICONS = { builtin: Sparkles, http: Globe, code: Braces, connector: Plug } as const;
 const TONES = {
   builtin: "bg-brand-soft text-brand-text",
   http: "bg-warning-soft text-warning-text",
   code: "bg-success-soft text-success-text",
+  connector: "bg-neutral-soft text-ink",
 } as const;
 
 export function ToolMark({ kind, className }: { kind: string; className?: string }) {

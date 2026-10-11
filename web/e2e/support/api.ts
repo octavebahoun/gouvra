@@ -301,3 +301,39 @@ export async function waitForWorkflowRun(owner: SeededUser, runId: string, timeo
   }
   throw new Error(`Workflow run ${runId} did not finish within ${timeoutMs} ms`);
 }
+
+type SeededAutomation = {
+  id: string;
+  name: string;
+  secret: string | null;
+  hook_url: string | null;
+};
+
+export async function createAutomation(
+  owner: SeededUser,
+  workspaceId: string,
+  body: Record<string, unknown>,
+) {
+  return call<SeededAutomation>("POST", `/workspaces/${workspaceId}/automations`, {
+    body,
+    cookies: owner.cookies,
+  });
+}
+
+export async function runAutomation(owner: SeededUser, automationId: string) {
+  return call<unknown>("POST", `/automations/${automationId}/run`, {
+    body: { input: { event: "test" } },
+    cookies: owner.cookies,
+  });
+}
+
+export async function createConnection(
+  owner: SeededUser,
+  workspaceId: string,
+  body: Record<string, unknown>,
+) {
+  return call<{ id: string }>("POST", `/workspaces/${workspaceId}/connections`, {
+    body,
+    cookies: owner.cookies,
+  });
+}

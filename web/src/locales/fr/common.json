@@ -13,7 +13,8 @@
     "loading": "Chargement…",
     "copyValue": "Copier {{label}}",
     "newContentAnnounced": "{{count}} nouvel élément",
-    "newContentAnnounced_other": "{{count}} nouveaux éléments"
+    "newContentAnnounced_other": "{{count}} nouveaux éléments",
+    "newTab": "s'ouvre dans un nouvel onglet"
   },
   "nav": {
     "overview": "Vue d'ensemble",

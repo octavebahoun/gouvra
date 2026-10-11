@@ -4,7 +4,9 @@ import {
   addMember,
   createAgent,
   createApiKey,
+  createAutomation,
   createBuiltinTool,
+  createConnection,
   createScriptedProvider,
   createSuite,
   createWorkflow,
@@ -13,6 +15,7 @@ import {
   createWorkspace,
   launchExecution,
   publishWorkflow,
+  runAutomation,
   signIn,
   startRun,
   startWorkflowRun,
@@ -38,6 +41,7 @@ type Ids = {
   runB: string;
   workflow: string;
   workflowRun: string;
+  webhook: string;
 };
 type Screen = {
   name: string;
@@ -126,6 +130,14 @@ const SIGNED_IN: Screen[] = [
     path: (w, ids) => `/w/${w.slug}/workflows/${ids.workflow}`,
     ready: "Ticket routing",
   },
+  { name: "automations", path: (w) => `/w/${w.slug}/automations`, ready: "Automations" },
+  {
+    name: "automation",
+    path: (w, ids) => `/w/${w.slug}/automations/${ids.webhook}`,
+    ready: "Ticket created",
+  },
+  { name: "connectors", path: (w) => `/w/${w.slug}/connectors`, ready: "Connectors" },
+  { name: "registry", path: (w) => `/w/${w.slug}/registry`, ready: "Registry" },
   {
     name: "workflow-run",
     path: (w, ids) => `/w/${w.slug}/workflows/runs/${ids.workflowRun}`,
@@ -215,7 +227,29 @@ test.beforeAll(async () => {
     input: "This is urgent: the export fails",
   });
   await waitForWorkflowRun(owner, workflowRun.id);
+  await createAutomation(owner, workspace.id, {
+    name: "Morning digest",
+    kind: "schedule",
+    target_type: "agent",
+    agent_id: agent.id,
+    cron: "0 9 * * 1-5",
+    timezone: "Europe/Paris",
+    input: "Summarise yesterday's tickets",
+  });
+  const webhook = await createAutomation(owner, workspace.id, {
+    name: "Ticket created",
+    kind: "webhook",
+    target_type: "agent",
+    agent_id: agent.id,
+  });
+  await runAutomation(owner, webhook.id);
+  await createConnection(owner, workspace.id, {
+    connector: "slack",
+    name: "Support Slack",
+    credentials: { webhook_url: "https://hooks.slack.com/services/T000/B000/abcdefabcdef" },
+  });
   ids = {
+    webhook: webhook.id,
     workflow: workflow.id,
     workflowRun: workflowRun.id,
     tool: tool.id,

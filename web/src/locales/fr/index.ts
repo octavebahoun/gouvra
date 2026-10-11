@@ -1,11 +1,14 @@
 import frAccount from "./account.json";
 import frAgents from "./agents.json";
+import frAutomations from "./automations.json";
 import frAuth from "./auth.json";
 import frCommon from "./common.json";
+import frConnectors from "./connectors.json";
 import frEvaluations from "./evaluations.json";
 import frExecutions from "./executions.json";
 import frOnboarding from "./onboarding.json";
 import frProviders from "./providers.json";
+import frRegistry from "./registry.json";
 import frSettings from "./settings.json";
 import frShell from "./shell.json";
 import frSite from "./site.json";
@@ -17,12 +20,15 @@ import frWorkflows from "./workflows.json";
 const bundle = {
   account: frAccount,
   agents: frAgents,
+  automations: frAutomations,
   auth: frAuth,
   common: frCommon,
+  connectors: frConnectors,
   evaluations: frEvaluations,
   executions: frExecutions,
   onboarding: frOnboarding,
   providers: frProviders,
+  registry: frRegistry,
   settings: frSettings,
   shell: frShell,
   site: frSite,

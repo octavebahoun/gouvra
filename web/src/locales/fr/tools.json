@@ -7,12 +7,14 @@
   "kinds": {
     "builtin": "Intégré",
     "http": "API HTTP",
-    "code": "Code"
+    "code": "Code",
+    "connector": "Connecteur"
   },
   "kindDescriptions": {
     "builtin": "Des capacités prêtes à l'emploi et sûres, exécutées dans Gouvra.",
     "http": "Appelle un point d'accès d'une API que vous autorisez, avec un identifiant facultatif.",
-    "code": "Votre propre code Python ou JavaScript, exécuté dans un bac à sable isolé, sans réseau par défaut."
+    "code": "Votre propre code Python ou JavaScript, exécuté dans un bac à sable isolé, sans réseau par défaut.",
+    "connector": "Une opération d'un service connecté (Slack, GitHub…), gérée par sa connexion."
   },
   "status": {
     "active": "Actif",
@@ -107,7 +109,10 @@
     "archiveBody": "Les agents n'y ont plus accès. Les traces passées conservent leurs appels.",
     "archived": "{{name}} archivé",
     "notFoundTitle": "Outil introuvable",
-    "notFoundBody": "Il n'existe pas ou appartient à un autre workspace."
+    "notFoundBody": "Il n'existe pas ou appartient à un autre workspace.",
+    "manageConnection": "Gérer la connexion",
+    "connection": "Connexion",
+    "connectionManaged": "Identifiants et schéma sont gérés sur la page Connecteurs."
   },
   "console": {
     "title": "Essayer l'outil",

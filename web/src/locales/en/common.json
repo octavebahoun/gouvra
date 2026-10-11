@@ -13,7 +13,8 @@
     "loading": "Loading…",
     "copyValue": "Copy {{label}}",
     "newContentAnnounced": "{{count}} new item",
-    "newContentAnnounced_other": "{{count}} new items"
+    "newContentAnnounced_other": "{{count}} new items",
+    "newTab": "opens in a new tab"
   },
   "nav": {
     "overview": "Overview",

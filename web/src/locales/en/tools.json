@@ -7,12 +7,14 @@
   "kinds": {
     "builtin": "Built-in",
     "http": "HTTP API",
-    "code": "Code"
+    "code": "Code",
+    "connector": "Connector"
   },
   "kindDescriptions": {
     "builtin": "Ready-made, safe capabilities that run inside Gouvra.",
     "http": "Call one endpoint of an API you allow, with an optional credential.",
-    "code": "Your own Python or JavaScript, run in an isolated sandbox without network by default."
+    "code": "Your own Python or JavaScript, run in an isolated sandbox without network by default.",
+    "connector": "An operation of a connected service (Slack, GitHub…), managed by its connection."
   },
   "status": {
     "active": "Active",
@@ -107,7 +109,10 @@
     "archiveBody": "Agents lose access to it. Past traces keep their calls.",
     "archived": "{{name}} archived",
     "notFoundTitle": "Tool not found",
-    "notFoundBody": "It doesn't exist or belongs to another workspace."
+    "notFoundBody": "It doesn't exist or belongs to another workspace.",
+    "manageConnection": "Manage the connection",
+    "connection": "Connection",
+    "connectionManaged": "Credentials and schema are managed on the Connectors page."
   },
   "console": {
     "title": "Try the tool",

@@ -1,0 +1,51 @@
+{
+  "title": "Connecteurs",
+  "description": "Connectez les services sur lesquels vos agents peuvent agir. Les identifiants sont chiffrés et jamais réaffichés ; chaque opération devient un outil à autoriser par agent.",
+  "readOnly": "Vous pouvez voir les connexions. Les ajouter et les modifier demande le rôle admin.",
+  "category": {
+    "messaging": "Messagerie",
+    "developer": "Développement",
+    "custom": "Sur mesure"
+  },
+  "connections": {
+    "title": "Vos connexions",
+    "empty": "Aucune connexion pour l'instant : choisissez un service ci-dessous.",
+    "agents_one": "Utilisée par {{count}} agent",
+    "agents_other": "Utilisée par {{count}} agents",
+    "check": "Vérifier",
+    "edit": "Modifier",
+    "remove": "Retirer",
+    "removeTitle": "Retirer « {{name}} » ?",
+    "removeBody_one": "Ses identifiants sont effacés et ses outils archivés ; {{count}} agent les perd.",
+    "removeBody_other": "Ses identifiants sont effacés et ses outils archivés ; {{count}} agents les perdent.",
+    "removed": "Connexion retirée"
+  },
+  "status": {
+    "ok": "Fonctionne",
+    "error": "Problème",
+    "unverified": "Pas encore vérifiée"
+  },
+  "library": {
+    "title": "Bibliothèque",
+    "description": "Des intégrations prêtes à l'emploi. Les requêtes sont construites par Gouvra à partir d'arguments vérifiés et envoyées uniquement aux serveurs du service.",
+    "connect": "Connecter",
+    "docs": "Obtenir les identifiants",
+    "readOnly": "lecture seule"
+  },
+  "connect": {
+    "title": "Connecter {{name}}",
+    "description": "Les identifiants sont chiffrés au repos et jamais réaffichés.",
+    "name": "Nom",
+    "nameHelp": "Apparaît dans le nom des outils, ex. « Slack support ».",
+    "submit": "Connecter",
+    "created_one": "« {{name}} » connecté : {{count}} outil ajouté",
+    "created_other": "« {{name}} » connecté : {{count}} outils ajoutés",
+    "tools": "Outils ajoutés : {{tools}}. Autorisez-les pour un agent dans ses réglages."
+  },
+  "edit": {
+    "title": "Modifier « {{name}} »",
+    "replace": "Remplacer les identifiants",
+    "replaceHelp": "Laissez vide pour garder les actuels (ils ne sont jamais affichés).",
+    "saved": "Connexion enregistrée"
+  }
+}

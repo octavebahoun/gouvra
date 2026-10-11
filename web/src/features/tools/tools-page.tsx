@@ -158,7 +158,7 @@ function ToolCard({ tool, to }: { tool: Tool; to: string }) {
           </div>
           <p className="mt-1 line-clamp-2 text-[13px] text-muted">{tool.description}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Badge tone="outline">{t(`kinds.${tool.kind as ToolKind}`)}</Badge>
+            <Badge tone="outline">{t(`kinds.${tool.kind as ToolKind | "connector"}`)}</Badge>
             <NetworkBadge usesNetwork={tool.uses_network} />
             <span className="text-xs text-muted">{t("usedBy", { count: tool.agent_count })}</span>
           </div>

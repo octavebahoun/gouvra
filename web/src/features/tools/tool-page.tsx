@@ -138,7 +138,7 @@ function ToolHeader({
         }
         meta={
           <>
-            <Badge tone="outline">{t(`kinds.${tool.kind as ToolKind}`)}</Badge>
+            <Badge tone="outline">{t(`kinds.${tool.kind as ToolKind | "connector"}`)}</Badge>
             <Badge tone={active ? "success" : "neutral"}>
               {t(`status.${active ? "active" : "disabled"}`)}
             </Badge>
@@ -170,7 +170,11 @@ function ToolHeader({
                 />
                 {active ? t("detail.disable") : t("detail.enable")}
               </label>
-              {tool.kind !== "builtin" || tool.builtin_key === "http_request" ? (
+              {tool.kind === "connector" ? (
+                <Button asChild variant="secondary" leftIcon={<Pencil aria-hidden />}>
+                  <Link to={`${basePath}/connectors`}>{t("detail.manageConnection")}</Link>
+                </Button>
+              ) : tool.kind !== "builtin" || tool.builtin_key === "http_request" ? (
                 <Button
                   variant="secondary"
                   leftIcon={<Pencil aria-hidden />}
@@ -307,6 +311,9 @@ function ToolOverview({ tool }: { tool: Tool }) {
         ? t("detail.credentialSet", { hint: tool.secret_hint ?? "••••" })
         : t("detail.credentialNone"),
     ]);
+  }
+  if (tool.kind === "connector") {
+    rows.push([t("detail.connection"), t("detail.connectionManaged")]);
   }
   rows.push([t("form.timeoutMs"), `${tool.timeout_ms.toLocaleString()} ms`]);
   rows.push([t("usedBy", { count: tool.agent_count }), ""]);

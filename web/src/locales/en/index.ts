@@ -1,11 +1,14 @@
 import enAccount from "./account.json";
 import enAgents from "./agents.json";
+import enAutomations from "./automations.json";
 import enAuth from "./auth.json";
 import enCommon from "./common.json";
+import enConnectors from "./connectors.json";
 import enEvaluations from "./evaluations.json";
 import enExecutions from "./executions.json";
 import enOnboarding from "./onboarding.json";
 import enProviders from "./providers.json";
+import enRegistry from "./registry.json";
 import enSettings from "./settings.json";
 import enShell from "./shell.json";
 import enSite from "./site.json";
@@ -17,12 +20,15 @@ import enWorkflows from "./workflows.json";
 const bundle = {
   account: enAccount,
   agents: enAgents,
+  automations: enAutomations,
   auth: enAuth,
   common: enCommon,
+  connectors: enConnectors,
   evaluations: enEvaluations,
   executions: enExecutions,
   onboarding: enOnboarding,
   providers: enProviders,
+  registry: enRegistry,
   settings: enSettings,
   shell: enShell,
   site: enSite,

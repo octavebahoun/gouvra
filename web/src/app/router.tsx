@@ -281,6 +281,35 @@ export const router = createBrowserRouter([
                         Component: m.WorkflowPage,
                       })),
                   },
+                  // Automations
+                  {
+                    path: "automations",
+                    lazy: () =>
+                      import("@/features/automations/automations-page").then((m) => ({
+                        Component: m.AutomationsPage,
+                      })),
+                  },
+                  {
+                    path: "automations/:automationId",
+                    lazy: () =>
+                      import("@/features/automations/automation-page").then((m) => ({
+                        Component: m.AutomationPage,
+                      })),
+                  },
+                  {
+                    path: "connectors",
+                    lazy: () =>
+                      import("@/features/connectors/connectors-page").then((m) => ({
+                        Component: m.ConnectorsPage,
+                      })),
+                  },
+                  {
+                    path: "registry",
+                    lazy: () =>
+                      import("@/features/registry/registry-page").then((m) => ({
+                        Component: m.RegistryPage,
+                      })),
+                  },
                   // O — providers
                   {
                     path: "providers",

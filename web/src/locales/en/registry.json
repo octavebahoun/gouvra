@@ -1,0 +1,47 @@
+{
+  "title": "Registry",
+  "description": "Every model and tool this workspace can use: prices, capabilities, and which agents rely on them.",
+  "sections": "Registry sections",
+  "usedBy": "Used by",
+  "more": "+{{count}} more",
+  "models": {
+    "tab": "Models",
+    "search": "Search models",
+    "filter": "Show",
+    "filters": {
+      "all": "All",
+      "configured": "Ready to use",
+      "used": "In use"
+    },
+    "none": "No model matches.",
+    "recommended": "Recommended",
+    "context": "{{size}} context",
+    "capabilities": "Capabilities",
+    "caps": {
+      "tools": "Calls tools",
+      "json": "JSON output",
+      "vision": "Reads images",
+      "reasoning": "Reasoning"
+    },
+    "price": "{{input}} in · {{output}} out",
+    "perMillion": "per million tokens",
+    "asOf": "published price, {{date}}",
+    "noPrice": "No published price: costs are marked unavailable.",
+    "configure": "Add a provider to use it",
+    "unused": "Not used by an agent yet"
+  },
+  "tools": {
+    "tab": "Tools",
+    "kind": {
+      "builtin": "Built-in",
+      "http": "HTTP API",
+      "code": "Code",
+      "connector": "Connector"
+    },
+    "network": "Network",
+    "available": "Not added",
+    "add": "Add",
+    "added": "“{{name}}” added to the workspace",
+    "unused": "Not allowed for an agent yet"
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "title": "Registre",
+  "description": "Tous les modèles et outils utilisables dans cet espace : prix, capacités, et quels agents s'en servent.",
+  "sections": "Sections du registre",
+  "usedBy": "Utilisé par",
+  "more": "+{{count}} autres",
+  "models": {
+    "tab": "Modèles",
+    "search": "Rechercher un modèle",
+    "filter": "Afficher",
+    "filters": {
+      "all": "Tous",
+      "configured": "Prêts à l'emploi",
+      "used": "Utilisés"
+    },
+    "none": "Aucun modèle ne correspond.",
+    "recommended": "Recommandé",
+    "context": "contexte {{size}}",
+    "capabilities": "Capacités",
+    "caps": {
+      "tools": "Appelle des outils",
+      "json": "Sortie JSON",
+      "vision": "Lit les images",
+      "reasoning": "Raisonnement"
+    },
+    "price": "{{input}} en entrée · {{output}} en sortie",
+    "perMillion": "par million de tokens",
+    "asOf": "prix publié, {{date}}",
+    "noPrice": "Pas de prix publié : les coûts sont marqués indisponibles.",
+    "configure": "Ajoutez un fournisseur pour l'utiliser",
+    "unused": "Utilisé par aucun agent pour l'instant"
+  },
+  "tools": {
+    "tab": "Outils",
+    "kind": {
+      "builtin": "Intégré",
+      "http": "API HTTP",
+      "code": "Code",
+      "connector": "Connecteur"
+    },
+    "network": "Réseau",
+    "available": "Non ajouté",
+    "add": "Ajouter",
+    "added": "« {{name}} » ajouté à l'espace",
+    "unused": "Autorisé pour aucun agent pour l'instant"
+  }
+}
