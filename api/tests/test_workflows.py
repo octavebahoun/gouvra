@@ -427,6 +427,8 @@ async def test_multi_step_workflow_runs_both_branches(lab: dict[str, Any]) -> No
     assert parcel["status"] == "succeeded"
     assert parcel["output"]["text"] == "Echo: Reply to: Where is my parcel?"
     assert step(parcel, "check")["branch"] == "false"
+    # A condition passes the value it tested on (here the classifier's answer).
+    assert step(parcel, "check")["output"]["text"] == "Echo: Where is my parcel?"
     assert (statuses(parcel)["compute"], statuses(parcel)["confirm"]) == ("skipped", "skipped")
 
     listing = (
@@ -667,6 +669,24 @@ async def test_outputs_of_parallel_paths_and_runs_without_output(lab: dict[str, 
         ],
         [edge("start", "check"), edge("check", "end", "true")],
     )
+    after_condition = graph(
+        [
+            node("start", "start"),
+            node("check", "condition", value="{{input}}", operator="equals", operand="yes"),
+            node("shout", "transform", template="{{input}}!"),
+            node("end", "end"),
+        ],
+        [
+            edge("start", "check"),
+            edge("check", "shout", "true"),
+            edge("shout", "end"),
+            {**edge("check", "end", "false"), "id": "check-end-false"},
+        ],
+    )
+    run = await start(owner, await published(owner, ws_id, after_condition, "Joined"), "no")
+    await settle()
+    joined = await run_of(owner, run["id"])
+    assert (joined["status"], joined["output"]["text"]) == ("succeeded", "no")
     workflow = await create_workflow(owner, ws_id, one_way, name="One way")
     assert {i["code"] for i in workflow["issues"]} == {"no_false_branch"}  # a warning only
     assert workflow["can_publish"] is True

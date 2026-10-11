@@ -675,10 +675,11 @@ async def _start(
         else:
             _succeed(step, rendered, parsed, now)
     elif isinstance(node, g.ConditionNode):
+        # Like a switch, a condition passes the value it tested on to the branch it chose.
         result, value = g.evaluate(node, context)
         step.branch = "true" if result else "false"
         step.input = {"value": value[:2000], "operator": node.operator, "operand": node.operand}
-        _succeed(step, step.branch, {"result": result, "value": value[:2000]}, now)
+        _succeed(step, value, g.parse_json(value), now)
     elif isinstance(node, g.EndNode):
         _end(step, node, context, analysis, steps, now)
     elif isinstance(node, g.AgentNode):
