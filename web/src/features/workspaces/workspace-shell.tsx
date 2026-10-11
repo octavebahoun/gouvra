@@ -8,6 +8,7 @@ import { useSignOut } from "@/lib/auth/use-sign-out";
 import { AppShell } from "@/components/layout/app-shell";
 import { UserMenu, WorkspaceSwitcher, type WorkspaceOption } from "@/components/layout/shell-parts";
 import { CreateWorkspaceDialog } from "./create-workspace-dialog";
+import { SuspendedBanner } from "./suspended-banner";
 
 /** The part of the path after `/w/:slug/` ("settings/members"), kept when switching workspace. */
 function sectionOf(pathname: string, slug: string): string {
@@ -73,6 +74,9 @@ export function WorkspaceShell({
           <UserMenu user={session.user} collapsed={collapsed} onSignOut={() => signOut()} />
         )}
       >
+        {pathname.startsWith(`/w/${workspace.slug}`) ? (
+          <SuspendedBanner workspaceId={workspace.id} />
+        ) : null}
         {children}
       </AppShell>
       <CreateWorkspaceDialog open={creating} onOpenChange={setCreating} />

@@ -122,6 +122,38 @@ export const router = createBrowserRouter([
                     Component: m.AccountRoute,
                   })),
               },
+              // Instance administration (super-admins)
+              {
+                path: "admin",
+                lazy: () =>
+                  import("@/features/admin/admin-route").then((m) => ({
+                    Component: m.AdminRoute,
+                  })),
+                children: [
+                  { index: true, element: <Navigate to="workspaces" replace /> },
+                  {
+                    path: "workspaces",
+                    lazy: () =>
+                      import("@/features/admin/workspaces-tab").then((m) => ({
+                        Component: m.WorkspacesTab,
+                      })),
+                  },
+                  {
+                    path: "users",
+                    lazy: () =>
+                      import("@/features/admin/users-tab").then((m) => ({
+                        Component: m.UsersTab,
+                      })),
+                  },
+                  {
+                    path: "audit",
+                    lazy: () =>
+                      import("@/features/admin/audit-tab").then((m) => ({
+                        Component: m.AuditTab,
+                      })),
+                  },
+                ],
+              },
               // Workspace app shell
               {
                 path: "w/:slug",
@@ -170,6 +202,20 @@ export const router = createBrowserRouter([
                           })),
                       },
                       {
+                        path: "billing",
+                        lazy: () =>
+                          import("@/features/billing/billing-tab").then((m) => ({
+                            Component: m.BillingTab,
+                          })),
+                      },
+                      {
+                        path: "data",
+                        lazy: () =>
+                          import("@/features/workspaces/settings/data-tab").then((m) => ({
+                            Component: m.DataTab,
+                          })),
+                      },
+                      {
                         path: "audit",
                         lazy: () =>
                           import("@/features/workspaces/settings/audit-tab").then((m) => ({
@@ -177,6 +223,14 @@ export const router = createBrowserRouter([
                           })),
                       },
                     ],
+                  },
+                  // Simulated checkout (instances without a payment provider)
+                  {
+                    path: "settings/billing/checkout",
+                    lazy: () =>
+                      import("@/features/billing/simulated-checkout-page").then((m) => ({
+                        Component: m.SimulatedCheckoutPage,
+                      })),
                   },
                   // H, I, J — agents
                   {

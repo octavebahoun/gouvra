@@ -1,0 +1,67 @@
+{
+  "title": "Instance administration",
+  "description": "Every workspace and account of this Gouvra instance.",
+  "tabs": {
+    "label": "Administration sections",
+    "workspaces": "Workspaces",
+    "users": "Users",
+    "audit": "Audit log"
+  },
+  "plans": {
+    "free": "Free",
+    "team": "Team",
+    "business": "Business",
+    "self_hosted": "Self-hosted"
+  },
+  "overview": {
+    "users": "Users",
+    "workspaces": "Workspaces",
+    "suspended": "Suspended",
+    "runs": "Runs, 30 days",
+    "runs24h_one": "{{count}} in the last 24 h",
+    "runs24h_other": "{{count}} in the last 24 h",
+    "spend": "Model spend, 30 days",
+    "billing": "Billing: {{provider}}"
+  },
+  "workspaces": {
+    "search": "Search by name or slug",
+    "empty": "No workspace matches.",
+    "members_one": "{{count}} member",
+    "members_other": "{{count}} members",
+    "created": "created {{date}}",
+    "activity_one": "{{count}} run · {{spend}} (30 d)",
+    "activity_other": "{{count}} runs · {{spend}} (30 d)",
+    "demo": "Demo",
+    "statusSuspended": "Suspended",
+    "planFor": "Plan of {{name}}",
+    "planGranted": "{{name}} now has the {{plan}} plan",
+    "suspend": "Suspend",
+    "restore": "Restore",
+    "suspendTitle": "Suspend {{name}}?",
+    "suspendBody": "Members keep read access, but nothing can run or change until the workspace is restored: schedules and webhooks start no runs (each refusal is logged).",
+    "suspended": "{{name}} suspended",
+    "restored": "{{name}} restored"
+  },
+  "users": {
+    "search": "Search by e-mail or name",
+    "empty": "No account matches.",
+    "superadmin": "Super-admin",
+    "statusDisabled": "Disabled",
+    "unverified": "E-mail not verified",
+    "workspaces_one": "{{count}} workspace",
+    "workspaces_other": "{{count}} workspaces",
+    "joined": "joined {{date}}",
+    "you": "You",
+    "disable": "Disable",
+    "enable": "Enable",
+    "disableTitle": "Disable {{email}}?",
+    "disableBody": "The account is signed out everywhere and can no longer sign in. Its workspaces and data are kept.",
+    "disabled": "{{email}} disabled",
+    "enabled": "{{email}} enabled"
+  },
+  "audit": {
+    "empty": "Nothing recorded yet.",
+    "more": "Load more",
+    "system": "System"
+  }
+}

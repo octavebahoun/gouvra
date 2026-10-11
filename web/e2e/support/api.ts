@@ -1,3 +1,6 @@
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { fileURLToPath } from "node:url";
 import type { BrowserContext } from "@playwright/test";
 import { API_URL, BASE_URL, DEFAULT_PASSWORD, uniqueEmail } from "./env";
 import { tokenOf, waitForLink } from "./mailpit";
@@ -336,4 +339,37 @@ export async function createConnection(
     body,
     cookies: owner.cookies,
   });
+}
+
+// ---------------------------------------------------------------- billing & administration
+
+export type SeededBilling = { provider: string; test_mode: boolean; plan: { key: string } };
+
+export async function billingOf(owner: SeededUser, workspaceId: string) {
+  return call<SeededBilling>("GET", `/workspaces/${workspaceId}/billing`, {
+    cookies: owner.cookies,
+  });
+}
+
+export async function setBudget(
+  owner: SeededUser,
+  workspaceId: string,
+  body: Record<string, unknown>,
+) {
+  return call("PUT", `/workspaces/${workspaceId}/budget`, { body, cookies: owner.cookies });
+}
+
+const REPO_ROOT = fileURLToPath(new URL("../../..", import.meta.url));
+
+/**
+ * Instance administration is only granted from the command line, like on a real install.
+ * Asynchronous on purpose: blocking the event loop for seconds lets pooled keep-alive sockets go
+ * stale, and the next request on one fails with "other side closed".
+ */
+export async function promoteSuperadmin(user: SeededUser): Promise<void> {
+  await promisify(execFile)(
+    "docker",
+    ["compose", "exec", "-T", "api", "gouvra", "create-superadmin", user.email],
+    { cwd: REPO_ROOT },
+  );
 }

@@ -1,0 +1,138 @@
+{
+  "title": "Facturation",
+  "disabled": {
+    "title": "Aucune offre à gérer ici",
+    "body": "Cette instance est auto-hébergée : chaque espace a l'offre Auto-hébergé, sans quota ni facturation."
+  },
+  "testMode": {
+    "stripe": "Stripe en mode test — aucun paiement réel",
+    "card": "Payez avec la carte de test 4242 4242 4242 4242, une date d'expiration future et n'importe quel CVC.",
+    "simulated": "Facturation simulée",
+    "simulatedBody": "Cette instance n'a pas de prestataire de paiement : s'abonner change l'offre pour 30 jours, sans carte ni débit."
+  },
+  "current": {
+    "title": "Offre actuelle",
+    "description": "Ce que cet espace peut utiliser, et ce que ce mois a consommé.",
+    "granted": "Accordée par un administrateur",
+    "renewsOn": "Renouvellement le {{date}}",
+    "endsOn": "Prend fin le {{date}}, puis retour à Free",
+    "free": "Gratuit pour toujours, sans carte.",
+    "manage": "Gérer l'abonnement",
+    "cancelScheduled": "Retour à Free en fin de période"
+  },
+  "status": {
+    "active": "Active",
+    "trialing": "Essai",
+    "past_due": "Paiement en attente",
+    "canceled": "Annulée",
+    "incomplete": "Incomplète",
+    "unpaid": "Impayée"
+  },
+  "meter": {
+    "runs": "Runs ce mois-ci",
+    "agents": "Agents",
+    "members": "Membres et invitations",
+    "automations": "Automatisations",
+    "of": "{{used}} sur {{limit}}",
+    "unlimited": "{{used}} · illimité",
+    "period": "Période en cours : {{start}} – {{end}} (UTC)."
+  },
+  "plans": {
+    "title": "Offres",
+    "description": "Changez d'offre à tout moment ; les limites s'appliquent aussitôt.",
+    "yours": "Votre offre",
+    "perMonth": "/ mois",
+    "current": "Offre actuelle",
+    "upgrade": "Passer à {{plan}}",
+    "changePortal": "Changer dans le portail",
+    "downgrade": "Résilier en fin de période",
+    "downgradePortal": "Résilier dans le portail",
+    "ownerOnly": "Seul le propriétaire de l'espace peut changer d'offre.",
+    "features": {
+      "runs_one": "{{count}} run par mois",
+      "runs_other": "{{count}} runs par mois",
+      "runsUnlimited": "Runs illimités",
+      "agents_one": "{{count}} agent",
+      "agents_other": "{{count}} agents",
+      "agentsUnlimited": "Agents illimités",
+      "members_one": "{{count}} membre",
+      "members_other": "{{count}} membres",
+      "membersUnlimited": "Membres illimités",
+      "automations_one": "{{count}} automatisation",
+      "automations_other": "{{count}} automatisations",
+      "automationsUnlimited": "Automatisations illimitées",
+      "concurrency_one": "{{count}} run à la fois",
+      "concurrency_other": "{{count}} runs à la fois",
+      "retention_one": "Historique conservé jusqu'à {{count}} jour",
+      "retention_other": "Historique conservé jusqu'à {{count}} jours"
+    }
+  },
+  "checkout": {
+    "success": "Paiement reçu — activation de l'offre…",
+    "cancelled": "Paiement annulé : rien n'a été débité.",
+    "waiting": "Activation…",
+    "active": "Offre {{plan}} active"
+  },
+  "simulated": {
+    "title": "Confirmer l'offre",
+    "description": "Paiement simulé : ni carte, ni débit.",
+    "invalid": "Ce lien de paiement est invalide ou a expiré. Recommencez depuis Facturation.",
+    "subscribing": "Abonnement de {{workspace}} à",
+    "plan": "{{plan}} — {{price}} $ / mois",
+    "noCharge": "Rien n'est débité : l'offre est active 30 jours, puis l'espace revient à Free.",
+    "confirm": "Activer l'offre",
+    "back": "Retour à la facturation"
+  },
+  "budget": {
+    "title": "Budget mensuel",
+    "description": "Dépense en modèles ce mois-ci, avec des alertes avant la limite.",
+    "set": "Définir un budget",
+    "edit": "Modifier",
+    "of": "sur {{limit}}",
+    "none": "Aucun budget : les runs ne sont jamais arrêtés pour leur coût.",
+    "alertsAt": "Alertes à {{list}}",
+    "stops": "Bloque les nouveaux runs à 100 %",
+    "dialogTitle": "Budget mensuel",
+    "dialogDescription": "Propriétaires et admins reçoivent un e-mail et une alerte à chaque seuil, une fois par mois.",
+    "amount": "Limite par mois",
+    "amountHelp": "En dollars US, comparée au coût de tous les runs du mois.",
+    "invalid": "Saisissez un montant supérieur à 0.",
+    "thresholds": "Seuils d'alerte",
+    "thresholdsHelp": "Pourcentages de la limite.",
+    "hardStop": "Bloquer les nouveaux runs à 100 %",
+    "hardStopHelp": "Les runs en cours se terminent ; les nouveaux sont refusés jusqu'au mois suivant ou à un budget plus élevé.",
+    "remove": "Supprimer le budget",
+    "saved": "Budget enregistré",
+    "removed": "Budget supprimé"
+  },
+  "alerts": {
+    "title": "Alertes",
+    "description": "Budget, quota et paiements de cet espace.",
+    "dismiss": "Masquer l'alerte",
+    "kinds": {
+      "budget": "{{percent}} % du budget mensuel utilisé : {{spent}} sur {{limit}}.",
+      "quota": "{{percent}} % des runs inclus dans l'offre {{plan}} utilisés ({{used}} sur {{limit}}).",
+      "paymentFailed": "Un paiement a échoué : mettez à jour le moyen de paiement pour garder l'offre {{plan}}."
+    }
+  },
+  "retention": {
+    "title": "Conservation des données",
+    "description": "Durée de conservation du contenu des runs et du journal d'audit. L'usage et les coûts sont toujours conservés.",
+    "runs": "Runs, runs de workflow et alertes",
+    "runsHelp": "Supprimés après ce délai ; jusqu'à {{max}} jours avec cette offre.",
+    "audit": "Journal d'audit",
+    "auditHelp": "90 jours minimum.",
+    "days_one": "{{count}} jour",
+    "days_other": "{{count}} jours",
+    "readOnly": "Seuls les propriétaires et admins peuvent modifier la conservation.",
+    "saved": "Conservation enregistrée"
+  },
+  "exports": {
+    "title": "Export",
+    "description": "Emportez votre configuration et votre historique.",
+    "configuration": "Exporter la configuration",
+    "configurationHelp": "Agents, outils, workflows, automatisations et suites d'évaluation en JSON — sans aucun secret (clés, jetons et URL de webhook exclus).",
+    "usage": "CSV d'usage",
+    "executions": "CSV des runs"
+  }
+}

@@ -99,5 +99,9 @@
   },
   "account": {
     "backToApp": "Retour à l'application"
+  },
+  "suspended": {
+    "title": "Espace suspendu.",
+    "body": "Un administrateur de l'instance l'a suspendu : tout reste lisible, mais plus rien ne peut s'exécuter ni changer."
   }
 }

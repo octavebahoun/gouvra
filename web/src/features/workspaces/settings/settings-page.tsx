@@ -7,7 +7,7 @@ import { TabLinks } from "@/components/ui/tabs";
 import { useApiKeys, useMembers } from "../api";
 import { useCurrentWorkspace } from "../use-current-workspace";
 
-/** Screen Q — workspace settings, one URL per section (general, members, API keys, audit). */
+/** Screen Q — workspace settings, one URL per section (general, members, keys, billing, data, audit). */
 export function SettingsPage() {
   const { t } = useTranslation("settings");
   const { workspace, basePath, detail } = useCurrentWorkspace();
@@ -37,6 +37,10 @@ export function SettingsPage() {
             label: t("tabs.apiKeys"),
             count: canManageKeys ? activeKeys : undefined,
           },
+          ...(can(detail.data, "billing:read")
+            ? [{ to: `${basePath}/settings/billing`, label: t("tabs.billing") }]
+            : []),
+          { to: `${basePath}/settings/data`, label: t("tabs.data") },
           { to: `${basePath}/settings/audit`, label: t("tabs.audit") },
         ]}
       />

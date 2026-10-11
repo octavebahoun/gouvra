@@ -377,7 +377,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Operational settings (limits) */
+        /** Operational settings (limits, retention) */
         get: operations["workspaces_get_settings_"];
         put?: never;
         post?: never;
@@ -1740,6 +1740,330 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/billing/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plans offered by this instance */
+        get: operations["billing_plans"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Plan, subscription and usage */
+        get: operations["billing_billing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing/checkout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start subscribing to a paid plan (returns where to send the browser) */
+        post: operations["billing_checkout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing/portal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open the billing portal (payment method, invoices, plan changes, cancellation) */
+        post: operations["billing_portal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing/simulated/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm a simulated payment (instances without a payment provider) */
+        post: operations["billing_simulated_confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/billing/simulated/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a simulated subscription at the end of its period */
+        post: operations["billing_simulated_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/stripe/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stripe events (signature verified; each event applied once) */
+        post: operations["billing_stripe_webhook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/budget": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Monthly budget and what was spent */
+        get: operations["budgets_get_budget"];
+        /** Set, change or remove the budget */
+        put: operations["budgets_put_budget"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent alerts (budget, quota, payment) */
+        get: operations["budgets_list_alerts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/alerts/{alert_id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss an alert */
+        post: operations["budgets_dismiss_alert"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/exports/configuration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agents, tools, workflows, evaluations and automations as JSON (no secret) */
+        get: operations["exports_export_configuration"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/exports/executions.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Executions as CSV (default: the last 30 days) */
+        get: operations["exports_export_executions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/exports/usage.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Usage per day, agent and model as CSV (default: the last 30 days) */
+        get: operations["exports_export_usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The instance at a glance */
+        get: operations["administration_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/workspaces": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every workspace (organisation) of the instance */
+        get: operations["administration_workspaces"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/workspaces/{workspace_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Suspend or restore a workspace; grant a plan */
+        patch: operations["administration_update_workspace"];
+        trace?: never;
+    };
+    "/api/v1/admin/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every account of the instance */
+        get: operations["administration_users"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/admin/users/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Disable or re-enable an account (signs it out) */
+        patch: operations["administration_update_user"];
+        trace?: never;
+    };
+    "/api/v1/admin/audit-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The instance-wide audit log */
+        get: operations["administration_audit_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1754,6 +2078,111 @@ export interface components {
             status: "accepted";
             /** Message */
             message: string;
+        };
+        /** AdminAuditOut */
+        AdminAuditOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Action */
+            action: string;
+            /** Actor Label */
+            actor_label: string | null;
+            /** Workspace Id */
+            workspace_id: string | null;
+            /** Target Type */
+            target_type: string | null;
+            /** Target Id */
+            target_id: string | null;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Ip Address */
+            ip_address: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AdminUserIn */
+        AdminUserIn: {
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "active" | "disabled";
+        };
+        /** AdminUserOut */
+        AdminUserOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Email */
+            email: string;
+            /** Display Name */
+            display_name: string;
+            /** Status */
+            status: string;
+            /** Is Superadmin */
+            is_superadmin: boolean;
+            /** Email Verified */
+            email_verified: boolean;
+            /** Workspaces */
+            workspaces: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** AdminWorkspaceIn */
+        AdminWorkspaceIn: {
+            /** Status */
+            status?: ("active" | "suspended") | null;
+            /**
+             * Plan
+             * @description Grant a plan without payment (or back to Free)
+             */
+            plan?: ("free" | "team" | "business") | null;
+        };
+        /** AdminWorkspaceOut */
+        AdminWorkspaceOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Slug */
+            slug: string;
+            /** Owner Email */
+            owner_email: string | null;
+            /** Members */
+            members: number;
+            /** Plan */
+            plan: string;
+            /** Subscription Status */
+            subscription_status: string | null;
+            /** Status */
+            status: string;
+            /** Is Demo */
+            is_demo: boolean;
+            /** Executions 30D */
+            executions_30d: number;
+            /** Spend 30D */
+            spend_30d: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** AgentCreateIn */
         AgentCreateIn: {
@@ -2037,6 +2466,29 @@ export interface components {
             created_at: string;
             /** Is Current */
             is_current: boolean;
+        };
+        /** AlertOut */
+        AlertOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Level */
+            level: string;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Dismissed At */
+            dismissed_at: string | null;
         };
         /** ApiKeyCreateIn */
         ApiKeyCreateIn: {
@@ -2422,6 +2874,28 @@ export interface components {
             /** Enabled */
             enabled?: boolean | null;
         };
+        /** BillingOut */
+        BillingOut: {
+            /** Enabled */
+            enabled: boolean;
+            /**
+             * Provider
+             * @enum {string}
+             */
+            provider: "none" | "simulated" | "stripe";
+            /**
+             * Test Mode
+             * @description Stripe test keys: no real charge
+             */
+            test_mode: boolean;
+            plan: components["schemas"]["PlanOut"];
+            subscription: components["schemas"]["SubscriptionOut"] | null;
+            usage: components["schemas"]["UsageCounts"];
+            /** Plans */
+            plans: components["schemas"]["PlanOut"][];
+            /** Can Manage */
+            can_manage: boolean;
+        };
         /** BreakdownRow */
         BreakdownRow: {
             /** Agent Id */
@@ -2449,6 +2923,48 @@ export interface components {
             partial: boolean;
             /** Model Calls */
             model_calls: number;
+        };
+        /** BudgetIn */
+        BudgetIn: {
+            /**
+             * Monthly Limit
+             * @description None removes the budget
+             */
+            monthly_limit?: number | string | null;
+            /** Thresholds */
+            thresholds?: number[];
+            /**
+             * Hard Stop
+             * @default false
+             */
+            hard_stop?: boolean;
+        };
+        /** BudgetOut */
+        BudgetOut: {
+            budget: components["schemas"]["BudgetSettings"] | null;
+            /** Spent */
+            spent: string;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
+        };
+        /** BudgetSettings */
+        BudgetSettings: {
+            /** Monthly Limit */
+            monthly_limit: string;
+            /** Currency */
+            currency: string;
+            /** Thresholds */
+            thresholds: number[];
+            /** Hard Stop */
+            hard_stop: boolean;
         };
         /** BuiltinToolOut */
         BuiltinToolOut: {
@@ -2592,6 +3108,14 @@ export interface components {
             status: "unverified" | "ok" | "error";
             /** Message */
             message: string;
+        };
+        /** CheckoutIn */
+        CheckoutIn: {
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "team" | "business";
         };
         /** ComparisonOut */
         ComparisonOut: {
@@ -3238,6 +3762,27 @@ export interface components {
             /** Workflow Run Id */
             workflow_run_id: string | null;
         };
+        /** InstanceOverviewOut */
+        InstanceOverviewOut: {
+            /** Users */
+            users: number;
+            /** Workspaces */
+            workspaces: number;
+            /** Suspended Workspaces */
+            suspended_workspaces: number;
+            /** Executions 24H */
+            executions_24h: number;
+            /** Executions 30D */
+            executions_30d: number;
+            /** Spend 30D */
+            spend_30d: string;
+            /** Plans */
+            plans: {
+                [key: string]: number;
+            };
+            /** Billing Provider */
+            billing_provider: string;
+        };
         /** InvitationCreateIn */
         InvitationCreateIn: {
             /**
@@ -3522,6 +4067,18 @@ export interface components {
             /** Recent Failures */
             recent_failures: components["schemas"]["ExecutionSummary"][];
         };
+        /** Page[AdminAuditOut] */
+        Page_AdminAuditOut_: {
+            /** Data */
+            data: components["schemas"]["AdminAuditOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+        };
         /** Page[AgentOut] */
         Page_AgentOut_: {
             /** Data */
@@ -3593,6 +4150,36 @@ export interface components {
              * @default false
              */
             has_more: boolean;
+        };
+        /** PlanOut */
+        PlanOut: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Price Monthly */
+            price_monthly: string;
+            /** Executions Per Month */
+            executions_per_month: number | null;
+            /** Members */
+            members: number | null;
+            /** Agents */
+            agents: number | null;
+            /** Automations */
+            automations: number | null;
+            /** Concurrency */
+            concurrency: number;
+            /** Retention Days Max */
+            retention_days_max: number;
+            /** Paid */
+            paid: boolean;
+        };
+        /** PlansOut */
+        PlansOut: {
+            /** Enabled */
+            enabled: boolean;
+            /** Plans */
+            plans: components["schemas"]["PlanOut"][];
         };
         /** Position */
         Position: {
@@ -3766,6 +4353,11 @@ export interface components {
             api_key?: string | null;
             /** Default Model */
             default_model?: string | null;
+        };
+        /** RedirectOut */
+        RedirectOut: {
+            /** Url */
+            url: string;
         };
         /** Ref */
         Ref: {
@@ -4201,6 +4793,16 @@ export interface components {
             /** Workspaces */
             workspaces: components["schemas"]["WorkspaceSummary"][];
         };
+        /** SimulatedConfirmIn */
+        SimulatedConfirmIn: {
+            /**
+             * Plan
+             * @enum {string}
+             */
+            plan: "team" | "business";
+            /** Token */
+            token: string;
+        };
         /** StartNode */
         StartNode: {
             /** Id */
@@ -4220,6 +4822,19 @@ export interface components {
             input_schema?: {
                 [key: string]: unknown;
             } | null;
+        };
+        /** SubscriptionOut */
+        SubscriptionOut: {
+            /** Status */
+            status: string;
+            /** Provider */
+            provider: string;
+            /** Current Period End */
+            current_period_end: string | null;
+            /** Cancel At Period End */
+            cancel_at_period_end: boolean;
+            /** Granted By Admin */
+            granted_by_admin: boolean;
         };
         /** SuiteCreateIn */
         SuiteCreateIn: {
@@ -4580,6 +5195,27 @@ export interface components {
              * @enum {string}
              */
             output?: "text" | "json";
+        };
+        /** UsageCounts */
+        UsageCounts: {
+            /** Executions */
+            executions: number;
+            /** Members */
+            members: number;
+            /** Agents */
+            agents: number;
+            /** Automations */
+            automations: number;
+            /**
+             * Period Start
+             * Format: date-time
+             */
+            period_start: string;
+            /**
+             * Period End
+             * Format: date-time
+             */
+            period_end: string;
         };
         /** UsageReportOut */
         UsageReportOut: {
@@ -5075,6 +5711,13 @@ export interface components {
         WorkspaceSettingsIn: {
             /** Max Concurrent Executions */
             max_concurrent_executions?: number | null;
+            /**
+             * Retention Days
+             * @description Runs, deliveries and alerts kept this long
+             */
+            retention_days?: number | null;
+            /** Audit Retention Days */
+            audit_retention_days?: number | null;
         };
         /** WorkspaceSettingsOut */
         WorkspaceSettingsOut: {
@@ -5082,6 +5725,15 @@ export interface components {
             max_concurrent_executions: number;
             /** Max Concurrent Executions Limit */
             max_concurrent_executions_limit: number;
+            /** Retention Days */
+            retention_days: number;
+            /**
+             * Retention Days Max
+             * @description The most the plan allows
+             */
+            retention_days_max: number;
+            /** Audit Retention Days */
+            audit_retention_days: number;
         };
         /** WorkspaceSummary */
         WorkspaceSummary: {
@@ -9292,6 +9944,633 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RegistryOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_plans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlansOut"];
+                };
+            };
+        };
+    };
+    billing_billing: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_checkout: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedirectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_portal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RedirectOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_simulated_confirm: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulatedConfirmIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_simulated_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    billing_stripe_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: string;
+                    };
+                };
+            };
+            /** @description Missing or invalid Stripe-Signature */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    budgets_get_budget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    budgets_put_budget: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BudgetIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BudgetOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    budgets_list_alerts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    budgets_dismiss_alert: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                alert_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AlertOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exports_export_configuration: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exports_export_executions: {
+        parameters: {
+            query?: {
+                since?: string | null;
+                until?: string | null;
+            };
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "text/csv": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    exports_export_usage: {
+        parameters: {
+            query?: {
+                since?: string | null;
+                until?: string | null;
+            };
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                    "text/csv": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    administration_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstanceOverviewOut"];
+                };
+            };
+        };
+    };
+    administration_workspaces: {
+        parameters: {
+            query?: {
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminWorkspaceOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    administration_update_workspace: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminWorkspaceIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminWorkspaceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    administration_users: {
+        parameters: {
+            query?: {
+                q?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    administration_update_user: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdminUserIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdminUserOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    administration_audit_events: {
+        parameters: {
+            query?: {
+                /** @description Page size (max 100) */
+                limit?: number;
+                /** @description `next_cursor` of the previous page */
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AdminAuditOut_"];
                 };
             };
             /** @description Validation Error */

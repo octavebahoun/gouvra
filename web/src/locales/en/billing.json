@@ -1,0 +1,138 @@
+{
+  "title": "Billing",
+  "disabled": {
+    "title": "No plan to manage here",
+    "body": "This instance is self-hosted: every workspace has the Self-hosted plan, with no quota and no billing."
+  },
+  "testMode": {
+    "stripe": "Stripe test mode — no real payment",
+    "card": "Pay with the test card 4242 4242 4242 4242, any future expiry date and any CVC.",
+    "simulated": "Simulated billing",
+    "simulatedBody": "This instance has no payment provider: subscribing changes the plan for 30 days, without any card or charge."
+  },
+  "current": {
+    "title": "Current plan",
+    "description": "What this workspace can use, and what this month used.",
+    "granted": "Granted by an administrator",
+    "renewsOn": "Renews on {{date}}",
+    "endsOn": "Ends on {{date}}, then back to Free",
+    "free": "Free forever, no card required.",
+    "manage": "Manage subscription",
+    "cancelScheduled": "Back to Free at the end of the period"
+  },
+  "status": {
+    "active": "Active",
+    "trialing": "Trial",
+    "past_due": "Payment due",
+    "canceled": "Canceled",
+    "incomplete": "Incomplete",
+    "unpaid": "Unpaid"
+  },
+  "meter": {
+    "runs": "Runs this month",
+    "agents": "Agents",
+    "members": "Members and invitations",
+    "automations": "Automations",
+    "of": "{{used}} of {{limit}}",
+    "unlimited": "{{used}} · unlimited",
+    "period": "Current period: {{start}} – {{end}} (UTC)."
+  },
+  "plans": {
+    "title": "Plans",
+    "description": "Change plan at any time; limits apply right away.",
+    "yours": "Your plan",
+    "perMonth": "/ month",
+    "current": "Current plan",
+    "upgrade": "Upgrade to {{plan}}",
+    "changePortal": "Change in the portal",
+    "downgrade": "Cancel at period end",
+    "downgradePortal": "Cancel in the portal",
+    "ownerOnly": "Only the workspace owner can change the plan.",
+    "features": {
+      "runs_one": "{{count}} run per month",
+      "runs_other": "{{count}} runs per month",
+      "runsUnlimited": "Unlimited runs",
+      "agents_one": "{{count}} agent",
+      "agents_other": "{{count}} agents",
+      "agentsUnlimited": "Unlimited agents",
+      "members_one": "{{count}} member",
+      "members_other": "{{count}} members",
+      "membersUnlimited": "Unlimited members",
+      "automations_one": "{{count}} automation",
+      "automations_other": "{{count}} automations",
+      "automationsUnlimited": "Unlimited automations",
+      "concurrency_one": "{{count}} run at a time",
+      "concurrency_other": "{{count}} runs at a time",
+      "retention_one": "History kept up to {{count}} day",
+      "retention_other": "History kept up to {{count}} days"
+    }
+  },
+  "checkout": {
+    "success": "Payment received — activating the plan…",
+    "cancelled": "Checkout cancelled: nothing was charged.",
+    "waiting": "Activating…",
+    "active": "{{plan}} plan active"
+  },
+  "simulated": {
+    "title": "Confirm the plan",
+    "description": "Simulated checkout: no card, no charge.",
+    "invalid": "This checkout link is invalid or has expired. Start again from Billing.",
+    "subscribing": "Subscribing {{workspace}} to",
+    "plan": "{{plan}} — ${{price}} / month",
+    "noCharge": "Nothing is charged: the plan is active for 30 days, then the workspace goes back to Free.",
+    "confirm": "Activate the plan",
+    "back": "Back to billing"
+  },
+  "budget": {
+    "title": "Monthly budget",
+    "description": "Model spend this month, with alerts before the limit.",
+    "set": "Set a budget",
+    "edit": "Edit",
+    "of": "of {{limit}}",
+    "none": "No budget: runs are never stopped for cost.",
+    "alertsAt": "Alerts at {{list}}",
+    "stops": "Stops new runs at 100%",
+    "dialogTitle": "Monthly budget",
+    "dialogDescription": "Owners and admins get an e-mail and an alert at each threshold, once per month.",
+    "amount": "Limit per month",
+    "amountHelp": "In US dollars, compared with the cost of every run this month.",
+    "invalid": "Enter an amount greater than 0.",
+    "thresholds": "Alert thresholds",
+    "thresholdsHelp": "Percentages of the limit.",
+    "hardStop": "Stop new runs at 100%",
+    "hardStopHelp": "Running runs finish; new ones are refused until next month or a higher budget.",
+    "remove": "Remove the budget",
+    "saved": "Budget saved",
+    "removed": "Budget removed"
+  },
+  "alerts": {
+    "title": "Alerts",
+    "description": "Budget, quota and payment events of this workspace.",
+    "dismiss": "Dismiss the alert",
+    "kinds": {
+      "budget": "{{percent}}% of the monthly budget used: {{spent}} of {{limit}}.",
+      "quota": "{{percent}}% of the runs included in the {{plan}} plan used ({{used}} of {{limit}}).",
+      "paymentFailed": "A payment failed: update the payment method to keep the {{plan}} plan."
+    }
+  },
+  "retention": {
+    "title": "Data retention",
+    "description": "How long run content and audit entries are kept. Usage and costs are always kept.",
+    "runs": "Runs, workflow runs and alerts",
+    "runsHelp": "Deleted after this delay; up to {{max}} days on this plan.",
+    "audit": "Audit log",
+    "auditHelp": "At least 90 days.",
+    "days_one": "{{count}} day",
+    "days_other": "{{count}} days",
+    "readOnly": "Only owners and admins can change retention.",
+    "saved": "Retention saved"
+  },
+  "exports": {
+    "title": "Export",
+    "description": "Take your configuration and your history with you.",
+    "configuration": "Export the configuration",
+    "configurationHelp": "Agents, tools, workflows, automations and evaluation suites as JSON — without any secret (keys, tokens and webhook URLs are left out).",
+    "usage": "Usage CSV",
+    "executions": "Runs CSV"
+  }
+}

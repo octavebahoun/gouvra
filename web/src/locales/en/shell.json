@@ -99,5 +99,9 @@
   },
   "account": {
     "backToApp": "Back to the app"
+  },
+  "suspended": {
+    "title": "Workspace suspended.",
+    "body": "An administrator of this instance suspended it: you can still read everything, but nothing can run or change."
   }
 }

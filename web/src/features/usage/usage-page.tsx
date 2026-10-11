@@ -18,6 +18,7 @@ import {
 import { cn } from "@/lib/cn";
 import { useDocumentTitle } from "@/lib/use-document-title";
 import { PageContainer, PageHeader } from "@/components/layout/page-header";
+import { AlertsCard, BudgetCard, ExportButtons } from "@/features/billing/budget-section";
 import { fadeUp, staggerChildren } from "@/components/motion/presets";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Card, CardHeader, Skeleton } from "@/components/ui/feedback";
@@ -45,33 +46,40 @@ export function UsagePage() {
         title={t("title")}
         description={t("description")}
         actions={
-          <RadioGroup.Root
-            value={period}
-            onValueChange={(value) => {
-              const next = new URLSearchParams(params);
-              if (value === "7d") next.delete("period");
-              else next.set("period", value);
-              setParams(next, { replace: true });
-            }}
-            aria-label={t("period")}
-            className="inline-flex rounded-field border border-line bg-surface-2 p-0.5"
-          >
-            {PERIODS.map((value) => (
-              <RadioGroup.Item
-                key={value}
-                value={value}
-                aria-label={t(`periods.${value}`)}
-                className={cn(
-                  "h-8 rounded-[5px] px-3 text-[13px] font-medium text-muted transition-colors max-md:h-10",
-                  "hover:text-ink data-[state=checked]:bg-surface data-[state=checked]:text-ink data-[state=checked]:shadow-sm",
-                )}
-              >
-                {value}
-              </RadioGroup.Item>
-            ))}
-          </RadioGroup.Root>
+          <>
+            <ExportButtons />
+            <RadioGroup.Root
+              value={period}
+              onValueChange={(value) => {
+                const next = new URLSearchParams(params);
+                if (value === "7d") next.delete("period");
+                else next.set("period", value);
+                setParams(next, { replace: true });
+              }}
+              aria-label={t("period")}
+              className="inline-flex rounded-field border border-line bg-surface-2 p-0.5"
+            >
+              {PERIODS.map((value) => (
+                <RadioGroup.Item
+                  key={value}
+                  value={value}
+                  aria-label={t(`periods.${value}`)}
+                  className={cn(
+                    "h-8 rounded-[5px] px-3 text-[13px] font-medium text-muted transition-colors max-md:h-10",
+                    "hover:text-ink data-[state=checked]:bg-surface data-[state=checked]:text-ink data-[state=checked]:shadow-sm",
+                  )}
+                >
+                  {value}
+                </RadioGroup.Item>
+              ))}
+            </RadioGroup.Root>
+          </>
         }
       />
+      <div className="mb-6 grid gap-6 empty:hidden lg:grid-cols-2">
+        <BudgetCard />
+        <AlertsCard />
+      </div>
       {usage.isPending ? (
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">

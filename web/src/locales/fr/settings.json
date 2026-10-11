@@ -6,6 +6,8 @@
     "general": "Général",
     "members": "Membres",
     "apiKeys": "Clés d'API",
+    "billing": "Facturation",
+    "data": "Données",
     "audit": "Journal d'audit"
   },
   "workspaceForm": {
@@ -288,6 +290,56 @@
       },
       "execution": {
         "exported": "Exécution exportée"
+      },
+      "workflow": {
+        "created": "Workflow créé",
+        "published": "Workflow publié",
+        "restored": "Version de workflow restaurée",
+        "archived": "Workflow archivé",
+        "deleted": "Workflow supprimé",
+        "run_started": "Run de workflow lancé"
+      },
+      "evaluation": {
+        "suite_created": "Suite d'évaluation créée",
+        "suite_archived": "Suite d'évaluation archivée",
+        "run_started": "Évaluation lancée"
+      },
+      "automation": {
+        "created": "Automatisation créée",
+        "updated": "Automatisation modifiée",
+        "deleted": "Automatisation supprimée",
+        "secret_rotated": "Secret de webhook renouvelé"
+      },
+      "connection": {
+        "created": "Service connecté",
+        "updated": "Connexion modifiée",
+        "removed": "Service déconnecté"
+      },
+      "billing": {
+        "checkout_started": "Paiement commencé",
+        "subscribed": "Offre activée",
+        "cancel_requested": "Résiliation demandée",
+        "subscription_changed": "Abonnement modifié"
+      },
+      "budget": {
+        "updated": "Budget modifié",
+        "removed": "Budget supprimé"
+      },
+      "retention": {
+        "purged": "Anciennes données supprimées"
+      },
+      "export": {
+        "created": "Données exportées"
+      },
+      "admin": {
+        "workspace_suspended": "Espace suspendu",
+        "workspace_restored": "Espace rétabli",
+        "plan_granted": "Offre accordée",
+        "user_disabled": "Compte désactivé",
+        "user_enabled": "Compte réactivé"
+      },
+      "instance": {
+        "superadmin_granted": "Administration de l'instance accordée"
       }
     },
     "by": "par {{actor}}"

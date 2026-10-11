@@ -1,0 +1,67 @@
+{
+  "title": "Administration de l'instance",
+  "description": "Tous les espaces et comptes de cette instance Gouvra.",
+  "tabs": {
+    "label": "Sections d'administration",
+    "workspaces": "Espaces",
+    "users": "Utilisateurs",
+    "audit": "Journal d'audit"
+  },
+  "plans": {
+    "free": "Free",
+    "team": "Team",
+    "business": "Business",
+    "self_hosted": "Auto-hébergé"
+  },
+  "overview": {
+    "users": "Utilisateurs",
+    "workspaces": "Espaces",
+    "suspended": "Suspendus",
+    "runs": "Runs, 30 jours",
+    "runs24h_one": "{{count}} ces dernières 24 h",
+    "runs24h_other": "{{count}} ces dernières 24 h",
+    "spend": "Dépense modèles, 30 jours",
+    "billing": "Facturation : {{provider}}"
+  },
+  "workspaces": {
+    "search": "Rechercher par nom ou slug",
+    "empty": "Aucun espace ne correspond.",
+    "members_one": "{{count}} membre",
+    "members_other": "{{count}} membres",
+    "created": "créé le {{date}}",
+    "activity_one": "{{count}} run · {{spend}} (30 j)",
+    "activity_other": "{{count}} runs · {{spend}} (30 j)",
+    "demo": "Démo",
+    "statusSuspended": "Suspendu",
+    "planFor": "Offre de {{name}}",
+    "planGranted": "{{name}} a maintenant l'offre {{plan}}",
+    "suspend": "Suspendre",
+    "restore": "Rétablir",
+    "suspendTitle": "Suspendre {{name}} ?",
+    "suspendBody": "Les membres gardent la lecture, mais plus rien ne peut s'exécuter ni changer jusqu'au rétablissement : planifications et webhooks ne lancent plus aucun run (chaque refus est tracé).",
+    "suspended": "{{name}} suspendu",
+    "restored": "{{name}} rétabli"
+  },
+  "users": {
+    "search": "Rechercher par e-mail ou nom",
+    "empty": "Aucun compte ne correspond.",
+    "superadmin": "Super-admin",
+    "statusDisabled": "Désactivé",
+    "unverified": "E-mail non vérifié",
+    "workspaces_one": "{{count}} espace",
+    "workspaces_other": "{{count}} espaces",
+    "joined": "inscrit le {{date}}",
+    "you": "Vous",
+    "disable": "Désactiver",
+    "enable": "Réactiver",
+    "disableTitle": "Désactiver {{email}} ?",
+    "disableBody": "Le compte est déconnecté partout et ne peut plus se connecter. Ses espaces et données sont conservés.",
+    "disabled": "{{email}} désactivé",
+    "enabled": "{{email}} réactivé"
+  },
+  "audit": {
+    "empty": "Rien d'enregistré pour l'instant.",
+    "more": "Charger plus",
+    "system": "Système"
+  }
+}

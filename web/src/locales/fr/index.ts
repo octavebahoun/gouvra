@@ -1,7 +1,9 @@
 import frAccount from "./account.json";
+import frAdmin from "./admin.json";
 import frAgents from "./agents.json";
 import frAutomations from "./automations.json";
 import frAuth from "./auth.json";
+import frBilling from "./billing.json";
 import frCommon from "./common.json";
 import frConnectors from "./connectors.json";
 import frEvaluations from "./evaluations.json";
@@ -19,9 +21,11 @@ import frWorkflows from "./workflows.json";
 /** Every namespace of this language, loaded as one chunk when the language is used. */
 const bundle = {
   account: frAccount,
+  admin: frAdmin,
   agents: frAgents,
   automations: frAutomations,
   auth: frAuth,
+  billing: frBilling,
   common: frCommon,
   connectors: frConnectors,
   evaluations: frEvaluations,

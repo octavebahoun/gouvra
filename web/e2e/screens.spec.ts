@@ -14,6 +14,7 @@ import {
   createVerifiedUser,
   createWorkspace,
   launchExecution,
+  promoteSuperadmin,
   publishWorkflow,
   runAutomation,
   signIn,
@@ -89,7 +90,20 @@ const SIGNED_IN: Screen[] = [
     path: (w) => `/w/${w.slug}/settings/audit`,
     ready: "Workspace settings",
   },
+  {
+    name: "settings-billing",
+    path: (w) => `/w/${w.slug}/settings/billing`,
+    ready: "Workspace settings",
+  },
+  {
+    name: "settings-data",
+    path: (w) => `/w/${w.slug}/settings/data`,
+    ready: "Workspace settings",
+  },
   { name: "account", path: () => "/account", ready: "Profile & preferences" },
+  { name: "admin-workspaces", path: () => "/admin/workspaces", ready: "Instance administration" },
+  { name: "admin-users", path: () => "/admin/users", ready: "Instance administration" },
+  { name: "admin-audit", path: () => "/admin/audit", ready: "Instance administration" },
   { name: "providers", path: (w) => `/w/${w.slug}/providers`, ready: "Providers" },
   { name: "tools", path: (w) => `/w/${w.slug}/tools`, ready: "Tools" },
   { name: "tool", path: (w, ids) => `/w/${w.slug}/tools/${ids.tool}`, ready: "Calculator" },
@@ -157,6 +171,7 @@ test.beforeAll(async () => {
   await addMember(owner, workspace, member, "member");
   await createApiKey(owner, workspace.id, "CI pipeline");
   newcomer = await createVerifiedUser({ tag: "screens-new", name: "Grace Hopper" });
+  await promoteSuperadmin(owner);
   const provider = await createScriptedProvider(owner, workspace.id);
   const tool = await createBuiltinTool(owner, workspace.id, "calculator");
   const agent = await createAgent(owner, workspace.id, {

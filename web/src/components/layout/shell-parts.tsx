@@ -92,7 +92,7 @@ export function UserMenu({
   onLanguageChange,
   onThemeChange,
   collapsed = false,
-  adminHref,
+  adminHref = "/admin",
   placement = "top",
   className,
 }: UserMenuProps) {

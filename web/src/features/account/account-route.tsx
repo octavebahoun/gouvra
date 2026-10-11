@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
 import { useCurrentSession } from "@/lib/auth/session";
@@ -16,20 +17,23 @@ import { AccountPage } from "./account-page";
  * away). Someone without any workspace gets a simple top bar instead.
  */
 export function AccountRoute() {
+  return (
+    <PersonalShell>
+      <AccountPage />
+    </PersonalShell>
+  );
+}
+
+/** The shell of pages that belong to a person rather than a workspace (profile, instance admin). */
+export function PersonalShell({ children }: { children: ReactNode }) {
   const session = useCurrentSession();
   const last = readLastWorkspace(session.user.id);
   const workspace = session.workspaces.find((w) => w.slug === last) ?? session.workspaces[0];
-  if (workspace) {
-    return (
-      <WorkspaceShell workspace={workspace}>
-        <AccountPage />
-      </WorkspaceShell>
-    );
-  }
-  return <PlainShell />;
+  if (workspace) return <WorkspaceShell workspace={workspace}>{children}</WorkspaceShell>;
+  return <PlainShell>{children}</PlainShell>;
 }
 
-function PlainShell() {
+function PlainShell({ children }: { children: ReactNode }) {
   const { t } = useTranslation("shell");
   const session = useCurrentSession();
   const { signOut } = useSignOut();
@@ -58,7 +62,7 @@ function PlainShell() {
         </div>
       </header>
       <main id="main" tabIndex={-1} className="flex-1 outline-none">
-        <AccountPage />
+        {children}
       </main>
     </div>
   );

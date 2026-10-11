@@ -30,6 +30,8 @@ export const namespaces = [
   "automations",
   "connectors",
   "registry",
+  "billing",
+  "admin",
 ] as const satisfies readonly (keyof Resources)[];
 
 export const languageNames: Record<Language, string> = { en: "English", fr: "Français" };

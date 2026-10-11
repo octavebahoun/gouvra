@@ -6,6 +6,8 @@
     "general": "General",
     "members": "Members",
     "apiKeys": "API keys",
+    "billing": "Billing",
+    "data": "Data",
     "audit": "Audit log"
   },
   "workspaceForm": {
@@ -288,6 +290,56 @@
       },
       "execution": {
         "exported": "Execution exported"
+      },
+      "workflow": {
+        "created": "Workflow created",
+        "published": "Workflow published",
+        "restored": "Workflow version restored",
+        "archived": "Workflow archived",
+        "deleted": "Workflow deleted",
+        "run_started": "Workflow run started"
+      },
+      "evaluation": {
+        "suite_created": "Evaluation suite created",
+        "suite_archived": "Evaluation suite archived",
+        "run_started": "Evaluation run started"
+      },
+      "automation": {
+        "created": "Automation created",
+        "updated": "Automation updated",
+        "deleted": "Automation deleted",
+        "secret_rotated": "Webhook secret rotated"
+      },
+      "connection": {
+        "created": "Service connected",
+        "updated": "Connection updated",
+        "removed": "Service disconnected"
+      },
+      "billing": {
+        "checkout_started": "Checkout started",
+        "subscribed": "Plan activated",
+        "cancel_requested": "Cancellation requested",
+        "subscription_changed": "Subscription changed"
+      },
+      "budget": {
+        "updated": "Budget changed",
+        "removed": "Budget removed"
+      },
+      "retention": {
+        "purged": "Old data deleted"
+      },
+      "export": {
+        "created": "Data exported"
+      },
+      "admin": {
+        "workspace_suspended": "Workspace suspended",
+        "workspace_restored": "Workspace restored",
+        "plan_granted": "Plan granted",
+        "user_disabled": "Account disabled",
+        "user_enabled": "Account enabled"
+      },
+      "instance": {
+        "superadmin_granted": "Instance administration granted"
       }
     },
     "by": "by {{actor}}"
