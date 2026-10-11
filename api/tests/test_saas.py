@@ -12,16 +12,25 @@ from datetime import timedelta
 from typing import Any
 
 import pytest
-from sqlalchemy import select, update
+from sqlalchemy import event, select, update
 
 from gouvra.core.config import BillingProviderKind, get_settings
-from gouvra.core.db import get_sessionmaker, utcnow
+from gouvra.core.db import get_engine, get_sessionmaker, utcnow
 from gouvra.modules.billing.service import plan_of
 from gouvra.modules.executions.models import Execution, UsageRecord
 from gouvra.modules.identity.models import User
 from gouvra.modules.retention.service import purge_workspace
 from gouvra.modules.workspaces.models import Workspace
-from tests.helpers import Account, Outbox, add_member, create_agent, drain, launch, signup
+from tests.helpers import (
+    Account,
+    Outbox,
+    add_member,
+    create_agent,
+    create_workspace,
+    drain,
+    launch,
+    signup,
+)
 
 pytestmark = pytest.mark.usefixtures("outbox")
 
@@ -156,7 +165,9 @@ async def test_instance_administration(
     assert overview["users"] >= 2
     assert overview["workspaces"] >= 1
     assert overview["billing_provider"] == "none"
-    listed = (await admin.client.get("/api/v1/admin/workspaces", params={"q": ws["name"]})).json()
+    listed = (await admin.client.get("/api/v1/admin/workspaces", params={"q": ws["name"]})).json()[
+        "data"
+    ]
     entry = next(w for w in listed if w["id"] == ws["id"])
     assert (entry["owner_email"], entry["status"], entry["plan"]) == (
         owner.email,
@@ -181,7 +192,7 @@ async def test_instance_administration(
     ).status_code == 202
 
     victim = await signup(make_client(), outbox, "leaver@example.com")
-    users = (await admin.client.get("/api/v1/admin/users", params={"q": "leaver"})).json()
+    users = (await admin.client.get("/api/v1/admin/users", params={"q": "leaver"})).json()["data"]
     assert [u["email"] for u in users] == ["leaver@example.com"]
     disabled = await admin.client.patch(
         f"/api/v1/admin/users/{victim.user_id}", json={"status": "disabled"}
@@ -223,3 +234,47 @@ async def test_create_superadmin_command(make_client: Any, outbox: Outbox) -> No
     )
     assert unknown.returncode == 1
     assert "Sign up first" in unknown.stderr
+
+
+async def test_admin_lists_cost_the_same_whatever_their_size(
+    make_client: Any, outbox: Outbox
+) -> None:
+    """No query per row: the number of statements does not grow with the number of rows."""
+    admin = await signup(make_client(), outbox, "counter@example.com")
+    await _promote(admin)
+    statements: list[str] = []
+
+    def count(_conn: Any, _cursor: Any, statement: str, *_: Any) -> None:
+        statements.append(statement)
+
+    async def measure(path: str) -> int:
+        statements.clear()
+        event.listen(get_engine().sync_engine, "before_cursor_execute", count)
+        try:
+            assert (await admin.client.get(path)).status_code == 200
+        finally:
+            event.remove(get_engine().sync_engine, "before_cursor_execute", count)
+        return len(statements)
+
+    await create_workspace(admin, "Counted 1")
+    before = (await measure("/api/v1/admin/workspaces"), await measure("/api/v1/admin/users"))
+    for index in range(4):
+        await create_workspace(admin, f"Counted {index + 2}")
+        await signup(make_client(), outbox, f"counted{index}@example.com")
+    after = (await measure("/api/v1/admin/workspaces"), await measure("/api/v1/admin/users"))
+    assert after == before
+
+    # Search is literal: % and _ are not wildcards.
+    literal = await admin.client.get("/api/v1/admin/workspaces", params={"q": "%"})
+    assert literal.json()["data"] == []
+    found = (await admin.client.get("/api/v1/admin/users", params={"q": "counted_"})).json()
+    assert found["data"] == []
+
+    # Pages: newest first, then the next ones through the cursor.
+    first = (await admin.client.get("/api/v1/admin/workspaces", params={"limit": 2})).json()
+    assert [w["name"] for w in first["data"]] == ["Counted 5", "Counted 4"]
+    assert first["has_more"] is True
+    following = await admin.client.get(
+        "/api/v1/admin/workspaces", params={"limit": 2, "cursor": first["next_cursor"]}
+    )
+    assert [w["name"] for w in following.json()["data"]] == ["Counted 3", "Counted 2"]

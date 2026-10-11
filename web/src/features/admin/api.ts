@@ -13,6 +13,7 @@ export type AdminUser = Schemas["AdminUserOut"];
 export type AdminAuditEvent = Schemas["AdminAuditOut"];
 
 const AUDIT_PAGE_SIZE = 50;
+const LIST_PAGE_SIZE = 50;
 
 export const adminKeys = {
   all: ["admin"] as const,
@@ -31,10 +32,16 @@ export function useInstanceOverview() {
 }
 
 export function useAdminWorkspaces(q: string) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: adminKeys.workspaces(q),
-    queryFn: () =>
-      unwrap(client.GET("/api/v1/admin/workspaces", { params: { query: { q: q || undefined } } })),
+    queryFn: ({ pageParam }) =>
+      unwrap(
+        client.GET("/api/v1/admin/workspaces", {
+          params: { query: { q: q || undefined, limit: LIST_PAGE_SIZE, cursor: pageParam } },
+        }),
+      ),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => (page.has_more && page.next_cursor ? page.next_cursor : undefined),
     placeholderData: keepPreviousData,
   });
 }
@@ -54,10 +61,16 @@ export function useUpdateAdminWorkspace() {
 }
 
 export function useAdminUsers(q: string) {
-  return useQuery({
+  return useInfiniteQuery({
     queryKey: adminKeys.users(q),
-    queryFn: () =>
-      unwrap(client.GET("/api/v1/admin/users", { params: { query: { q: q || undefined } } })),
+    queryFn: ({ pageParam }) =>
+      unwrap(
+        client.GET("/api/v1/admin/users", {
+          params: { query: { q: q || undefined, limit: LIST_PAGE_SIZE, cursor: pageParam } },
+        }),
+      ),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (page) => (page.has_more && page.next_cursor ? page.next_cursor : undefined),
     placeholderData: keepPreviousData,
   });
 }

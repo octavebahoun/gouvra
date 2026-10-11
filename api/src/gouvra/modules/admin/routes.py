@@ -97,11 +97,24 @@ async def overview(_: SuperAdmin, db: DbSession) -> InstanceOverviewOut:
     now = utcnow()
     plans = dict(
         (
-            await db.execute(select(Subscription.plan, func.count()).group_by(Subscription.plan))
+            await db.execute(
+                select(Subscription.plan, func.count())
+                .where(Subscription.status.in_(billing.PAID_STATUSES))
+                .group_by(Subscription.plan)
+            )
         ).all()
     )
     workspaces = await _count(db, select(func.count()).select_from(Workspace))
     paid = sum(plans.get(key, 0) for key in ("team", "business"))
+    by_plan = (
+        {"self_hosted": workspaces}
+        if not billing.billing_enabled()
+        else {
+            "free": workspaces - paid,
+            "team": plans.get("team", 0),
+            "business": plans.get("business", 0),
+        }
+    )
     return InstanceOverviewOut(
         users=await _count(db, select(func.count()).select_from(User)),
         workspaces=workspaces,
@@ -133,64 +146,101 @@ async def overview(_: SuperAdmin, db: DbSession) -> InstanceOverviewOut:
             ).scalar_one()
             or 0
         ),
-        plans={
-            "free": workspaces - paid,
-            "team": plans.get("team", 0),
-            "business": plans.get("business", 0),
-        },
+        plans=by_plan,
         billing_provider=billing.provider().value,
     )
 
 
-async def _workspace_out(db: AsyncSession, workspace: Workspace) -> AdminWorkspaceOut:
+def _contains(text: str) -> str:
+    """A LIKE pattern matching `text` literally (its % and _ are not wildcards)."""
+    escaped = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    return f"%{escaped}%"
+
+
+async def _grouped(db: AsyncSession, query: Any) -> dict[Any, Any]:
+    return dict((await db.execute(query)).all())
+
+
+async def _workspace_summaries(
+    db: AsyncSession, workspaces: list[Workspace]
+) -> list[AdminWorkspaceOut]:
+    """Owners, members, plans and 30-day activity of many workspaces in five queries."""
+    if not workspaces:
+        return []
+    ids = [w.id for w in workspaces]
     since = utcnow() - timedelta(days=30)
-    owner = await db.get(User, workspace.owner_id)
-    subscription = await billing.subscription_of(db, workspace.id)
-    return AdminWorkspaceOut(
-        id=workspace.id,
-        name=workspace.name,
-        slug=workspace.slug,
-        owner_email=owner.email if owner else None,
-        members=await _count(
-            db,
-            select(func.count())
-            .select_from(Membership)
-            .where(Membership.workspace_id == workspace.id),
-        ),
-        plan=billing.effective_plan(subscription).key,
-        subscription_status=subscription.status if subscription else None,
-        status=workspace.status,
-        is_demo=workspace.is_demo,
-        executions_30d=await _count(
-            db,
-            select(func.count())
-            .select_from(Execution)
-            .where(Execution.workspace_id == workspace.id, Execution.created_at >= since),
-        ),
-        spend_30d=Decimal(
-            (
-                await db.execute(
-                    select(func.coalesce(func.sum(UsageRecord.cost_amount), 0)).where(
-                        UsageRecord.workspace_id == workspace.id, UsageRecord.recorded_at >= since
-                    )
-                )
-            ).scalar_one()
-            or 0
-        ),
-        created_at=workspace.created_at,
+    owners = await _grouped(
+        db, select(User.id, User.email).where(User.id.in_({w.owner_id for w in workspaces}))
     )
+    members = await _grouped(
+        db,
+        select(Membership.workspace_id, func.count())
+        .where(Membership.workspace_id.in_(ids))
+        .group_by(Membership.workspace_id),
+    )
+    runs = await _grouped(
+        db,
+        select(Execution.workspace_id, func.count())
+        .where(Execution.workspace_id.in_(ids), Execution.created_at >= since)
+        .group_by(Execution.workspace_id),
+    )
+    spend = await _grouped(
+        db,
+        select(UsageRecord.workspace_id, func.sum(UsageRecord.cost_amount))
+        .where(UsageRecord.workspace_id.in_(ids), UsageRecord.recorded_at >= since)
+        .group_by(UsageRecord.workspace_id),
+    )
+    subscriptions = {
+        row.workspace_id: row
+        for row in (
+            await db.execute(select(Subscription).where(Subscription.workspace_id.in_(ids)))
+        ).scalars()
+    }
+    summaries = []
+    for workspace in workspaces:
+        subscription = subscriptions.get(workspace.id)
+        summaries.append(
+            AdminWorkspaceOut(
+                id=workspace.id,
+                name=workspace.name,
+                slug=workspace.slug,
+                owner_email=owners.get(workspace.owner_id),
+                members=members.get(workspace.id, 0),
+                plan=billing.effective_plan(subscription).key,
+                subscription_status=subscription.status if subscription else None,
+                status=workspace.status,
+                is_demo=workspace.is_demo,
+                executions_30d=runs.get(workspace.id, 0),
+                spend_30d=Decimal(spend.get(workspace.id) or 0),
+                created_at=workspace.created_at,
+            )
+        )
+    return summaries
 
 
-@router.get("/workspaces", summary="Every workspace (organisation) of the instance")
+@router.get("/workspaces", summary="Every workspace (organisation) of the instance, newest first")
 async def workspaces(
     _: SuperAdmin,
     db: DbSession,
+    params: Annotated[PageParams, Depends(page_params)],
     q: Annotated[str | None, Query(max_length=80)] = None,
-) -> list[AdminWorkspaceOut]:
-    query = select(Workspace).order_by(Workspace.created_at.desc()).limit(200)
+) -> Page[AdminWorkspaceOut]:
+    query = select(Workspace)
     if q:
-        query = query.where(or_(Workspace.name.ilike(f"%{q}%"), Workspace.slug.ilike(f"%{q}%")))
-    return [await _workspace_out(db, w) for w in (await db.execute(query)).scalars()]
+        pattern = _contains(q)
+        query = query.where(
+            or_(
+                Workspace.name.ilike(pattern, escape="\\"),
+                Workspace.slug.ilike(pattern, escape="\\"),
+            )
+        )
+    rows = list(
+        (
+            await db.execute(paginate_desc(query, params, Workspace.created_at, Workspace.id))
+        ).scalars()
+    )
+    summaries = {w.id: w for w in await _workspace_summaries(db, rows[: params.limit])}
+    return build_page(rows, params, lambda w: summaries[w.id], lambda w: (w.created_at, w.id))
 
 
 @router.patch("/workspaces/{workspace_id}", summary="Suspend or restore a workspace; grant a plan")
@@ -216,34 +266,54 @@ async def update_workspace(
     if payload.plan:
         await billing.grant_plan(db, workspace.id, payload.plan, actor)
     await db.refresh(workspace)
-    return await _workspace_out(db, workspace)
+    return (await _workspace_summaries(db, [workspace]))[0]
 
 
-async def _user_out(db: AsyncSession, user: User) -> AdminUserOut:
-    return AdminUserOut(
-        id=user.id,
-        email=user.email,
-        display_name=user.display_name,
-        status=user.status,
-        is_superadmin=user.is_superadmin,
-        email_verified=user.email_verified,
-        workspaces=await _count(
-            db, select(func.count()).select_from(Membership).where(Membership.user_id == user.id)
-        ),
-        created_at=user.created_at,
+async def _user_summaries(db: AsyncSession, users: list[User]) -> list[AdminUserOut]:
+    if not users:
+        return []
+    workspaces = await _grouped(
+        db,
+        select(Membership.user_id, func.count())
+        .where(Membership.user_id.in_([u.id for u in users]))
+        .group_by(Membership.user_id),
     )
+    return [
+        AdminUserOut(
+            id=user.id,
+            email=user.email,
+            display_name=user.display_name,
+            status=user.status,
+            is_superadmin=user.is_superadmin,
+            email_verified=user.email_verified,
+            workspaces=workspaces.get(user.id, 0),
+            created_at=user.created_at,
+        )
+        for user in users
+    ]
 
 
-@router.get("/users", summary="Every account of the instance")
+@router.get("/users", summary="Every account of the instance, newest first")
 async def users(
     _: SuperAdmin,
     db: DbSession,
+    params: Annotated[PageParams, Depends(page_params)],
     q: Annotated[str | None, Query(max_length=120)] = None,
-) -> list[AdminUserOut]:
-    query = select(User).order_by(User.created_at.desc()).limit(200)
+) -> Page[AdminUserOut]:
+    query = select(User)
     if q:
-        query = query.where(or_(User.email.ilike(f"%{q}%"), User.display_name.ilike(f"%{q}%")))
-    return [await _user_out(db, u) for u in (await db.execute(query)).scalars()]
+        pattern = _contains(q)
+        query = query.where(
+            or_(
+                User.email.ilike(pattern, escape="\\"),
+                User.display_name.ilike(pattern, escape="\\"),
+            )
+        )
+    rows = list(
+        (await db.execute(paginate_desc(query, params, User.created_at, User.id))).scalars()
+    )
+    summaries = {u.id: u for u in await _user_summaries(db, rows[: params.limit])}
+    return build_page(rows, params, lambda u: summaries[u.id], lambda u: (u.created_at, u.id))
 
 
 @router.patch("/users/{user_id}", summary="Disable or re-enable an account (signs it out)")
@@ -275,7 +345,7 @@ async def update_user(
             target_id=user.id,
         )
         await db.commit()
-    return await _user_out(db, user)
+    return (await _user_summaries(db, [user]))[0]
 
 
 @router.get("/audit-events", summary="The instance-wide audit log")

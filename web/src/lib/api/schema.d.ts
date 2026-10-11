@@ -1986,7 +1986,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Every workspace (organisation) of the instance */
+        /** Every workspace (organisation) of the instance, newest first */
         get: operations["administration_workspaces"];
         put?: never;
         post?: never;
@@ -2020,7 +2020,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Every account of the instance */
+        /** Every account of the instance, newest first */
         get: operations["administration_users"];
         put?: never;
         post?: never;
@@ -4071,6 +4071,30 @@ export interface components {
         Page_AdminAuditOut_: {
             /** Data */
             data: components["schemas"]["AdminAuditOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+        };
+        /** Page[AdminUserOut] */
+        Page_AdminUserOut_: {
+            /** Data */
+            data: components["schemas"]["AdminUserOut"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+        };
+        /** Page[AdminWorkspaceOut] */
+        Page_AdminWorkspaceOut_: {
+            /** Data */
+            data: components["schemas"]["AdminWorkspaceOut"][];
             /** Next Cursor */
             next_cursor: string | null;
             /**
@@ -10422,6 +10446,10 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string | null;
+                /** @description Page size (max 100) */
+                limit?: number;
+                /** @description `next_cursor` of the previous page */
+                cursor?: string | null;
             };
             header?: never;
             path?: never;
@@ -10435,7 +10463,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminWorkspaceOut"][];
+                    "application/json": components["schemas"]["Page_AdminWorkspaceOut_"];
                 };
             };
             /** @description Validation Error */
@@ -10488,6 +10516,10 @@ export interface operations {
         parameters: {
             query?: {
                 q?: string | null;
+                /** @description Page size (max 100) */
+                limit?: number;
+                /** @description `next_cursor` of the previous page */
+                cursor?: string | null;
             };
             header?: never;
             path?: never;
@@ -10501,7 +10533,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUserOut"][];
+                    "application/json": components["schemas"]["Page_AdminUserOut_"];
                 };
             };
             /** @description Validation Error */

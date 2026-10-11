@@ -14,6 +14,7 @@ import { ConfirmDialog } from "@/components/ui/dialog";
 import { Card, Skeleton } from "@/components/ui/feedback";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { useAdminUsers, useUpdateAdminUser, type AdminUser } from "./api";
+import { LoadMore } from "./load-more";
 import { SearchField } from "./search-field";
 
 /** Every account of the instance; disabling one signs it out everywhere. */
@@ -23,6 +24,7 @@ export function UsersTab() {
   const [search, setSearch] = useState("");
   const query = useDeferredValue(search.trim());
   const users = useAdminUsers(query);
+  const rows = users.data?.pages.flatMap((page) => page.data) ?? [];
   const update = useUpdateAdminUser();
   const [disabling, setDisabling] = useState<AdminUser | null>(null);
 
@@ -52,7 +54,7 @@ export function UsersTab() {
         <Card>
           <ErrorState error={users.error} onRetry={() => void users.refetch()} />
         </Card>
-      ) : users.data.length === 0 ? (
+      ) : rows.length === 0 ? (
         <Card>
           <EmptyState compact title={t("users.empty")} />
         </Card>
@@ -64,7 +66,7 @@ export function UsersTab() {
             animate="visible"
             className={cn("divide-y divide-line", users.isPlaceholderData && "opacity-60")}
           >
-            {users.data.map((user) => (
+            {rows.map((user) => (
               <UserRow
                 key={user.id}
                 user={user}
@@ -74,6 +76,11 @@ export function UsersTab() {
               />
             ))}
           </motion.ul>
+          <LoadMore
+            hasNextPage={users.hasNextPage}
+            isFetchingNextPage={users.isFetchingNextPage}
+            fetchNextPage={users.fetchNextPage}
+          />
         </Card>
       )}
       <ConfirmDialog

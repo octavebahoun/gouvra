@@ -7091,7 +7091,7 @@
         "tags": [
           "administration"
         ],
-        "summary": "Every workspace (organisation) of the instance",
+        "summary": "Every workspace (organisation) of the instance, newest first",
         "operationId": "administration_workspaces",
         "parameters": [
           {
@@ -7110,6 +7110,39 @@
               ],
               "title": "Q"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (max 100)",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size (max 100)"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "Cursor"
+            },
+            "description": "`next_cursor` of the previous page"
           }
         ],
         "responses": {
@@ -7118,11 +7151,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AdminWorkspaceOut"
-                  },
-                  "title": "Response Administration Workspaces"
+                  "$ref": "#/components/schemas/Page_AdminWorkspaceOut_"
                 }
               }
             }
@@ -7198,7 +7227,7 @@
         "tags": [
           "administration"
         ],
-        "summary": "Every account of the instance",
+        "summary": "Every account of the instance, newest first",
         "operationId": "administration_users",
         "parameters": [
           {
@@ -7217,6 +7246,39 @@
               ],
               "title": "Q"
             }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (max 100)",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size (max 100)"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "Cursor"
+            },
+            "description": "`next_cursor` of the previous page"
           }
         ],
         "responses": {
@@ -7225,11 +7287,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/AdminUserOut"
-                  },
-                  "title": "Response Administration Users"
+                  "$ref": "#/components/schemas/Page_AdminUserOut_"
                 }
               }
             }
@@ -13135,6 +13193,74 @@
           "has_more"
         ],
         "title": "Page[AdminAuditOut]"
+      },
+      "Page_AdminUserOut_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AdminUserOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "next_cursor",
+          "has_more"
+        ],
+        "title": "Page[AdminUserOut]"
+      },
+      "Page_AdminWorkspaceOut_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AdminWorkspaceOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "next_cursor",
+          "has_more"
+        ],
+        "title": "Page[AdminWorkspaceOut]"
       },
       "Page_AgentOut_": {
         "properties": {

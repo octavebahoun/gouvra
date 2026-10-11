@@ -56,6 +56,12 @@ export function OverviewCards() {
   const plans = Object.entries(data.plans)
     .map(([plan, count]) => `${t(`plans.${plan as "free"}`, { defaultValue: plan })} ${count}`)
     .join(" · ");
+  const providerLabel =
+    data.billing_provider === "stripe"
+      ? t("overview.providers.stripe")
+      : data.billing_provider === "simulated"
+        ? t("overview.providers.simulated")
+        : t("overview.providers.none");
   const spend = new Intl.NumberFormat(undefined, { style: "currency", currency: "USD" }).format(
     Number(data.spend_30d),
   );
@@ -92,7 +98,7 @@ export function OverviewCards() {
         icon={<CircleDollarSign aria-hidden />}
         label={t("overview.spend")}
         value={spend}
-        hint={t("overview.billing", { provider: data.billing_provider })}
+        hint={t("overview.billing", { provider: providerLabel })}
       />
     </motion.div>
   );

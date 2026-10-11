@@ -18,10 +18,15 @@
     "workspaces": "Espaces",
     "suspended": "Suspendus",
     "runs": "Runs, 30 jours",
-    "runs24h_one": "{{count}} ces dernières 24 h",
-    "runs24h_other": "{{count}} ces dernières 24 h",
+    "runs24h_one": "{{count, number}} ces dernières 24 h",
+    "runs24h_other": "{{count, number}} ces dernières 24 h",
     "spend": "Dépense modèles, 30 jours",
-    "billing": "Facturation : {{provider}}"
+    "billing": "Facturation : {{provider}}",
+    "providers": {
+      "none": "désactivée",
+      "simulated": "simulée",
+      "stripe": "Stripe"
+    }
   },
   "workspaces": {
     "search": "Rechercher par nom ou slug",
@@ -29,8 +34,8 @@
     "members_one": "{{count}} membre",
     "members_other": "{{count}} membres",
     "created": "créé le {{date}}",
-    "activity_one": "{{count}} run · {{spend}} (30 j)",
-    "activity_other": "{{count}} runs · {{spend}} (30 j)",
+    "activity_one": "{{count, number}} run · {{spend}} (30 j)",
+    "activity_other": "{{count, number}} runs · {{spend}} (30 j)",
     "demo": "Démo",
     "statusSuspended": "Suspendu",
     "planFor": "Offre de {{name}}",
@@ -61,7 +66,7 @@
   },
   "audit": {
     "empty": "Rien d'enregistré pour l'instant.",
-    "more": "Charger plus",
     "system": "Système"
-  }
+  },
+  "more": "Charger plus"
 }

@@ -17,6 +17,7 @@ import {
   useUpdateAdminWorkspace,
   type AdminWorkspace,
 } from "./api";
+import { LoadMore } from "./load-more";
 import { SearchField } from "./search-field";
 
 const GRANTABLE = ["free", "team", "business"] as const;
@@ -27,6 +28,7 @@ export function WorkspacesTab() {
   const [search, setSearch] = useState("");
   const query = useDeferredValue(search.trim());
   const workspaces = useAdminWorkspaces(query);
+  const rows = workspaces.data?.pages.flatMap((page) => page.data) ?? [];
   const billing = useInstanceOverview().data?.billing_provider;
   const [suspending, setSuspending] = useState<AdminWorkspace | null>(null);
   const update = useUpdateAdminWorkspace();
@@ -64,7 +66,7 @@ export function WorkspacesTab() {
         <Card>
           <ErrorState error={workspaces.error} onRetry={() => void workspaces.refetch()} />
         </Card>
-      ) : workspaces.data.length === 0 ? (
+      ) : rows.length === 0 ? (
         <Card>
           <EmptyState compact title={t("workspaces.empty")} />
         </Card>
@@ -76,7 +78,7 @@ export function WorkspacesTab() {
             animate="visible"
             className={cn("divide-y divide-line", workspaces.isPlaceholderData && "opacity-60")}
           >
-            {workspaces.data.map((workspace) => (
+            {rows.map((workspace) => (
               <WorkspaceRow
                 key={workspace.id}
                 workspace={workspace}
@@ -87,6 +89,11 @@ export function WorkspacesTab() {
               />
             ))}
           </motion.ul>
+          <LoadMore
+            hasNextPage={workspaces.hasNextPage}
+            isFetchingNextPage={workspaces.isFetchingNextPage}
+            fetchNextPage={workspaces.fetchNextPage}
+          />
         </Card>
       )}
       <ConfirmDialog

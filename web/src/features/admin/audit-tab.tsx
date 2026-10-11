@@ -1,10 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { useFormatters } from "@/lib/format";
-import { Button } from "@/components/ui/button";
 import { Card, Skeleton } from "@/components/ui/feedback";
 import { EmptyState, ErrorState } from "@/components/ui/states";
 import { auditActionLabel } from "@/features/workspaces/settings/audit-actions";
 import { useAdminAudit, type AdminAuditEvent } from "./api";
+import { LoadMore } from "./load-more";
 
 /** The instance-wide audit log: every workspace's events plus the administrators' own. */
 export function AuditTab() {
@@ -33,17 +33,11 @@ export function AuditTab() {
           <AuditRow key={event.id} event={event} />
         ))}
       </ul>
-      {audit.hasNextPage ? (
-        <div className="border-t border-line p-3 text-center">
-          <Button
-            variant="tertiary"
-            loading={audit.isFetchingNextPage}
-            onClick={() => void audit.fetchNextPage()}
-          >
-            {t("audit.more")}
-          </Button>
-        </div>
-      ) : null}
+      <LoadMore
+        hasNextPage={audit.hasNextPage}
+        isFetchingNextPage={audit.isFetchingNextPage}
+        fetchNextPage={audit.fetchNextPage}
+      />
     </Card>
   );
 }
