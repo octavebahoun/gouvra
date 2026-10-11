@@ -11,6 +11,11 @@ tool calls, tokens, costs and errors. When something fails, Gouvra tells you why
   <img src="docs/images/usage-dark.png" width="49%" alt="Usage with cost provenance, dark mode" />
 </p>
 
+## Why Gouvra?
+
+Gouvra is the control room you host yourself. When a run fails, it tells you why in plain
+language. When it shows a cost, the number comes from the provider or from a published price.
+
 ## Features
 
 - **Agents with versions** — instructions, model, parameters, tools and limits; every change is a
