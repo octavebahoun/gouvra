@@ -37,7 +37,7 @@ tool calls, tokens, costs and errors. When something fails, Gouvra tells you why
 Requirements: Docker with Compose v2.
 
 ```bash
-git clone https://github.com/gouvra/gouvra && cd gouvra
+git clone https://github.com/octavebahoun/gouvra && cd gouvra
 scripts/gen-secrets          # generates every internal secret into .env
 docker compose up -d         # first build takes a few minutes
 ```
