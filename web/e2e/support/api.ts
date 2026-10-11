@@ -139,3 +139,68 @@ export async function signIn(context: BrowserContext, user: SeededUser): Promise
     })),
   );
 }
+
+// ---------------------------------------------------------------- build & operate data
+
+export type SeededProvider = { id: string; name: string };
+export type SeededTool = { id: string; name: string; display_name: string };
+export type SeededAgent = { id: string; name: string };
+export type SeededExecution = { id: string; status: string };
+
+/** The offline scripted provider: deterministic, free, no network. */
+export async function createScriptedProvider(
+  owner: SeededUser,
+  workspaceId: string,
+  name = "Scripted (offline)",
+) {
+  const provider = await call<SeededProvider>("POST", `/workspaces/${workspaceId}/providers`, {
+    body: { name, kind: "test", default_model: "gouvra-test-1" },
+    cookies: owner.cookies,
+  });
+  await call("POST", `/providers/${provider.id}/test`, { cookies: owner.cookies });
+  return provider;
+}
+
+export async function createBuiltinTool(owner: SeededUser, workspaceId: string, key: string) {
+  return call<SeededTool>("POST", `/workspaces/${workspaceId}/tools`, {
+    body: { kind: "builtin", builtin_key: key },
+    cookies: owner.cookies,
+  });
+}
+
+export async function createAgent(
+  owner: SeededUser,
+  workspaceId: string,
+  body: {
+    name: string;
+    provider_id: string;
+    tool_ids?: string[];
+    instructions?: string;
+    description?: string;
+  },
+) {
+  return call<SeededAgent>("POST", `/workspaces/${workspaceId}/agents`, {
+    body: { model: "gouvra-test-1", instructions: "You are a helpful test agent.", ...body },
+    cookies: owner.cookies,
+  });
+}
+
+export async function launchExecution(owner: SeededUser, agentId: string, input: string) {
+  return call<SeededExecution>("POST", `/agents/${agentId}/executions`, {
+    body: { input },
+    cookies: owner.cookies,
+  });
+}
+
+/** Wait until the worker has finished the execution (the stack's real worker runs it). */
+export async function waitForExecution(owner: SeededUser, executionId: string, timeoutMs = 30_000) {
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    const execution = await call<SeededExecution>("GET", `/executions/${executionId}`, {
+      cookies: owner.cookies,
+    });
+    if (!["queued", "running"].includes(execution.status)) return execution;
+    await new Promise((resolve) => setTimeout(resolve, 300));
+  }
+  throw new Error(`Execution ${executionId} did not finish within ${timeoutMs} ms`);
+}

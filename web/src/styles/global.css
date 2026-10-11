@@ -80,6 +80,16 @@
   }
 }
 
+/* A list row whose state just changed live: a brief brand wash, then back to normal. */
+@keyframes gv-row-flash {
+  0% {
+    background-color: color-mix(in srgb, var(--gv-brand) 14%, transparent);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
 @keyframes gv-shimmer {
   from {
     transform: translateX(-100%);

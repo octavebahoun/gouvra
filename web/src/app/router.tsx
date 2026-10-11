@@ -178,6 +178,79 @@ export const router = createBrowserRouter([
                       },
                     ],
                   },
+                  // H, I, J — agents
+                  {
+                    path: "agents",
+                    lazy: () =>
+                      import("@/features/agents/agents-page").then((m) => ({
+                        Component: m.AgentsPage,
+                      })),
+                  },
+                  {
+                    path: "agents/new",
+                    lazy: () =>
+                      import("@/features/agents/agent-editor-page").then((m) => ({
+                        Component: m.AgentEditorPage,
+                      })),
+                  },
+                  {
+                    path: "agents/:agentId",
+                    lazy: () =>
+                      import("@/features/agents/agent-page").then((m) => ({
+                        Component: m.AgentPage,
+                      })),
+                  },
+                  {
+                    path: "agents/:agentId/edit",
+                    lazy: () =>
+                      import("@/features/agents/agent-editor-page").then((m) => ({
+                        Component: m.AgentEditorPage,
+                      })),
+                  },
+                  // L, M — executions
+                  {
+                    path: "executions",
+                    lazy: () =>
+                      import("@/features/executions/executions-page").then((m) => ({
+                        Component: m.ExecutionsPage,
+                      })),
+                  },
+                  {
+                    path: "executions/:executionId",
+                    lazy: () =>
+                      import("@/features/executions/execution-page").then((m) => ({
+                        Component: m.ExecutionPage,
+                      })),
+                  },
+                  // P — usage
+                  {
+                    path: "usage",
+                    lazy: () =>
+                      import("@/features/usage/usage-page").then((m) => ({
+                        Component: m.UsagePage,
+                      })),
+                  },
+                  // O — providers
+                  {
+                    path: "providers",
+                    lazy: () =>
+                      import("@/features/providers/providers-page").then((m) => ({
+                        Component: m.ProvidersPage,
+                      })),
+                  },
+                  // N — tools
+                  {
+                    path: "tools",
+                    lazy: () =>
+                      import("@/features/tools/tools-page").then((m) => ({
+                        Component: m.ToolsPage,
+                      })),
+                  },
+                  {
+                    path: "tools/:toolId",
+                    lazy: () =>
+                      import("@/features/tools/tool-page").then((m) => ({ Component: m.ToolPage })),
+                  },
                   // H–P, S, T — sections delivered in later phases (honest interim pages)
                   {
                     path: ":section/*",

@@ -1,0 +1,316 @@
+{
+  "title": "Exécutions",
+  "description": "Chaque exécution de chaque agent, en direct. Ouvrez-en une pour suivre sa trace étape par étape.",
+  "loadError": "Les exécutions sont indisponibles pour le moment.",
+  "live": "En direct",
+  "liveHint": "Se met à jour quand une exécution change d'état",
+  "filters": {
+    "label": "Filtrer les exécutions",
+    "search": "Rechercher une entrée ou un ID",
+    "status": "État",
+    "allStatuses": "Tous les états",
+    "agent": "Agent",
+    "allAgents": "Tous les agents",
+    "trigger": "Déclencheur",
+    "allTriggers": "Tous les déclencheurs",
+    "period": "Période",
+    "periods": {
+      "all": "Toutes dates",
+      "24h": "Dernières 24 heures",
+      "7d": "7 derniers jours",
+      "30d": "30 derniers jours"
+    },
+    "active_one": "{{count}} filtre",
+    "active_other": "{{count}} filtres"
+  },
+  "triggers": {
+    "manual": "Manuel",
+    "api": "API",
+    "retry": "Relance",
+    "schedule": "Planification",
+    "webhook": "Webhook",
+    "evaluation": "Évaluation",
+    "workflow": "Workflow",
+    "agent": "Agent"
+  },
+  "columns": {
+    "execution": "Exécution",
+    "agent": "Agent",
+    "status": "État",
+    "trigger": "Déclencheur",
+    "duration": "Durée",
+    "cost": "Coût",
+    "started": "Lancée"
+  },
+  "deletedAgent": "Agent supprimé",
+  "noInput": "Aucune entrée",
+  "empty": {
+    "title": "Aucune exécution pour l'instant",
+    "body": "Lancez un agent : sa trace apparaît ici, en direct.",
+    "filteredTitle": "Aucune exécution ne correspond à ces filtres",
+    "filteredBody": "Élargissez la période ou effacez les filtres.",
+    "action": "Ouvrir les agents"
+  },
+  "countShown_one": "{{count}} exécution affichée",
+  "countShown_other": "{{count}} exécutions affichées",
+  "detail": {
+    "titleFallback": "Exécution",
+    "breadcrumb": "Exécutions",
+    "id": "ID d'exécution",
+    "copyId": "l'ID d'exécution",
+    "cancel": "Annuler",
+    "cancelling": "Annulation…",
+    "cancelRequested": "Annulation demandée",
+    "cancelled": "Exécution annulée",
+    "retry": "Relancer",
+    "retried": "Relancée sous forme d'une nouvelle exécution",
+    "export": "Exporter en JSON",
+    "openAgent": "Ouvrir l'agent",
+    "versionChip": "v{{version}}",
+    "triggeredBy": "{{trigger}} · par {{who}}",
+    "triggeredAuto": "{{trigger}}",
+    "attempt": "Tentative {{attempt}}",
+    "parent": "Suite de {{id}}",
+    "notFoundTitle": "Exécution introuvable",
+    "notFoundBody": "Elle n'existe pas ou appartient à un autre workspace."
+  },
+  "metrics": {
+    "duration": "Durée",
+    "steps": "Étapes",
+    "modelCalls": "Appels au modèle",
+    "toolCalls": "Appels d'outils",
+    "tokens": "Tokens",
+    "tokensDetail": "{{input}} en entrée · {{output}} en sortie",
+    "cost": "Coût",
+    "queuedFor": "En file depuis {{duration}}",
+    "timeout": "Limite de temps {{duration}}"
+  },
+  "io": {
+    "input": "Entrée",
+    "output": "Sortie",
+    "text": "Texte",
+    "json": "JSON",
+    "waiting": "La réponse s'affiche ici dès que le modèle l'écrit.",
+    "streaming": "Écriture…",
+    "none": "Cette exécution n'a produit aucune sortie.",
+    "truncated": "La réponse a été coupée par la limite de tokens de sortie."
+  },
+  "timeline": {
+    "title": "Trace",
+    "description": "Ce qui s'est passé, dans l'ordre. Les événements internes sont séparés de la réponse de l'agent.",
+    "empty": "Les événements s'affichent ici au fil de l'exécution.",
+    "waitingWorker": "En attente d'un worker disponible…",
+    "step": "Étape {{step}}",
+    "showDetails": "Afficher les détails",
+    "hideDetails": "Masquer les détails",
+    "copyEvent": "les données de l'événement",
+    "events": {
+      "execution_queued": "En file",
+      "execution_started": "Démarrée",
+      "execution_cancel_requested": "Annulation demandée",
+      "execution_succeeded": "Réussie",
+      "execution_failed": "Échouée",
+      "execution_cancelled": "Annulée",
+      "execution_timed_out": "Délai dépassé",
+      "model_request": "Appel au modèle",
+      "model_response": "Réponse du modèle",
+      "model_error": "Erreur du modèle",
+      "tool_call": "Appel d'outil",
+      "tool_result": "Résultat d'outil",
+      "log": "Note"
+    },
+    "startedDetail": "{{provider}} · {{model}}",
+    "requestDetail": "{{model}} · {{messages}} messages",
+    "requestTools_one": "{{count}} outil disponible",
+    "requestTools_other": "{{count}} outils disponibles",
+    "responseTools_one": "A demandé {{count}} outil",
+    "responseTools_other": "A demandé {{count}} outils",
+    "responseText": "A répondu",
+    "tokens": "{{input}} → {{output}} tokens",
+    "reasoning": "Raisonnement",
+    "thinking": "Réflexion…",
+    "writing": "Écriture…",
+    "arguments": "Arguments",
+    "result": "Résultat",
+    "toolOk": "Résultat en {{duration}}",
+    "toolFailed": "Échec : {{code}}",
+    "retriedAttempts_one": "Réussi après {{count}} nouvel essai",
+    "retriedAttempts_other": "Réussi après {{count}} nouveaux essais",
+    "requestId": "ID de requête du fournisseur"
+  },
+  "cost": {
+    "provider_reported": "Communiqué par le fournisseur",
+    "estimated": "Estimé d'après les tarifs publiés",
+    "unavailable": "Indisponible pour ce modèle",
+    "partial": "Certains appels n'ont pas de prix : le total est un minimum."
+  },
+  "diagnosis": {
+    "title": "Pourquoi l'exécution a échoué",
+    "code": "Code d'erreur",
+    "retryable": "Relancer peut fonctionner",
+    "notRetryable": "Relancer ne servira à rien tant que la cause n'est pas corrigée",
+    "fallback": {
+      "title": "L'exécution a échoué",
+      "explanation": "Gouvra a enregistré une erreur qu'il n'explique pas encore en détail.",
+      "action": "Consultez la trace ci-dessous ; partagez l'ID d'exécution si vous avez besoin d'aide."
+    },
+    "provider_auth_error": {
+      "title": "Le fournisseur a refusé la clé d'API",
+      "explanation": "La clé est erronée, révoquée ou appartient à un autre compte.",
+      "action": "Mettez la clé à jour dans Fournisseurs, puis relancez."
+    },
+    "provider_permission_denied": {
+      "title": "La clé n'a pas accès à ce modèle",
+      "explanation": "Le compte du fournisseur n'a pas accès au modèle ou à la fonction demandés.",
+      "action": "Choisissez un autre modèle, ou activez-le dans la console du fournisseur."
+    },
+    "provider_rate_limited": {
+      "title": "Le fournisseur limite les requêtes",
+      "explanation": "Trop de requêtes lui sont parvenues en peu de temps.",
+      "action": "Patientez un instant puis relancez, ou réduisez la concurrence du workspace."
+    },
+    "provider_quota_exhausted": {
+      "title": "Le compte du fournisseur n'a plus de crédit",
+      "explanation": "Le fournisseur a refusé l'appel : solde ou quota épuisé.",
+      "action": "Rechargez le compte du fournisseur, puis relancez."
+    },
+    "provider_unavailable": {
+      "title": "Le fournisseur est indisponible",
+      "explanation": "Ses serveurs n'ont pas répondu normalement (surcharge ou panne).",
+      "action": "Relancez dans quelques minutes."
+    },
+    "provider_timeout": {
+      "title": "Le fournisseur a mis trop de temps",
+      "explanation": "Aucune réponse n'est arrivée à temps.",
+      "action": "Relancez, ou augmentez la limite de temps de l'agent."
+    },
+    "provider_network_error": {
+      "title": "Le fournisseur est injoignable",
+      "explanation": "La connexion a échoué avant toute réponse.",
+      "action": "Vérifiez l'URL de base et le réseau, puis relancez."
+    },
+    "provider_bad_request": {
+      "title": "Le fournisseur a rejeté la requête",
+      "explanation": "Un paramètre n'est pas pris en charge par ce modèle ou ce fournisseur.",
+      "action": "Revoyez les paramètres du modèle de l'agent, puis relancez."
+    },
+    "model_not_found": {
+      "title": "Ce modèle n'existe pas chez le fournisseur",
+      "explanation": "Le nom du modèle est erroné ou le modèle a été retiré.",
+      "action": "Choisissez un modèle disponible dans les réglages de l'agent."
+    },
+    "context_length_exceeded": {
+      "title": "La conversation est trop longue pour le modèle",
+      "explanation": "Instructions, entrée et résultats d'outils dépassent la fenêtre de contexte du modèle.",
+      "action": "Raccourcissez l'entrée ou les instructions, ou choisissez un modèle au contexte plus grand."
+    },
+    "content_filtered": {
+      "title": "Le filtre de sécurité du fournisseur a bloqué la réponse",
+      "explanation": "Le fournisseur a refusé de renvoyer du contenu pour cette requête.",
+      "action": "Reformulez l'entrée."
+    },
+    "provider_invalid_response": {
+      "title": "Le fournisseur a envoyé une réponse illisible",
+      "explanation": "La réponse ne suit pas le format documenté du fournisseur.",
+      "action": "Relancez ; si cela persiste, consultez la page d'état du fournisseur."
+    },
+    "provider_misconfigured": {
+      "title": "Le fournisseur est mal configuré",
+      "explanation": "Ses réglages sont incomplets (clé ou URL de base manquante).",
+      "action": "Corrigez le fournisseur dans Fournisseurs."
+    },
+    "provider_missing": {
+      "title": "L'agent n'a pas de fournisseur",
+      "explanation": "Le fournisseur a été supprimé ou n'a jamais été choisi.",
+      "action": "Choisissez un fournisseur dans les réglages de l'agent."
+    },
+    "agent_version_missing": {
+      "title": "La version de l'agent n'existe plus",
+      "explanation": "La version que devait exécuter cette exécution a disparu.",
+      "action": "Relancez l'agent depuis sa page."
+    },
+    "limit_exceeded": {
+      "title": "L'agent a atteint l'une de ses limites",
+      "explanation": "Gouvra l'a arrêté à la limite que vous avez fixée ({{limit}}).",
+      "action": "Augmentez la limite dans les réglages de l'agent si la tâche en a vraiment besoin."
+    },
+    "model_refused": {
+      "title": "Le modèle a décliné la demande",
+      "explanation": "Le modèle a choisi de ne pas répondre à cette entrée.",
+      "action": "Reformulez l'entrée ou ajustez les instructions."
+    },
+    "output_truncated": {
+      "title": "La réponse a été coupée",
+      "explanation": "Le modèle a atteint sa limite de tokens de sortie avant de terminer.",
+      "action": "Augmentez le maximum de tokens de sortie ou demandez une réponse plus courte."
+    },
+    "timeout": {
+      "title": "L'exécution a manqué de temps",
+      "explanation": "Elle ne s'est pas terminée dans sa limite de temps.",
+      "action": "Augmentez la limite de temps ou simplifiez la tâche."
+    },
+    "worker_lost": {
+      "title": "Le worker qui l'exécutait s'est arrêté",
+      "explanation": "Le processus chargé de cette exécution a disparu (redémarrage ou plantage).",
+      "action": "Relancez-la : seul le temps passé est perdu."
+    },
+    "worker_shutdown": {
+      "title": "Interrompue par un arrêt",
+      "explanation": "Le worker a été arrêté pour maintenance avant la fin de l'exécution.",
+      "action": "Relancez-la."
+    },
+    "cancelled": {
+      "title": "Annulée",
+      "explanation": "Quelqu'un a annulé cette exécution.",
+      "action": "Relancez-la si nécessaire."
+    },
+    "internal_error": {
+      "title": "Gouvra a rencontré une erreur inattendue",
+      "explanation": "L'échec vient de Gouvra, pas de l'agent ni du fournisseur.",
+      "action": "Relancez ; si cela persiste, transmettez l'ID d'exécution à votre administrateur."
+    }
+  },
+  "limits": {
+    "max_steps": "nombre maximal de tours du modèle",
+    "max_tool_calls": "nombre maximal d'appels d'outils",
+    "max_total_tokens": "nombre maximal de tokens",
+    "max_cost_usd": "coût maximal"
+  },
+  "tools": {
+    "tool_not_allowed": "Le modèle a demandé un outil que cet agent n'a pas le droit d'utiliser.",
+    "invalid_arguments": "Le modèle a envoyé des arguments qui ne respectent pas le schéma de l'outil.",
+    "tool_timeout": "L'outil a mis trop de temps.",
+    "tool_error": "L'outil a signalé une erreur.",
+    "tool_disabled": "L'outil est désactivé.",
+    "tool_unavailable": "L'outil n'est pas disponible sur cette instance."
+  },
+  "launch": {
+    "title": "Lancer {{agent}}",
+    "description": "L'exécution démarre immédiatement ; vous la suivrez en direct.",
+    "input": "Entrée",
+    "inputPlaceholder": "Que doit faire l'agent ?",
+    "inputRequired": "Donnez une entrée à l'agent.",
+    "inputTooLarge": "L'entrée est trop volumineuse ({{max}} maximum).",
+    "mode": "Format de l'entrée",
+    "modeText": "Texte",
+    "modeJson": "JSON",
+    "jsonInvalid": "Ce n'est pas du JSON valide : {{message}}",
+    "jsonObject": "Utilisez un objet JSON, comme {\"question\": \"…\"}.",
+    "timeout": "Limite de temps (secondes)",
+    "timeoutHelp": "Par défaut, la limite de l'agent ({{seconds}} s).",
+    "limitsTitle": "Cette exécution est bornée par",
+    "limitSteps_one": "{{count}} tour du modèle",
+    "limitSteps_other": "{{count}} tours du modèle",
+    "limitTools_one": "{{count}} appel d'outil",
+    "limitTools_other": "{{count}} appels d'outils",
+    "limitTime": "{{seconds}} s",
+    "limitCost": "{{amount}} maximum",
+    "costNote": "Le coût dépend de la réponse du modèle ; il s'affiche en direct dès qu'il est connu.",
+    "submit": "Lancer",
+    "submitting": "Démarrage…",
+    "shortcut": "Ctrl + Entrée",
+    "notReady": "Cet agent ne peut pas encore s'exécuter : {{issues}}.",
+    "started": "Exécution lancée",
+    "rateLimited": "Trop d'exécutions lancées en peu de temps. Réessayez dans {{seconds}} s."
+  }
+}

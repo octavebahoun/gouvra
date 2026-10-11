@@ -7,6 +7,7 @@ import {
   useContext,
   useId,
   useState,
+  type AriaAttributes,
   type ComponentProps,
   type KeyboardEvent,
   type ReactElement,
@@ -22,12 +23,31 @@ type FieldContextValue = {
   hintId: string;
   errorId: string;
   invalid: boolean;
+  /** The ids that describe the control (description, hint, error), as aria-describedby wants them. */
+  describedBy: string | undefined;
 };
 const FieldContext = createContext<FieldContextValue | null>(null);
 
 /** Read the ids of the surrounding <Field> so custom controls can wire ARIA themselves. */
 export function useField(): FieldContextValue | null {
   return useContext(FieldContext);
+}
+
+/**
+ * Label, description and error wiring for a control rendered indirectly inside a <Field>
+ * (e.g. through react-hook-form's Controller, which the Field cannot clone): explicit props win.
+ */
+export function useFieldWiring(props: {
+  id?: string;
+  "aria-describedby"?: string;
+  "aria-invalid"?: AriaAttributes["aria-invalid"];
+}) {
+  const field = useField();
+  return {
+    id: props.id ?? field?.id,
+    "aria-describedby": props["aria-describedby"] ?? field?.describedBy,
+    "aria-invalid": props["aria-invalid"] ?? (field?.invalid ? true : undefined),
+  };
 }
 
 export const controlClass = cn(
@@ -96,7 +116,9 @@ export function Field({
     : children;
 
   return (
-    <FieldContext.Provider value={{ id, descriptionId, hintId, errorId, invalid }}>
+    <FieldContext.Provider
+      value={{ id, descriptionId, hintId, errorId, invalid, describedBy: describedBy || undefined }}
+    >
       <div className={cn("flex flex-col gap-1.5", className)}>
         <div className={cn("flex items-baseline justify-between gap-3", hideLabel && "sr-only")}>
           <label htmlFor={id} className="text-[13px] font-medium text-ink">

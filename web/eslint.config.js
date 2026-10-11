@@ -39,6 +39,7 @@ export default tseslint.config(
             "badgeVariants",
             "controlClass",
             "useField",
+            "useFieldWiring",
             "useAnnounce",
             "isTerminal",
           ],

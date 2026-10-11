@@ -156,11 +156,16 @@ export function NotFoundState({
   compact = false,
   action,
   headingLevel,
+  title,
+  description,
 }: {
   className?: string;
   compact?: boolean;
   action?: ReactNode;
   headingLevel?: "h1" | "h2";
+  /** Name what wasn't found ("Agent not found") instead of the generic wording. */
+  title?: ReactNode;
+  description?: ReactNode;
 }) {
   const { t } = useTranslation();
   return (
@@ -172,10 +177,10 @@ export function NotFoundState({
       title={
         <span className="inline-flex items-center gap-2">
           {compact ? <SearchX aria-hidden className="size-4 text-muted" /> : null}
-          {t("states.notFoundTitle")}
+          {title ?? t("states.notFoundTitle")}
         </span>
       }
-      description={t("states.notFoundBody")}
+      description={description ?? t("states.notFoundBody")}
       action={action}
     />
   );

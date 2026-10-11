@@ -1327,12 +1327,12 @@ export interface components {
              * Instructions
              * @default
              */
-            instructions: string;
+            instructions?: string;
             /** Provider Id */
             provider_id?: string | null;
             /** Model */
             model?: string | null;
-            parameters?: components["schemas"]["AgentParameters"];
+            parameters?: components["schemas"]["AgentParameters-Input"];
             /** Tool Ids */
             tool_ids?: string[];
             limits?: components["schemas"]["AgentLimits-Input"];
@@ -1342,7 +1342,7 @@ export interface components {
              * Description
              * @default
              */
-            description: string;
+            description?: string;
         };
         /** AgentDuplicateIn */
         AgentDuplicateIn: {
@@ -1356,17 +1356,17 @@ export interface components {
              * @description Model turns per execution
              * @default 8
              */
-            max_steps: number;
+            max_steps?: number;
             /**
              * Max Tool Calls
              * @default 20
              */
-            max_tool_calls: number;
+            max_tool_calls?: number;
             /**
              * Timeout S
              * @default 120
              */
-            timeout_s: number;
+            timeout_s?: number;
             /** Max Total Tokens */
             max_total_tokens?: number | null;
             /** Max Cost Usd */
@@ -1391,9 +1391,9 @@ export interface components {
              */
             timeout_s: number;
             /** Max Total Tokens */
-            max_total_tokens?: number | null;
+            max_total_tokens: number | null;
             /** Max Cost Usd */
-            max_cost_usd?: string | null;
+            max_cost_usd: string | null;
         };
         /** AgentOut */
         AgentOut: {
@@ -1438,13 +1438,34 @@ export interface components {
             updated_at: string;
         };
         /** AgentParameters */
-        AgentParameters: {
+        "AgentParameters-Input": {
             /** Temperature */
             temperature?: number | null;
             /** Top P */
             top_p?: number | null;
             /** Max Output Tokens */
             max_output_tokens?: number | null;
+            /**
+             * Reasoning
+             * @default auto
+             * @enum {string}
+             */
+            reasoning?: "auto" | "off" | "low" | "medium" | "high" | "max";
+            /**
+             * Response Format
+             * @default text
+             * @enum {string}
+             */
+            response_format?: "text" | "json";
+        };
+        /** AgentParameters */
+        "AgentParameters-Output": {
+            /** Temperature */
+            temperature: number | null;
+            /** Top P */
+            top_p: number | null;
+            /** Max Output Tokens */
+            max_output_tokens: number | null;
             /**
              * Reasoning
              * @default auto
@@ -1501,7 +1522,7 @@ export interface components {
             provider_id?: string | null;
             /** Model */
             model?: string | null;
-            parameters?: components["schemas"]["AgentParameters"] | null;
+            parameters?: components["schemas"]["AgentParameters-Input"] | null;
             /** Tool Ids */
             tool_ids?: string[] | null;
             limits?: components["schemas"]["AgentLimits-Input"] | null;
@@ -1527,7 +1548,7 @@ export interface components {
             provider_kind: string | null;
             /** Model */
             model: string;
-            parameters: components["schemas"]["AgentParameters"];
+            parameters: components["schemas"]["AgentParameters-Output"];
             /** Tools */
             tools: components["schemas"]["ToolRef"][];
             limits: components["schemas"]["AgentLimits-Output"];
@@ -1552,7 +1573,7 @@ export interface components {
              * @default member
              * @enum {string}
              */
-            role: "admin" | "member" | "viewer";
+            role?: "admin" | "member" | "viewer";
             /** Expires In Days */
             expires_in_days?: number | null;
         };
@@ -1647,13 +1668,13 @@ export interface components {
         /** BreakdownRow */
         BreakdownRow: {
             /** Agent Id */
-            agent_id?: string | null;
+            agent_id: string | null;
             /** Agent Name */
-            agent_name?: string | null;
+            agent_name: string | null;
             /** Provider Kind */
-            provider_kind?: string | null;
+            provider_kind: string | null;
             /** Model */
-            model?: string | null;
+            model: string | null;
             /** Input Tokens */
             input_tokens: number;
             /** Output Tokens */
@@ -1717,7 +1738,7 @@ export interface components {
              * Replace
              * @default false
              */
-            replace: boolean;
+            replace?: boolean;
         };
         /** CaseIn */
         CaseIn: {
@@ -1853,17 +1874,17 @@ export interface components {
              * @default all
              * @enum {string}
              */
-            mode: "all" | "any" | "none";
+            mode?: "all" | "any" | "none";
             /**
              * Case Sensitive
              * @default false
              */
-            case_sensitive: boolean;
+            case_sensitive?: boolean;
             /**
              * Weight
              * @default 1
              */
-            weight: number;
+            weight?: number;
         };
         /** CostOut */
         CostOut: {
@@ -1931,7 +1952,7 @@ export interface components {
              */
             retryable: boolean;
             /** Details */
-            details?: {
+            details: {
                 [key: string]: unknown;
             };
         };
@@ -1960,17 +1981,17 @@ export interface components {
              * Case Sensitive
              * @default false
              */
-            case_sensitive: boolean;
+            case_sensitive?: boolean;
             /**
              * Trim
              * @default true
              */
-            trim: boolean;
+            trim?: boolean;
             /**
              * Weight
              * @default 1
              */
-            weight: number;
+            weight?: number;
         };
         /** ExecutionEventOut */
         ExecutionEventOut: {
@@ -2158,7 +2179,7 @@ export interface components {
              * @default member
              * @enum {string}
              */
-            role: "admin" | "member" | "viewer";
+            role?: "admin" | "member" | "viewer";
         };
         /** InvitationOut */
         InvitationOut: {
@@ -2227,7 +2248,7 @@ export interface components {
              * Weight
              * @default 1
              */
-            weight: number;
+            weight?: number;
         };
         /** LastExecution */
         LastExecution: {
@@ -2274,12 +2295,12 @@ export interface components {
              * Pass Threshold
              * @default 0.7
              */
-            pass_threshold: number;
+            pass_threshold?: number;
             /**
              * Weight
              * @default 1
              */
-            weight: number;
+            weight?: number;
         };
         /** LoginIn */
         LoginIn: {
@@ -2420,7 +2441,7 @@ export interface components {
             /** Data */
             data: components["schemas"]["AgentOut"][];
             /** Next Cursor */
-            next_cursor?: string | null;
+            next_cursor: string | null;
             /**
              * Has More
              * @default false
@@ -2432,7 +2453,7 @@ export interface components {
             /** Data */
             data: components["schemas"]["AuditEventOut"][];
             /** Next Cursor */
-            next_cursor?: string | null;
+            next_cursor: string | null;
             /**
              * Has More
              * @default false
@@ -2444,7 +2465,7 @@ export interface components {
             /** Data */
             data: components["schemas"]["ExecutionSummary"][];
             /** Next Cursor */
-            next_cursor?: string | null;
+            next_cursor: string | null;
             /**
              * Has More
              * @default false
@@ -2456,7 +2477,7 @@ export interface components {
             /** Data */
             data: components["schemas"]["RunOut"][];
             /** Next Cursor */
-            next_cursor?: string | null;
+            next_cursor: string | null;
             /**
              * Has More
              * @default false
@@ -2636,17 +2657,17 @@ export interface components {
              * Ignore Case
              * @default false
              */
-            ignore_case: boolean;
+            ignore_case?: boolean;
             /**
              * Should Match
              * @default true
              */
-            should_match: boolean;
+            should_match?: boolean;
             /**
              * Weight
              * @default 1
              */
-            weight: number;
+            weight?: number;
         };
         /** RegisterIn */
         RegisterIn: {
@@ -2664,7 +2685,7 @@ export interface components {
              * @default en
              * @enum {string}
              */
-            locale: "en" | "fr";
+            locale?: "en" | "fr";
             /**
              * Accept Terms
              * @description The user accepted the terms of use.
@@ -2888,13 +2909,13 @@ export interface components {
              */
             cancelled: number;
             /** Pass Rate */
-            pass_rate?: number | null;
+            pass_rate: number | null;
             /** Avg Score */
-            avg_score?: number | null;
+            avg_score: number | null;
             /** Cost Amount */
-            cost_amount?: string | null;
+            cost_amount: string | null;
             /** Cost Currency */
-            cost_currency?: string | null;
+            cost_currency: string | null;
             /**
              * Cost Source
              * @default unavailable
@@ -2907,11 +2928,11 @@ export interface components {
              */
             cost_partial: boolean;
             /** Judge Cost Amount */
-            judge_cost_amount?: string | null;
+            judge_cost_amount: string | null;
             /** Avg Duration Ms */
-            avg_duration_ms?: number | null;
+            avg_duration_ms: number | null;
             /** P95 Duration Ms */
-            p95_duration_ms?: number | null;
+            p95_duration_ms: number | null;
             /**
              * Input Tokens
              * @default 0
@@ -2987,7 +3008,7 @@ export interface components {
              * Description
              * @default
              */
-            description: string;
+            description?: string;
             /** Agent Id */
             agent_id?: string | null;
             /** Default Graders */
@@ -2996,7 +3017,7 @@ export interface components {
              * Pass Threshold
              * @default 1
              */
-            pass_threshold: number;
+            pass_threshold?: number;
         };
         /** SuiteOut */
         SuiteOut: {
@@ -3148,7 +3169,7 @@ export interface components {
              * Timeout Ms
              * @default 15000
              */
-            timeout_ms: number;
+            timeout_ms?: number;
         };
         /** ToolOut */
         ToolOut: {
@@ -3229,11 +3250,11 @@ export interface components {
             /** Ok */
             ok: boolean;
             /** Output */
-            output?: unknown;
+            output: unknown;
             /** Error Code */
-            error_code?: string | null;
+            error_code: string | null;
             /** Error Message */
-            error_message?: string | null;
+            error_message: string | null;
             /** Duration Ms */
             duration_ms: number;
             /** Truncated */
@@ -3261,7 +3282,7 @@ export interface components {
              * Clear Secret
              * @default false
              */
-            clear_secret: boolean;
+            clear_secret?: boolean;
             /** Timeout Ms */
             timeout_ms?: number | null;
             /** Status */

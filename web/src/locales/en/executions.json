@@ -1,0 +1,316 @@
+{
+  "title": "Executions",
+  "description": "Every run of every agent, live. Open one to follow its trace step by step.",
+  "loadError": "Executions are unavailable right now.",
+  "live": "Live",
+  "liveHint": "Updates as executions change state",
+  "filters": {
+    "label": "Filter executions",
+    "search": "Search input or ID",
+    "status": "Status",
+    "allStatuses": "All statuses",
+    "agent": "Agent",
+    "allAgents": "All agents",
+    "trigger": "Trigger",
+    "allTriggers": "All triggers",
+    "period": "Period",
+    "periods": {
+      "all": "Any time",
+      "24h": "Last 24 hours",
+      "7d": "Last 7 days",
+      "30d": "Last 30 days"
+    },
+    "active_one": "{{count}} filter",
+    "active_other": "{{count}} filters"
+  },
+  "triggers": {
+    "manual": "Manual",
+    "api": "API",
+    "retry": "Retry",
+    "schedule": "Schedule",
+    "webhook": "Webhook",
+    "evaluation": "Evaluation",
+    "workflow": "Workflow",
+    "agent": "Agent"
+  },
+  "columns": {
+    "execution": "Execution",
+    "agent": "Agent",
+    "status": "Status",
+    "trigger": "Trigger",
+    "duration": "Duration",
+    "cost": "Cost",
+    "started": "Started"
+  },
+  "deletedAgent": "Deleted agent",
+  "noInput": "No input",
+  "empty": {
+    "title": "No executions yet",
+    "body": "Run an agent and its trace appears here, live.",
+    "filteredTitle": "No execution matches these filters",
+    "filteredBody": "Widen the period or clear the filters.",
+    "action": "Open agents"
+  },
+  "countShown_one": "{{count}} execution shown",
+  "countShown_other": "{{count}} executions shown",
+  "detail": {
+    "titleFallback": "Execution",
+    "breadcrumb": "Executions",
+    "id": "Execution ID",
+    "copyId": "execution ID",
+    "cancel": "Cancel",
+    "cancelling": "Cancelling…",
+    "cancelRequested": "Cancellation requested",
+    "cancelled": "Execution cancelled",
+    "retry": "Run again",
+    "retried": "Started again as a new execution",
+    "export": "Export JSON",
+    "openAgent": "Open agent",
+    "versionChip": "v{{version}}",
+    "triggeredBy": "{{trigger}} · by {{who}}",
+    "triggeredAuto": "{{trigger}}",
+    "attempt": "Attempt {{attempt}}",
+    "parent": "Follow-up of {{id}}",
+    "notFoundTitle": "Execution not found",
+    "notFoundBody": "It doesn't exist or belongs to another workspace."
+  },
+  "metrics": {
+    "duration": "Duration",
+    "steps": "Steps",
+    "modelCalls": "Model calls",
+    "toolCalls": "Tool calls",
+    "tokens": "Tokens",
+    "tokensDetail": "{{input}} in · {{output}} out",
+    "cost": "Cost",
+    "queuedFor": "Queued for {{duration}}",
+    "timeout": "Time limit {{duration}}"
+  },
+  "io": {
+    "input": "Input",
+    "output": "Output",
+    "text": "Text",
+    "json": "JSON",
+    "waiting": "The answer appears here as soon as the model writes it.",
+    "streaming": "Writing…",
+    "none": "This execution produced no output.",
+    "truncated": "The answer was cut by the output token limit."
+  },
+  "timeline": {
+    "title": "Trace",
+    "description": "What happened, in order. Internal events are kept apart from the agent's answer.",
+    "empty": "Events appear here as the execution runs.",
+    "waitingWorker": "Waiting for a worker to pick it up…",
+    "step": "Step {{step}}",
+    "showDetails": "Show details",
+    "hideDetails": "Hide details",
+    "copyEvent": "event data",
+    "events": {
+      "execution_queued": "Queued",
+      "execution_started": "Started",
+      "execution_cancel_requested": "Cancellation requested",
+      "execution_succeeded": "Succeeded",
+      "execution_failed": "Failed",
+      "execution_cancelled": "Cancelled",
+      "execution_timed_out": "Timed out",
+      "model_request": "Model call",
+      "model_response": "Model answered",
+      "model_error": "Model error",
+      "tool_call": "Tool call",
+      "tool_result": "Tool result",
+      "log": "Note"
+    },
+    "startedDetail": "{{provider}} · {{model}}",
+    "requestDetail": "{{model}} · {{messages}} messages",
+    "requestTools_one": "{{count}} tool available",
+    "requestTools_other": "{{count}} tools available",
+    "responseTools_one": "Asked for {{count}} tool",
+    "responseTools_other": "Asked for {{count}} tools",
+    "responseText": "Answered",
+    "tokens": "{{input}} → {{output}} tokens",
+    "reasoning": "Reasoning",
+    "thinking": "Thinking…",
+    "writing": "Writing…",
+    "arguments": "Arguments",
+    "result": "Result",
+    "toolOk": "Returned in {{duration}}",
+    "toolFailed": "Failed: {{code}}",
+    "retriedAttempts_one": "Succeeded after {{count}} retry",
+    "retriedAttempts_other": "Succeeded after {{count}} retries",
+    "requestId": "Provider request ID"
+  },
+  "cost": {
+    "provider_reported": "Reported by the provider",
+    "estimated": "Estimated from published prices",
+    "unavailable": "Not available for this model",
+    "partial": "Some calls have no price: the total is a lower bound."
+  },
+  "diagnosis": {
+    "title": "Why it failed",
+    "code": "Error code",
+    "retryable": "Retrying may work",
+    "notRetryable": "Retrying won't help until the cause is fixed",
+    "fallback": {
+      "title": "The execution failed",
+      "explanation": "Gouvra recorded an error it doesn't explain in detail yet.",
+      "action": "Check the trace below; share the execution ID if you need help."
+    },
+    "provider_auth_error": {
+      "title": "The provider refused the API key",
+      "explanation": "The key is wrong, revoked or belongs to another account.",
+      "action": "Update the key in Providers, then run again."
+    },
+    "provider_permission_denied": {
+      "title": "The key isn't allowed to use this model",
+      "explanation": "The provider account has no access to the requested model or feature.",
+      "action": "Choose another model, or enable it in the provider's console."
+    },
+    "provider_rate_limited": {
+      "title": "The provider is limiting requests",
+      "explanation": "Too many requests reached the provider in a short time.",
+      "action": "Wait a moment and run again, or lower the workspace concurrency."
+    },
+    "provider_quota_exhausted": {
+      "title": "The provider account is out of credit",
+      "explanation": "The provider refused the call because the balance or quota is used up.",
+      "action": "Top up the provider account, then run again."
+    },
+    "provider_unavailable": {
+      "title": "The provider is unavailable",
+      "explanation": "The provider's servers didn't answer normally (overload or outage).",
+      "action": "Run again in a few minutes."
+    },
+    "provider_timeout": {
+      "title": "The provider took too long",
+      "explanation": "No answer arrived in time.",
+      "action": "Run again, or raise the agent's time limit."
+    },
+    "provider_network_error": {
+      "title": "The provider couldn't be reached",
+      "explanation": "The connection failed before an answer came back.",
+      "action": "Check the base URL and the network, then run again."
+    },
+    "provider_bad_request": {
+      "title": "The provider rejected the request",
+      "explanation": "A parameter isn't supported by this model or provider.",
+      "action": "Review the agent's model parameters, then run again."
+    },
+    "model_not_found": {
+      "title": "This model doesn't exist at the provider",
+      "explanation": "The model name is wrong or was retired.",
+      "action": "Pick an available model in the agent's settings."
+    },
+    "context_length_exceeded": {
+      "title": "The conversation is too long for the model",
+      "explanation": "Instructions, input and tool results exceed the model's context window.",
+      "action": "Shorten the input or instructions, or choose a model with a larger context."
+    },
+    "content_filtered": {
+      "title": "The provider's safety filter blocked the answer",
+      "explanation": "The provider declined to return content for this request.",
+      "action": "Rephrase the input."
+    },
+    "provider_invalid_response": {
+      "title": "The provider sent an answer Gouvra couldn't read",
+      "explanation": "The response didn't follow the provider's documented format.",
+      "action": "Run again; if it persists, check the provider's status page."
+    },
+    "provider_misconfigured": {
+      "title": "The provider is misconfigured",
+      "explanation": "Its settings are incomplete (missing key or base URL).",
+      "action": "Fix the provider in Providers."
+    },
+    "provider_missing": {
+      "title": "The agent has no provider",
+      "explanation": "The provider was deleted or never chosen.",
+      "action": "Choose a provider in the agent's settings."
+    },
+    "agent_version_missing": {
+      "title": "The agent version is gone",
+      "explanation": "The version this execution should run no longer exists.",
+      "action": "Run the agent again from its page."
+    },
+    "limit_exceeded": {
+      "title": "The agent hit one of its limits",
+      "explanation": "Gouvra stopped it at the limit you set ({{limit}}).",
+      "action": "Raise the limit in the agent's settings if the work genuinely needs more."
+    },
+    "model_refused": {
+      "title": "The model declined the request",
+      "explanation": "The model chose not to answer this input.",
+      "action": "Rephrase the input or adjust the instructions."
+    },
+    "output_truncated": {
+      "title": "The answer was cut off",
+      "explanation": "The model reached its output token limit before finishing.",
+      "action": "Raise max output tokens or ask for a shorter answer."
+    },
+    "timeout": {
+      "title": "The execution ran out of time",
+      "explanation": "It didn't finish within its time limit.",
+      "action": "Raise the time limit or simplify the task."
+    },
+    "worker_lost": {
+      "title": "The worker running it stopped",
+      "explanation": "The process handling this execution disappeared (restart or crash).",
+      "action": "Run it again: nothing was lost but the time spent."
+    },
+    "worker_shutdown": {
+      "title": "Interrupted by a shutdown",
+      "explanation": "The worker was stopped for maintenance before the execution finished.",
+      "action": "Run it again."
+    },
+    "cancelled": {
+      "title": "Cancelled",
+      "explanation": "Someone cancelled this execution.",
+      "action": "Run it again if needed."
+    },
+    "internal_error": {
+      "title": "Gouvra hit an unexpected error",
+      "explanation": "The failure comes from Gouvra, not from the agent or provider.",
+      "action": "Run again; if it persists, share the execution ID with your administrator."
+    }
+  },
+  "limits": {
+    "max_steps": "maximum model turns",
+    "max_tool_calls": "maximum tool calls",
+    "max_total_tokens": "maximum tokens",
+    "max_cost_usd": "maximum cost"
+  },
+  "tools": {
+    "tool_not_allowed": "The model asked for a tool this agent may not use.",
+    "invalid_arguments": "The model sent arguments that don't match the tool's schema.",
+    "tool_timeout": "The tool took too long.",
+    "tool_error": "The tool reported an error.",
+    "tool_disabled": "The tool is disabled.",
+    "tool_unavailable": "The tool isn't available on this instance."
+  },
+  "launch": {
+    "title": "Run {{agent}}",
+    "description": "The execution starts at once; you'll follow it live.",
+    "input": "Input",
+    "inputPlaceholder": "What should the agent do?",
+    "inputRequired": "Give the agent an input.",
+    "inputTooLarge": "The input is too large ({{max}} max).",
+    "mode": "Input format",
+    "modeText": "Text",
+    "modeJson": "JSON",
+    "jsonInvalid": "This isn't valid JSON: {{message}}",
+    "jsonObject": "Use a JSON object, like {\"question\": \"…\"}.",
+    "timeout": "Time limit (seconds)",
+    "timeoutHelp": "Defaults to the agent's limit ({{seconds}} s).",
+    "limitsTitle": "This run is bounded by",
+    "limitSteps_one": "{{count}} model turn",
+    "limitSteps_other": "{{count}} model turns",
+    "limitTools_one": "{{count}} tool call",
+    "limitTools_other": "{{count}} tool calls",
+    "limitTime": "{{seconds}} s",
+    "limitCost": "{{amount}} max",
+    "costNote": "Cost depends on the model's answer; it's shown live once known.",
+    "submit": "Run",
+    "submitting": "Starting…",
+    "shortcut": "Ctrl + Enter",
+    "notReady": "This agent can't run yet: {{issues}}.",
+    "started": "Execution started",
+    "rateLimited": "Too many executions started in a short time. Try again in {{seconds}} s."
+  }
+}

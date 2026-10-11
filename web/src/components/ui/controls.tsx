@@ -6,11 +6,13 @@ import {
 } from "radix-ui";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/lib/cn";
-import { controlClass } from "./field";
+import { controlClass, useFieldWiring } from "./field";
 
 export function Checkbox({ className, ...props }: ComponentProps<typeof CheckboxPrimitive.Root>) {
+  const wiring = useFieldWiring(props);
   return (
     <CheckboxPrimitive.Root
+      {...wiring}
       className={cn(
         "peer inline-flex size-4.5 shrink-0 items-center justify-center rounded-[5px] border border-line-strong bg-surface",
         "transition-[background-color,border-color,transform] duration-150 ease-standard active:scale-90",
@@ -33,8 +35,10 @@ export function Checkbox({ className, ...props }: ComponentProps<typeof Checkbox
 }
 
 export function Switch({ className, ...props }: ComponentProps<typeof SwitchPrimitive.Root>) {
+  const wiring = useFieldWiring(props);
   return (
     <SwitchPrimitive.Root
+      {...wiring}
       className={cn(
         "inline-flex h-5 w-9 shrink-0 items-center rounded-full border border-transparent bg-line-strong/70 p-0.5",
         "transition-colors duration-200 ease-standard data-[state=checked]:bg-brand",
@@ -79,16 +83,17 @@ export function Select({
   className,
   ...aria
 }: SelectProps) {
+  const wiring = useFieldWiring({ id, ...aria });
   return (
     <SelectPrimitive.Root value={value} onValueChange={onValueChange} disabled={disabled}>
       <SelectPrimitive.Trigger
-        id={id}
+        {...aria}
+        {...wiring}
         className={cn(
           controlClass,
           "flex h-9 items-center justify-between gap-2 text-left data-[placeholder]:text-placeholder max-md:h-10",
           className,
         )}
-        {...aria}
       >
         <SelectPrimitive.Value placeholder={placeholder} />
         <SelectPrimitive.Icon>

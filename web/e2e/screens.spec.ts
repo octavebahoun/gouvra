@@ -2,10 +2,15 @@ import { expect, test, type Page } from "@playwright/test";
 import { expectAccessible, expectNoHorizontalOverflow } from "./support/a11y";
 import {
   addMember,
+  createAgent,
   createApiKey,
+  createBuiltinTool,
+  createScriptedProvider,
   createVerifiedUser,
   createWorkspace,
+  launchExecution,
   signIn,
+  waitForExecution,
   type SeededUser,
   type SeededWorkspace,
 } from "./support/api";
@@ -14,7 +19,12 @@ import {
  * Every screen, at the width of the running project (desktop, tablet, mobile) and in both
  * themes: no serious or critical axe violation (WCAG 2.2 AA) and no sideways scrolling.
  */
-type Screen = { name: string; path: (w: SeededWorkspace) => string; ready: string | RegExp };
+type Ids = { tool: string; agent: string; succeeded: string; failed: string };
+type Screen = {
+  name: string;
+  path: (w: SeededWorkspace, ids: Ids) => string;
+  ready: string | RegExp;
+};
 
 const PUBLIC: Screen[] = [
   { name: "landing", path: () => "/", ready: /agents/i },
@@ -57,11 +67,30 @@ const SIGNED_IN: Screen[] = [
     ready: "Workspace settings",
   },
   { name: "account", path: () => "/account", ready: "Profile & preferences" },
+  { name: "providers", path: (w) => `/w/${w.slug}/providers`, ready: "Providers" },
+  { name: "tools", path: (w) => `/w/${w.slug}/tools`, ready: "Tools" },
+  { name: "tool", path: (w, ids) => `/w/${w.slug}/tools/${ids.tool}`, ready: "Calculator" },
+  { name: "agents", path: (w) => `/w/${w.slug}/agents`, ready: "Agents" },
+  { name: "agent", path: (w, ids) => `/w/${w.slug}/agents/${ids.agent}`, ready: "Support triage" },
+  { name: "agent-new", path: (w) => `/w/${w.slug}/agents/new`, ready: "New agent" },
+  { name: "executions", path: (w) => `/w/${w.slug}/executions`, ready: "Executions" },
+  {
+    name: "execution-succeeded",
+    path: (w, ids) => `/w/${w.slug}/executions/${ids.succeeded}`,
+    ready: "Support triage",
+  },
+  {
+    name: "execution-failed",
+    path: (w, ids) => `/w/${w.slug}/executions/${ids.failed}`,
+    ready: "Support triage",
+  },
+  { name: "usage", path: (w) => `/w/${w.slug}/usage`, ready: "Usage" },
 ];
 
 let owner: SeededUser;
 let workspace: SeededWorkspace;
 let newcomer: SeededUser;
+let ids: Ids;
 
 test.beforeAll(async () => {
   owner = await createVerifiedUser({ tag: "screens", name: "Ada Lovelace" });
@@ -70,10 +99,27 @@ test.beforeAll(async () => {
   await addMember(owner, workspace, member, "member");
   await createApiKey(owner, workspace.id, "CI pipeline");
   newcomer = await createVerifiedUser({ tag: "screens-new", name: "Grace Hopper" });
+  const provider = await createScriptedProvider(owner, workspace.id);
+  const tool = await createBuiltinTool(owner, workspace.id, "calculator");
+  const agent = await createAgent(owner, workspace.id, {
+    name: "Support triage",
+    description: "Classifies incoming tickets.",
+    provider_id: provider.id,
+    tool_ids: [tool.id],
+  });
+  const succeeded = await launchExecution(
+    owner,
+    agent.id,
+    'Total? [tool:calculator {"expression": "2 * 49.99"}]',
+  );
+  const failed = await launchExecution(owner, agent.id, "Quota [fail:provider_rate_limited]");
+  await waitForExecution(owner, succeeded.id);
+  await waitForExecution(owner, failed.id);
+  ids = { tool: tool.id, agent: agent.id, succeeded: succeeded.id, failed: failed.id };
 });
 
 async function audit(page: Page, screen: Screen, label: string): Promise<void> {
-  await page.goto(screen.path(workspace));
+  await page.goto(screen.path(workspace, ids));
   await expect(page.getByRole("heading", { level: 1 }).first()).toContainText(screen.ready);
   await expectAccessible(page, label);
   await expectNoHorizontalOverflow(page, label);
