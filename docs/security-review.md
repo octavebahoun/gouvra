@@ -4,20 +4,20 @@ Self-review of the product against section 10 of the design document (*Sécurit�
 with the evidence for each point. Updated at the end of every phase; open items name the phase
 that closes them.
 
-Last review: 2026-10-11 (end of phase 5 — foundation stabilised).
+Last review: 2026-10-12 (release — the whole product, phases 1 to 9).
 
 | # | Requirement | Status | Evidence |
 |---|---|---|---|
 | 1 | Every authorisation is checked server-side, per resource and workspace. | ✅ | Central layer `core/authz.py` (`load_in_workspace`, `workspace_access`, one `Permission` per action, role matrix). No route reads a resource without it. |
-| 2 | No cross-workspace access (IDOR, multi-tenant leaks). | ✅ | `tests/test_isolation.py`: every workspace route and every resource route called by the owner of another workspace answers 404; mixed identifiers, service keys of another workspace, data untouched afterwards. Two guards fail the build if a route escapes the suite (they read the published route table). |
+| 2 | No cross-workspace access (IDOR, multi-tenant leaks). | ✅ | `tests/test_isolation.py`: every workspace route and every resource route called by the owner of another workspace answers 404; mixed identifiers, service keys of another workspace, data untouched afterwards. Two guards fail the build if a route escapes the suite (they read the published route table). `tests/test_public_surface.py` calls every route anonymously: only fourteen reviewed routes (sign-in flows, single-use tokens, OAuth, public prices, signed webhooks) answer with anything but 401. |
 | 3 | Provider keys never returned to the browser after saving. | ✅ | Write-only fields; responses carry `secret_set` and a 4-character hint. Tests assert no key material in provider and tool responses. |
 | 4 | Secrets encrypted at rest with a key outside the database; rotation documented. | ✅ | AES-256-GCM with associated data per row, key ring in `ENCRYPTION_KEYS` (environment), `gouvra rotate-secrets`; procedure in `docs/operations.md`. |
 | 5 | Never run user-supplied code in the API process. | ✅ | Code tools only run in the sandbox service, one throwaway container per call (`sandbox/runner.py`); without a configured sandbox they are refused. The calculator parses an AST whitelist — no `eval`. |
-| 6 | Tools are privileged capabilities: allow-list, validation, time-outs, quotas, isolation. | ✅ / ⏳ | Per-agent allow-list; strict JSON Schema arguments (closed objects); per-tool time-outs; per-execution tool-call limit; HTTP tools restricted to allow-listed hosts with DNS-rebinding and private-network protection (`core/netguard.py`, `tools/http_client.py`). Code tools: container with no network by default, read-only root, `nobody`, no capability, `no-new-privileges`, memory/CPU/PIDs/time limits — each property verified against a real Docker daemon (`tests/test_sandbox.py`). |
-| 7 | Limits on size, duration, concurrency and consumption. | ✅ / ⏳ | Request bodies (`BodySizeLimitMiddleware`), execution input size, time-outs (agent and instance maximum), workspace concurrency, launch rate limit, per-agent token and cost caps. ⏳ Workspace budgets and plan quotas: phase 9. |
+| 6 | Tools are privileged capabilities: allow-list, validation, time-outs, quotas, isolation. | ✅ | Per-agent allow-list; strict JSON Schema arguments (closed objects); per-tool time-outs; per-execution tool-call limit; HTTP tools and connectors restricted to their hosts with DNS-rebinding and private-network protection (`core/netguard.py`, `tools/http_client.py`), requests built server-side. Code tools: separate sandbox service, one container per call with no network by default, read-only root, `nobody`, no capability, `no-new-privileges`, memory/CPU/PIDs/time limits — each property verified against a real Docker daemon (`tests/test_sandbox.py`); Docker reached through a socket proxy limited to containers and images. |
+| 7 | Limits on size, duration, concurrency and consumption. | ✅ | Request bodies (`BodySizeLimitMiddleware`), execution input size, time-outs (agent and instance maximum), workspace concurrency (capped by the plan), launch rate limit, per-agent token and cost caps; plan quotas (monthly runs, agents, members, automations) and monthly budgets with an optional hard stop, enforced on every launch path (`usage/guard.py`: executions, workflow runs and steps, evaluations, automations). |
 | 8 | Secrets and personal data filtered from logs. | ✅ | `core/logging.py` redacts sensitive keys, credential-shaped values and e-mail addresses (tested); usage counters are explicitly kept. Execution events are redacted and size-capped before storage. |
-| 9 | Webhook signatures verified, processing idempotent. | ⏳ | Inbound webhooks arrive in phase 8 (automation) and Stripe webhooks in phase 9 (billing). Execution launches already honour `Idempotency-Key`. |
-| 10 | Backups, tested restore, retention policy, responsible disclosure. | ✅ / ⏳ | `scripts/backup` (verified dumps) and `scripts/restore`, round trip tested on 2026-10-11 (identical row counts and schema version); `SECURITY.md` disclosure process. ⏳ Retention policies: phase 9. |
+| 9 | Webhook signatures verified, processing idempotent. | ✅ | Inbound webhooks: unguessable address, timestamped HMAC-SHA256 (or GitHub's format) checked in constant time within 5 minutes, one delivery per identifier (`tests/test_automations.py`). Stripe: `Stripe-Signature` verified with `STRIPE_WEBHOOK_SECRET`, each event ID applied once, subscription read back from Stripe (`tests/test_billing.py`, forged and replayed events included). Execution launches honour `Idempotency-Key`. |
+| 10 | Backups, tested restore, retention policy, responsible disclosure. | ✅ | `scripts/backup` (verified dumps) and `scripts/restore`, round trip tested (identical row counts and schema version); retention per workspace bounded by the plan, hourly purge, usage history kept (`tests/test_saas.py`); `SECURITY.md` disclosure process. |
 
 ## Other controls reviewed
 
@@ -80,6 +80,6 @@ Last review: 2026-10-11 (end of phase 5 — foundation stabilised).
 
 ## Open items
 
-| Item | Closes in |
-|---|---|
-| Full re-review of the finished product | Phase 10 |
+None. The release review found and fixed: a line break in a workspace or display name could
+reach an e-mail subject (now refused at input and neutralised when rendering), and the
+instance lists queried the database once per row (now batched and paged).

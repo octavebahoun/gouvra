@@ -41,20 +41,30 @@ from gouvra.modules.tools.models import Tool
 router = APIRouter(tags=["agents"])
 
 
+async def _tools_by_id(db: DbSession, tool_ids: set[uuid.UUID]) -> dict[uuid.UUID, Tool]:
+    if not tool_ids:
+        return {}
+    return {
+        t.id: t for t in (await db.execute(select(Tool).where(Tool.id.in_(tool_ids)))).scalars()
+    }
+
+
 async def version_out(
-    db: DbSession, version: AgentVersion, current_id: uuid.UUID | None
+    db: DbSession,
+    version: AgentVersion,
+    current_id: uuid.UUID | None,
+    tools: dict[uuid.UUID, Tool] | None = None,
 ) -> AgentVersionOut:
+    """`tools` may be loaded once for many versions; providers and authors come from the session
+    identity map after their first load."""
     provider = (
         await db.get(ProviderConfig, version.provider_config_id)
         if version.provider_config_id
         else None
     )
     tool_ids = [uuid.UUID(t) for t in version.tool_ids or []]
-    tools = (
-        {t.id: t for t in (await db.execute(select(Tool).where(Tool.id.in_(tool_ids)))).scalars()}
-        if tool_ids
-        else {}
-    )
+    if tools is None:
+        tools = await _tools_by_id(db, set(tool_ids))
     author = await db.get(User, version.created_by_id) if version.created_by_id else None
     return AgentVersionOut(
         id=version.id,
@@ -223,14 +233,17 @@ async def list_versions(
     agent_id: uuid.UUID, actor: CurrentActor, db: DbSession
 ) -> list[AgentVersionOut]:
     agent, _ = await load_in_workspace(db, Agent, agent_id, actor, Permission.AGENTS_READ)
-    versions = (
-        await db.execute(
-            select(AgentVersion)
-            .where(AgentVersion.agent_id == agent.id)
-            .order_by(AgentVersion.number.desc())
-        )
-    ).scalars()
-    return [await version_out(db, v, agent.current_version_id) for v in versions]
+    versions = list(
+        (
+            await db.execute(
+                select(AgentVersion)
+                .where(AgentVersion.agent_id == agent.id)
+                .order_by(AgentVersion.number.desc())
+            )
+        ).scalars()
+    )
+    tools = await _tools_by_id(db, {uuid.UUID(t) for v in versions for t in v.tool_ids or []})
+    return [await version_out(db, v, agent.current_version_id, tools) for v in versions]
 
 
 @router.get("/agents/{agent_id}/versions/{number}", summary="One version")

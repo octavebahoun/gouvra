@@ -312,6 +312,11 @@ async def test_agent_versioning_and_lifecycle(team) -> None:  # type: ignore[no-
     versions = (await member.client.get(f"/api/v1/agents/{agent['id']}/versions")).json()
     assert [v["number"] for v in versions] == [2, 1]
     assert [v["is_current"] for v in versions] == [True, False]
+    # Tools are resolved for every version of the history (loaded once for all of them).
+    assert [[t["display_name"] for t in v["tools"]] for v in versions] == [
+        [calc["display_name"]],
+        [calc["display_name"]],
+    ]
     restored = (await member.client.post(f"/api/v1/agents/{agent['id']}/versions/1/restore")).json()
     assert restored["version"]["number"] == 3
     assert restored["version"]["instructions"] == "Be helpful."
