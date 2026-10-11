@@ -94,3 +94,13 @@ Priorité en cas de conflit : `BRIEF.md` > `docs/ui.md` / `docs/conception.md` >
 - **D-087 — Directive `[score:X]` du modèle scripté** : juge déterministe pour les tests et la démo hors ligne.
 - **D-088 — Garde-fous d'isolation lus dans OpenAPI** : FastAPI 0.143 ne met plus à plat les routeurs inclus, ce qui avait vidé en silence l'ancien garde-fou (il ne vérifiait plus rien). Il lit désormais la table des routes publiée, échoue si elle paraît vide, et couvre aussi les routes par ressource.
 
+## Interface des phases 2 à 4
+
+- **D-089 — Contrat OpenAPI exact** : les schémas de réponse marquent obligatoires les champs à valeur par défaut (`json_schema_serialization_defaults_required`), les types web sont générés avec `--default-non-nullable false` : en entrée, les champs par défaut restent facultatifs ; en sortie, ils sont garantis. Le compilateur vérifie le contrat dans les deux sens.
+- **D-090 — Compteurs d'usage jamais masqués** : le filtre de secrets masquait `input_tokens` & co (la clé contient « token »). Les compteurs connus sont exemptés ; tout le reste qui ressemble à un secret reste masqué.
+- **D-091 — Trace en direct** : exécution en cours ⇒ SSE (rejeu puis événements, fragments de texte, reprise par Last-Event-ID) ; exécution terminée ⇒ lecture REST de la trace. Les compteurs se rafraîchissent au plus toutes les 500 ms ; le flux du workspace anime les listes (ligne qui s'illumine au changement d'état).
+- **D-092 — Un coût n'est jamais un nombre nu** : « ≈ » si estimé, icône « communiqué par le fournisseur » sinon, « — » (jamais 0 $) si indisponible, « + » si partiel ; la provenance est lisible au clavier et par lecteur d'écran.
+- **D-093 — Formulaires en dialogue remontés à chaque ouverture** (clé de session) plutôt que réinitialisés dans un effet : conforme aux règles du compilateur React, aucun état résiduel d'une ouverture à l'autre.
+- **D-094 — Lignes de liste en container queries** : une même ligne d'exécution s'adapte à la largeur de sa liste (pleine page, vue d'ensemble, détail d'agent), pas à celle de la fenêtre.
+- **D-095 — Référence E2E = build de production** (Caddy, port 8080) ; le serveur de dev ne sert qu'à itérer. Les parcours lisent les vrais e-mails dans Mailpit et exécutent les vrais agents via le worker (modèle scripté hors ligne).
+

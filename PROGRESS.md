@@ -4,8 +4,8 @@
 
 ## État
 
-- **Backend terminé et commité pour les phases 2, 3, 4 et 6.** Écrans web : phase 2 en cours (sous-agent), phases 3, 4 et 6 à faire.
-- **Tâche suivante :** relire le travail web du sous-agent (captures, a11y), puis écrans : Providers (O), Tools (N), Agents (H, I, J), lancement (K), Executions (L), détail d'exécution animé (M), Overview (G), Usage (P), Évaluations.
+- **Phases 1 à 4 terminées** (backend + interface, critères de sortie vérifiés par E2E). Phase 6 : backend terminé, écrans à faire. Phase 7 : backend des workflows commencé (graphe, modèles, schémas — non commités).
+- **Tâche suivante :** phase 5 (stabilisation : site public, découpage du bundle, docs, audit sécurité, prod compose), puis écrans Évaluations (S) et suite de la phase 7.
 
 ## Brief mis à jour — 2026-10-11 03:56 (relu en entier)
 
@@ -37,9 +37,9 @@
 | # | Phase | État | Critère de sortie |
 |---|---|---|---|
 | 1 | Fondations | **fait** (2026-10-11) | `docker compose up` démarre tout, CI verte |
-| 2 | Identité | backend **fait** ; web en cours | Tests des flux + isolation inter-workspace verts |
-| 3 | Agent simple | backend **fait** (exécution réelle DeepSeek OK) ; web à faire | Une exécution réelle, tracée de bout en bout |
-| 4 | Exploitation | backend **fait** (vue d'ensemble, usage, stats, audit, export, limites) ; web à faire | Diagnostic d'un échec depuis l'UI |
+| 2 | Identité | **fait** (2026-10-11) | Tests des flux + isolation inter-workspace verts |
+| 3 | Agent simple | **fait** (2026-10-11) | Une exécution réelle, tracée de bout en bout |
+| 4 | Exploitation | **fait** (2026-10-11) | Diagnostic d'un échec depuis l'UI |
 | 5 | Stabilisation du socle | à faire | Section 9 du brief validée sur le socle |
 | 6 | Évaluations | backend **fait** (comparaison v1/v2 vérifiée par l'API) ; web à faire | Comparaison de deux versions d'agent |
 | 7 | Workflows | à faire | Workflow multi-étapes exécuté et visualisé en direct |
@@ -50,6 +50,7 @@
 ## Problèmes ouverts
 
 - Swagger UI (`/api/docs`) charge ses assets depuis un CDN : à auto-héberger (phase 5).
+- Bundle web : chunk principal 548 Ko (171 Ko gzip) — découpage à faire en phase 5 (espaces de noms i18n et librairies chargés à la demande).
 - `pandoc`, `stripe` CLI absents du système : pandoc récupéré via `pypandoc_binary` (lien `~/.local/bin/pandoc`) ; Stripe CLI à télécharger (phase 9).
 
 ## Journal de vérification
@@ -82,4 +83,11 @@
 - Critère de sortie (côté API) : une suite lancée sur la v1 (texte) puis la v2 (mode JSON) d'un agent ⇒ 0 % puis 100 % de réussite, comparaison « 3 améliorés, 0 régressé » ✔.
 - Juge réel DeepSeek (`deepseek-flash`) ✔ ; ReDoS coupé à 0,5 s ✔ ; annulation d'un run ✔ ; worker de notation réveillé par le moteur ✔.
 - **Correction honnête du journal phase 2/3** : le garde-fou « toute nouvelle route doit être couverte » ne vérifiait plus rien depuis FastAPI 0.143 (D-088). Réparé ; toutes les routes existantes étaient bien couvertes (isolation : 78 tests ✔).
+
+### Phases 2, 3, 4 (interface) — 2026-10-11
+- Écrans : B–F, Q, R (phase 2, repris du sous-agent arrêté par la limite d'usage : correctifs mobiles, typage, E2E) ; G, H, I, J, K, L, M, N, O, P (phases 3–4).
+- Portes : prettier ✔, eslint strict + jsx-a11y ✔ (0 avertissement), tsc ✔, vitest 28/28 ✔, build ✔, `pnpm audit` ✔ ; backend 260 tests ✔, mypy ✔.
+- E2E (Playwright, build de production, vraie pile) : **28/28** — 7 parcours identité (e-mails lus dans Mailpit), 3 parcours « construire & exploiter », 18 audits axe (chaque écran × 3 largeurs × 2 thèmes : 0 violation grave ou critique, aucun défilement horizontal).
+- Critère phase 3 (UI) : fournisseur hors ligne connecté, agent créé dans l'éditeur, exécution suivie en direct jusqu'au succès (appel d'outil, résultat 7006652) ✔. Critère phase 4 : échec diagnostiqué depuis l'UI (cause, action, code, « relancer peut fonctionner ») ✔.
+- Bugs réels trouvés par la boucle et corrigés : compteurs de tokens masqués dans les traces (D-090) ; garde « modifications non enregistrées » qui bloquait la sortie après enregistrement ; outil intégré sans réglage ouvrant le formulaire d'hôtes ; listes déroulantes sans nom accessible dans un `Controller` ; tableau pour lecteur d'écran élargissant la page mobile ; variable i18n `context` (réservée par i18next).
 
