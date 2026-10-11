@@ -35,9 +35,7 @@ def cell(value: Any) -> str:
 
 def _range(since: date | None, until: date | None) -> tuple[datetime, datetime]:
     end = datetime.combine(until, time.max, tzinfo=UTC) if until else utcnow()
-    start = (
-        datetime.combine(since, time.min, tzinfo=UTC) if since else end - timedelta(days=30)
-    )
+    start = datetime.combine(since, time.min, tzinfo=UTC) if since else end - timedelta(days=30)
     return start, end
 
 
@@ -75,28 +73,63 @@ async def export_configuration(
     from gouvra.modules.workflows.models import Workflow, WorkflowVersion
 
     ws = ctx.workspace_id
-    tools = list((await db.execute(select(Tool).where(Tool.workspace_id == ws, Tool.archived_at.is_(None)))).scalars())
+    tools = list(
+        (
+            await db.execute(
+                select(Tool).where(Tool.workspace_id == ws, Tool.archived_at.is_(None))
+            )
+        ).scalars()
+    )
     tool_names = {str(t.id): t.name for t in tools}
-    providers = {p.id: p.name for p in (await db.execute(select(ProviderConfig).where(ProviderConfig.workspace_id == ws))).scalars()}
+    providers = {
+        p.id: p.name
+        for p in (
+            await db.execute(select(ProviderConfig).where(ProviderConfig.workspace_id == ws))
+        ).scalars()
+    }
     agents = []
-    for agent in (await db.execute(select(Agent).where(Agent.workspace_id == ws, Agent.archived_at.is_(None)).order_by(Agent.name))).scalars():
-        version = await db.get(AgentVersion, agent.current_version_id) if agent.current_version_id else None
+    for agent in (
+        await db.execute(
+            select(Agent)
+            .where(Agent.workspace_id == ws, Agent.archived_at.is_(None))
+            .order_by(Agent.name)
+        )
+    ).scalars():
+        version = (
+            await db.get(AgentVersion, agent.current_version_id)
+            if agent.current_version_id
+            else None
+        )
         agents.append(
             {
                 "name": agent.name,
                 "description": agent.description,
                 "version": version.number if version else None,
-                "provider": providers.get(version.provider_config_id) if version and version.provider_config_id else None,
+                "provider": providers.get(version.provider_config_id)
+                if version and version.provider_config_id
+                else None,
                 "model": version.model if version else None,
                 "instructions": version.instructions if version else None,
                 "parameters": version.parameters if version else None,
                 "limits": version.limits if version else None,
-                "tools": [tool_names.get(str(i), str(i)) for i in (version.tool_ids if version else [])],
+                "tools": [
+                    tool_names.get(str(i), str(i)) for i in (version.tool_ids if version else [])
+                ],
             }
         )
     workflows = []
-    for workflow in (await db.execute(select(Workflow).where(Workflow.workspace_id == ws, Workflow.archived_at.is_(None)).order_by(Workflow.name))).scalars():
-        published = await db.get(WorkflowVersion, workflow.current_version_id) if workflow.current_version_id else None
+    for workflow in (
+        await db.execute(
+            select(Workflow)
+            .where(Workflow.workspace_id == ws, Workflow.archived_at.is_(None))
+            .order_by(Workflow.name)
+        )
+    ).scalars():
+        published = (
+            await db.get(WorkflowVersion, workflow.current_version_id)
+            if workflow.current_version_id
+            else None
+        )
         workflows.append(
             {
                 "name": workflow.name,
@@ -107,8 +140,18 @@ async def export_configuration(
             }
         )
     suites = []
-    for suite in (await db.execute(select(EvalSuite).where(EvalSuite.workspace_id == ws, EvalSuite.archived_at.is_(None)).order_by(EvalSuite.name))).scalars():
-        cases = (await db.execute(select(EvalCase).where(EvalCase.suite_id == suite.id).order_by(EvalCase.created_at))).scalars()
+    for suite in (
+        await db.execute(
+            select(EvalSuite)
+            .where(EvalSuite.workspace_id == ws, EvalSuite.archived_at.is_(None))
+            .order_by(EvalSuite.name)
+        )
+    ).scalars():
+        cases = (
+            await db.execute(
+                select(EvalCase).where(EvalCase.suite_id == suite.id).order_by(EvalCase.created_at)
+            )
+        ).scalars()
         suites.append(
             {
                 "name": suite.name,
@@ -116,7 +159,13 @@ async def export_configuration(
                 "default_graders": suite.default_graders,
                 "pass_threshold": suite.pass_threshold,
                 "cases": [
-                    {"name": c.name, "input": c.input, "expected": c.expected, "graders": c.graders, "tags": c.tags}
+                    {
+                        "name": c.name,
+                        "input": c.input,
+                        "expected": c.expected,
+                        "graders": c.graders,
+                        "tags": c.tags,
+                    }
                     for c in cases
                 ],
             }
@@ -133,7 +182,11 @@ async def export_configuration(
             "signature_format": a.signature_format if a.kind == "webhook" else None,
             "enabled": a.enabled,
         }
-        for a in (await db.execute(select(Automation).where(Automation.workspace_id == ws).order_by(Automation.name))).scalars()
+        for a in (
+            await db.execute(
+                select(Automation).where(Automation.workspace_id == ws).order_by(Automation.name)
+            )
+        ).scalars()
     ]
     document = {
         "format": "gouvra.export/v1",
@@ -159,10 +212,11 @@ async def export_configuration(
         "automations": automations,
     }
     await _audit(db, ctx, "configuration", {})
+    filename = _filename(ctx, "configuration", "json")
     return Response(
         content=orjson.dumps(document, option=orjson.OPT_INDENT_2, default=str),
         media_type="application/json",
-        headers={"Content-Disposition": f'attachment; filename="{_filename(ctx, "configuration", "json")}"'},
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
     )
 
 
@@ -243,13 +297,26 @@ async def export_executions(
                 cursor = (last.created_at, last.id)
 
     header = [
-        "id", "created_at", "agent", "agent_version", "trigger", "status", "duration_ms",
-        "input_tokens", "output_tokens", "cost_amount", "cost_currency", "cost_source", "error_code",
+        "id",
+        "created_at",
+        "agent",
+        "agent_version",
+        "trigger",
+        "status",
+        "duration_ms",
+        "input_tokens",
+        "output_tokens",
+        "cost_amount",
+        "cost_currency",
+        "cost_source",
+        "error_code",
     ]
     return StreamingResponse(
         _csv_stream(header, rows()),
         media_type="text/csv; charset=utf-8",
-        headers={"Content-Disposition": f'attachment; filename="{_filename(ctx, "executions", "csv")}"'},
+        headers={
+            "Content-Disposition": f'attachment; filename="{_filename(ctx, "executions", "csv")}"'
+        },
     )
 
 
@@ -295,9 +362,27 @@ async def export_usage(
 
     async def rows() -> AsyncIterator[list[Any]]:
         for when, agent, provider, model, calls, tokens_in, tokens_out, cost in result:
-            yield [when.date().isoformat(), agent, provider, model, calls, tokens_in, tokens_out, cost]
+            yield [
+                when.date().isoformat(),
+                agent,
+                provider,
+                model,
+                calls,
+                tokens_in,
+                tokens_out,
+                cost,
+            ]
 
-    header = ["date", "agent", "provider", "model", "model_calls", "input_tokens", "output_tokens", "cost_usd"]
+    header = [
+        "date",
+        "agent",
+        "provider",
+        "model",
+        "model_calls",
+        "input_tokens",
+        "output_tokens",
+        "cost_usd",
+    ]
     return StreamingResponse(
         _csv_stream(header, rows()),
         media_type="text/csv; charset=utf-8",
