@@ -1,0 +1,183 @@
+@import "tailwindcss";
+@import "./tokens/tokens.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Only semantic colours exist: the default Tailwind palette is removed on purpose. */
+@theme inline {
+  --color-*: initial;
+  --color-canvas: var(--gv-canvas);
+  --color-surface: var(--gv-surface);
+  --color-surface-2: var(--gv-surface-2);
+  --color-sunken: var(--gv-sunken);
+  --color-overlay: var(--gv-overlay);
+  --color-ink: var(--gv-ink);
+  --color-muted: var(--gv-muted);
+  --color-placeholder: var(--gv-placeholder);
+  --color-on-solid: var(--gv-on-solid);
+  --color-line: var(--gv-line);
+  --color-line-strong: var(--gv-line-strong);
+  --color-brand: var(--gv-brand);
+  --color-brand-hover: var(--gv-brand-hover);
+  --color-brand-soft: var(--gv-brand-soft);
+  --color-brand-text: var(--gv-brand-text);
+  --color-focus: var(--gv-focus);
+  --color-success: var(--gv-success);
+  --color-success-text: var(--gv-success-text);
+  --color-success-soft: var(--gv-success-soft);
+  --color-warning: var(--gv-warning);
+  --color-warning-text: var(--gv-warning-text);
+  --color-warning-soft: var(--gv-warning-soft);
+  --color-danger: var(--gv-danger);
+  --color-danger-solid: var(--gv-danger-solid);
+  --color-danger-solid-hover: var(--gv-danger-solid-hover);
+  --color-danger-text: var(--gv-danger-text);
+  --color-danger-soft: var(--gv-danger-soft);
+  --color-neutral-soft: var(--gv-neutral-soft);
+  --color-chart-1: var(--gv-chart-1);
+  --color-chart-2: var(--gv-chart-2);
+  --color-chart-3: var(--gv-chart-3);
+  --color-chart-4: var(--gv-chart-4);
+  --color-chart-5: var(--gv-chart-5);
+  --color-chart-grid: var(--gv-chart-grid);
+
+  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:
+    "JetBrains Mono Variable", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  /* Radii: fields/buttons 6px, cards 10px, large panels 14px */
+  --radius-field: 6px;
+  --radius-card: 10px;
+  --radius-panel: 14px;
+
+  --shadow-sm: var(--gv-shadow-sm);
+  --shadow-md: var(--gv-shadow-md);
+  --shadow-lg: var(--gv-shadow-lg);
+  --shadow-glow: var(--gv-glow-brand);
+
+  /* Motion: fast feedback, base transitions, slow panels */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-exit: cubic-bezier(0.3, 0, 1, 1);
+  --default-transition-duration: 180ms;
+  --default-transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+
+  --animate-shimmer: gv-shimmer 1.6s var(--ease-standard) infinite;
+  --animate-breathe: gv-breathe 1.8s ease-in-out infinite;
+  --animate-float: gv-float 6s ease-in-out infinite;
+  --animate-dash: gv-dash 1.2s linear infinite;
+  --animate-spin-slow: spin 2.4s linear infinite;
+  --animate-pop-in: gv-pop-in 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+@keyframes gv-pop-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(-2px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gv-shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes gv-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+@keyframes gv-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes gv-dash {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-canvas font-sans text-sm text-ink antialiased;
+    font-feature-settings:
+      "cv11" 1,
+      "ss03" 1;
+    min-height: 100dvh;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--gv-focus);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--gv-brand) 28%, transparent);
+  }
+
+  ::placeholder {
+    color: var(--gv-placeholder);
+    opacity: 1;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    @apply font-mono;
+    font-variant-ligatures: none;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--gv-line-strong) transparent;
+  }
+
+  [hidden] {
+    display: none !important;
+  }
+}
+
+/* Reduced motion: keep every state visible, drop the movement. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* View-transition used by the theme toggle (circular reveal from the toggle). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

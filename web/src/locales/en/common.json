@@ -1,0 +1,167 @@
+{
+  "app": {
+    "name": "Gouvra",
+    "tagline": "The control room for your AI agents"
+  },
+  "a11y": {
+    "skipToContent": "Skip to main content",
+    "openNavigation": "Open navigation",
+    "closeNavigation": "Close navigation",
+    "mainNavigation": "Main navigation",
+    "breadcrumb": "Breadcrumb",
+    "close": "Close",
+    "loading": "Loading…",
+    "copyValue": "Copy {{label}}",
+    "newContentAnnounced": "{{count}} new item",
+    "newContentAnnounced_other": "{{count}} new items"
+  },
+  "nav": {
+    "overview": "Overview",
+    "agents": "Agents",
+    "executions": "Executions",
+    "evaluations": "Evaluations",
+    "workflows": "Workflows",
+    "tools": "Tools",
+    "providers": "Providers",
+    "automations": "Automations",
+    "connectors": "Connectors",
+    "registry": "Registry",
+    "usage": "Usage",
+    "settings": "Workspace settings",
+    "admin": "Administration",
+    "docs": "Documentation",
+    "build": "Build",
+    "operate": "Operate",
+    "configure": "Configure"
+  },
+  "actions": {
+    "save": "Save",
+    "saving": "Saving…",
+    "saved": "Saved",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "continue": "Continue",
+    "back": "Back",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "archive": "Archive",
+    "restore": "Restore",
+    "retry": "Retry",
+    "refresh": "Refresh",
+    "copy": "Copy",
+    "copied": "Copied",
+    "close": "Close",
+    "search": "Search",
+    "clearFilters": "Reset filters",
+    "loadMore": "Load more",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "signOut": "Sign out",
+    "learnMore": "Learn more",
+    "export": "Export",
+    "open": "Open",
+    "test": "Test",
+    "next": "Next",
+    "previous": "Previous",
+    "dismiss": "Dismiss"
+  },
+  "states": {
+    "loading": "Loading…",
+    "emptyTitle": "Nothing here yet",
+    "errorTitle": "We couldn't load this",
+    "errorBody": "The request failed. Retry, and quote the diagnostic ID if the problem persists.",
+    "diagnosticId": "Diagnostic ID",
+    "accessDeniedTitle": "You don't have access to this",
+    "accessDeniedBody": "Your role in this workspace doesn't allow this action. Ask a workspace admin if you need it.",
+    "notFoundTitle": "Page not found",
+    "notFoundBody": "This page doesn't exist, or it isn't shared with you.",
+    "offlineTitle": "You're offline",
+    "offlineBody": "We'll reconnect automatically. Unsaved changes stay on this page.",
+    "apiDownTitle": "Gouvra's API is unreachable",
+    "apiDownBody": "We keep retrying. Unsaved changes stay on this page.",
+    "partialData": "Some data is unavailable",
+    "unavailable": "Unavailable",
+    "lastUpdated": "Updated {{time}}",
+    "unsavedChanges": "Unsaved changes",
+    "leaveUnsavedTitle": "Leave without saving?",
+    "leaveUnsavedBody": "Your changes on this page will be lost.",
+    "leave": "Leave",
+    "stay": "Stay"
+  },
+  "status": {
+    "queued": "Queued",
+    "running": "Running",
+    "succeeded": "Succeeded",
+    "failed": "Failed",
+    "cancelled": "Cancelled",
+    "timed_out": "Timed out",
+    "active": "Active",
+    "archived": "Archived",
+    "disabled": "Disabled",
+    "untested": "Not tested",
+    "ok": "Connected",
+    "error": "Error"
+  },
+  "theme": {
+    "label": "Theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "toggle": "Switch to {{mode}} theme"
+  },
+  "language": {
+    "label": "Language"
+  },
+  "userMenu": {
+    "label": "Account menu",
+    "profile": "Profile & preferences",
+    "admin": "Instance administration"
+  },
+  "workspace": {
+    "switcherLabel": "Current workspace",
+    "switchTo": "Switch workspace",
+    "create": "Create a workspace",
+    "switchedTo": "Now working in {{name}}",
+    "role": {
+      "owner": "Owner",
+      "admin": "Admin",
+      "member": "Member",
+      "viewer": "Viewer"
+    }
+  },
+  "errors": {
+    "network": "Can't reach the server. Check your connection and retry.",
+    "server": "The server hit an unexpected error.",
+    "rateLimited": "Too many attempts. Try again in {{seconds}} s.",
+    "validation": "Some fields need your attention.",
+    "unknown": "Something went wrong."
+  },
+  "time": {
+    "justNow": "just now",
+    "durationMs": "{{value}} ms",
+    "durationS": "{{value}} s",
+    "durationM": "{{m}} min {{s}} s"
+  },
+  "cost": {
+    "provider_reported": "Reported by provider",
+    "estimated": "Estimated",
+    "unavailable": "Unavailable"
+  },
+  "pagination": {
+    "showing": "Showing {{count}}",
+    "page": "Page {{page}}"
+  },
+  "footer": {
+    "license": "Open source · Apache-2.0"
+  },
+  "form": {
+    "required": "required",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
+  },
+  "confirm": {
+    "typeName": "Type “{{name}}” to confirm"
+  }
+}

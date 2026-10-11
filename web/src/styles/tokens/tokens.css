@@ -1,0 +1,111 @@
+/*
+ * Gouvra design tokens — "control room for AI agents".
+ * Source of truth for colour, elevation and motion. Components never use raw colours:
+ * they use the semantic utilities generated from these tokens (bg-surface, text-muted...).
+ * Every text/background pair below is checked for WCAG 2.2 AA (see scripts/check-contrast.py).
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --gv-canvas: #f6f8fb;
+  --gv-surface: #ffffff;
+  --gv-surface-2: #f1f4f9;
+  --gv-sunken: #eef2f7;
+  --gv-overlay: rgb(15 23 42 / 0.45);
+
+  /* Text */
+  --gv-ink: #172b4d;
+  --gv-muted: #5b6880;
+  --gv-placeholder: #66748a;
+  --gv-on-solid: #ffffff;
+
+  /* Lines */
+  --gv-line: #d9e1ec;
+  --gv-line-strong: #7f8ba2;
+
+  /* Brand (actions, links, focus) */
+  --gv-brand: #2563eb;
+  --gv-brand-hover: #1d4ed8;
+  --gv-brand-soft: #eaf1fe;
+  --gv-brand-text: #1d4ed8;
+  --gv-focus: #2563eb;
+
+  /* States — "solid" is for filled controls, "text" for labels, "soft" for tinted backgrounds */
+  --gv-success: #16845b;
+  --gv-success-text: #0f6b49;
+  --gv-success-soft: #e7f5ee;
+  --gv-warning: #b7791f;
+  --gv-warning-text: #8a5a12;
+  --gv-warning-soft: #fdf4e3;
+  --gv-danger: #c2413b;
+  --gv-danger-solid: #c2413b;
+  --gv-danger-solid-hover: #a8332e;
+  --gv-danger-text: #a3322d;
+  --gv-danger-soft: #fcebea;
+  --gv-neutral-soft: #eef1f6;
+
+  /* Data visualisation (categorical, colour-blind friendly order) */
+  --gv-chart-1: #2563eb;
+  --gv-chart-2: #0e9f8e;
+  --gv-chart-3: #d97706;
+  --gv-chart-4: #9333ea;
+  --gv-chart-5: #db2777;
+  --gv-chart-grid: #e3e9f2;
+
+  /* Elevation */
+  --gv-shadow-sm: 0 1px 2px rgb(23 43 77 / 0.06), 0 1px 1px rgb(23 43 77 / 0.04);
+  --gv-shadow-md: 0 4px 12px -2px rgb(23 43 77 / 0.1), 0 2px 4px -2px rgb(23 43 77 / 0.06);
+  --gv-shadow-lg: 0 18px 40px -12px rgb(23 43 77 / 0.25), 0 4px 10px -4px rgb(23 43 77 / 0.08);
+  --gv-glow-brand: 0 0 0 4px rgb(37 99 235 / 0.14);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --gv-canvas: #0b111c;
+  --gv-surface: #111a29;
+  --gv-surface-2: #18233a;
+  --gv-sunken: #0d1522;
+  --gv-overlay: rgb(2 6 15 / 0.66);
+
+  --gv-ink: #e6edf7;
+  --gv-muted: #9aa8bd;
+  --gv-placeholder: #8593a9;
+  --gv-on-solid: #ffffff;
+
+  --gv-line: #24324a;
+  --gv-line-strong: #5d6e8c;
+
+  --gv-brand: #2563eb;
+  --gv-brand-hover: #2d68e8;
+  --gv-brand-soft: #16264a;
+  --gv-brand-text: #8db4ff;
+  --gv-focus: #6b9dff;
+
+  --gv-success: #3fb984;
+  --gv-success-text: #6fd8a8;
+  --gv-success-soft: #11291f;
+  --gv-warning: #e0a43b;
+  --gv-warning-text: #f2c26b;
+  --gv-warning-soft: #2d2412;
+  --gv-danger: #f0645c;
+  --gv-danger-solid: #c2413b;
+  --gv-danger-solid-hover: #b03a35;
+  --gv-danger-text: #ff948c;
+  --gv-danger-soft: #33191a;
+  --gv-neutral-soft: #1b2638;
+
+  --gv-chart-1: #5b8def;
+  --gv-chart-2: #2bc4b0;
+  --gv-chart-3: #f0a63a;
+  --gv-chart-4: #b47cf5;
+  --gv-chart-5: #f06aa6;
+  --gv-chart-grid: #22304a;
+
+  --gv-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --gv-shadow-md: 0 6px 16px -4px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.02);
+  --gv-shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.65), 0 0 0 1px rgb(255 255 255 / 0.03);
+  --gv-glow-brand: 0 0 0 4px rgb(91 141 239 / 0.22);
+}

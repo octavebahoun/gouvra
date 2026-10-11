@@ -1,0 +1,42 @@
+# Gouvra web front: serves the SPA and reverse-proxies the API (same origin, no CORS).
+{
+	admin off
+	auto_https off
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+(security_headers) {
+	header {
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Cross-Origin-Opener-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		-Server
+	}
+}
+
+{$SITE_ADDRESS::8080} {
+	encode zstd gzip
+
+	handle /api/* {
+		reverse_proxy {$API_UPSTREAM:api:8000} {
+			flush_interval -1
+			header_up X-Request-ID {http.request.header.X-Request-ID}
+		}
+	}
+
+	handle {
+		import security_headers
+		root * /srv
+		@immutable path /assets/*
+		header @immutable Cache-Control "public, max-age=31536000, immutable"
+		@html path / /index.html
+		header @html Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+}

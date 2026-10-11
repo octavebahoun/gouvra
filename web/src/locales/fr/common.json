@@ -1,0 +1,167 @@
+{
+  "app": {
+    "name": "Gouvra",
+    "tagline": "La salle de contrôle de vos agents IA"
+  },
+  "a11y": {
+    "skipToContent": "Aller au contenu principal",
+    "openNavigation": "Ouvrir la navigation",
+    "closeNavigation": "Fermer la navigation",
+    "mainNavigation": "Navigation principale",
+    "breadcrumb": "Fil d'Ariane",
+    "close": "Fermer",
+    "loading": "Chargement…",
+    "copyValue": "Copier {{label}}",
+    "newContentAnnounced": "{{count}} nouvel élément",
+    "newContentAnnounced_other": "{{count}} nouveaux éléments"
+  },
+  "nav": {
+    "overview": "Vue d'ensemble",
+    "agents": "Agents",
+    "executions": "Exécutions",
+    "evaluations": "Évaluations",
+    "workflows": "Workflows",
+    "tools": "Outils",
+    "providers": "Fournisseurs",
+    "automations": "Automatisations",
+    "connectors": "Connecteurs",
+    "registry": "Registre",
+    "usage": "Consommation",
+    "settings": "Paramètres du workspace",
+    "admin": "Administration",
+    "docs": "Documentation",
+    "build": "Construire",
+    "operate": "Exploiter",
+    "configure": "Configurer"
+  },
+  "actions": {
+    "save": "Enregistrer",
+    "saving": "Enregistrement…",
+    "saved": "Enregistré",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "continue": "Continuer",
+    "back": "Retour",
+    "create": "Créer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "duplicate": "Dupliquer",
+    "archive": "Archiver",
+    "restore": "Restaurer",
+    "retry": "Réessayer",
+    "refresh": "Actualiser",
+    "copy": "Copier",
+    "copied": "Copié",
+    "close": "Fermer",
+    "search": "Rechercher",
+    "clearFilters": "Réinitialiser les filtres",
+    "loadMore": "Charger plus",
+    "showMore": "Afficher plus",
+    "showLess": "Afficher moins",
+    "signOut": "Se déconnecter",
+    "learnMore": "En savoir plus",
+    "export": "Exporter",
+    "open": "Ouvrir",
+    "test": "Tester",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "dismiss": "Masquer"
+  },
+  "states": {
+    "loading": "Chargement…",
+    "emptyTitle": "Rien pour l'instant",
+    "errorTitle": "Chargement impossible",
+    "errorBody": "La requête a échoué. Réessayez, et citez l'identifiant de diagnostic si le problème persiste.",
+    "diagnosticId": "Identifiant de diagnostic",
+    "accessDeniedTitle": "Vous n'avez pas accès à cette page",
+    "accessDeniedBody": "Votre rôle dans ce workspace ne permet pas cette action. Demandez-la à un administrateur si besoin.",
+    "notFoundTitle": "Page introuvable",
+    "notFoundBody": "Cette page n'existe pas, ou elle ne vous est pas partagée.",
+    "offlineTitle": "Vous êtes hors ligne",
+    "offlineBody": "La reconnexion est automatique. Vos modifications non enregistrées restent sur cette page.",
+    "apiDownTitle": "L'API de Gouvra est injoignable",
+    "apiDownBody": "Nous réessayons en continu. Vos modifications non enregistrées restent sur cette page.",
+    "partialData": "Certaines données sont indisponibles",
+    "unavailable": "Indisponible",
+    "lastUpdated": "Mis à jour {{time}}",
+    "unsavedChanges": "Modifications non enregistrées",
+    "leaveUnsavedTitle": "Quitter sans enregistrer ?",
+    "leaveUnsavedBody": "Vos modifications sur cette page seront perdues.",
+    "leave": "Quitter",
+    "stay": "Rester"
+  },
+  "status": {
+    "queued": "En attente",
+    "running": "En cours",
+    "succeeded": "Réussie",
+    "failed": "Échec",
+    "cancelled": "Annulée",
+    "timed_out": "Délai dépassé",
+    "active": "Actif",
+    "archived": "Archivé",
+    "disabled": "Désactivé",
+    "untested": "Non testé",
+    "ok": "Connecté",
+    "error": "Erreur"
+  },
+  "theme": {
+    "label": "Thème",
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "toggle": "Passer au thème {{mode}}"
+  },
+  "language": {
+    "label": "Langue"
+  },
+  "userMenu": {
+    "label": "Menu du compte",
+    "profile": "Profil et préférences",
+    "admin": "Administration de l'instance"
+  },
+  "workspace": {
+    "switcherLabel": "Workspace actuel",
+    "switchTo": "Changer de workspace",
+    "create": "Créer un workspace",
+    "switchedTo": "Vous travaillez maintenant dans {{name}}",
+    "role": {
+      "owner": "Propriétaire",
+      "admin": "Admin",
+      "member": "Membre",
+      "viewer": "Lecteur"
+    }
+  },
+  "errors": {
+    "network": "Serveur injoignable. Vérifiez votre connexion et réessayez.",
+    "server": "Le serveur a rencontré une erreur inattendue.",
+    "rateLimited": "Trop de tentatives. Réessayez dans {{seconds}} s.",
+    "validation": "Certains champs demandent votre attention.",
+    "unknown": "Une erreur s'est produite."
+  },
+  "time": {
+    "justNow": "à l'instant",
+    "durationMs": "{{value}} ms",
+    "durationS": "{{value}} s",
+    "durationM": "{{m}} min {{s}} s"
+  },
+  "cost": {
+    "provider_reported": "Rapporté par le fournisseur",
+    "estimated": "Estimé",
+    "unavailable": "Indisponible"
+  },
+  "pagination": {
+    "showing": "{{count}} affichés",
+    "page": "Page {{page}}"
+  },
+  "footer": {
+    "license": "Open source · Apache-2.0"
+  },
+  "form": {
+    "required": "obligatoire",
+    "showPassword": "Afficher le mot de passe",
+    "hidePassword": "Masquer le mot de passe"
+  },
+  "confirm": {
+    "typeName": "Saisissez « {{name}} » pour confirmer"
+  }
+}
