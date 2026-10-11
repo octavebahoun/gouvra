@@ -39,6 +39,12 @@ def cmd_export_openapi(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_check_config(args: argparse.Namespace) -> int:
+    from gouvra.core.config_check import main as check_main
+
+    return check_main(live=args.live)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="gouvra", description="Gouvra operator commands")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -50,6 +56,10 @@ def main(argv: list[str] | None = None) -> int:
     export = sub.add_parser("export-openapi", help="Write the OpenAPI schema to a file")
     export.add_argument("--output", default="openapi.json")
     export.set_defaults(func=cmd_export_openapi)
+
+    check = sub.add_parser("check-config", help="Verify configuration (never prints secret values)")
+    check.add_argument("--live", action="store_true", help="also call providers (read-only)")
+    check.set_defaults(func=cmd_check_config)
 
     args = parser.parse_args(argv)
     result: int = args.func(args)

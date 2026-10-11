@@ -10,6 +10,17 @@ from gouvra.core.config import get_settings
 api_router = APIRouter()
 
 
+def _include_modules() -> None:
+    from gouvra.modules.api_keys.routes import router as api_keys_router
+    from gouvra.modules.identity.routes import me_router
+    from gouvra.modules.identity.routes import router as auth_router
+    from gouvra.modules.workspaces.routes import invitations_router
+    from gouvra.modules.workspaces.routes import router as workspaces_router
+
+    for router in (auth_router, me_router, workspaces_router, invitations_router, api_keys_router):
+        api_router.include_router(router)
+
+
 class MetaOut(BaseModel):
     name: str
     version: str
@@ -31,3 +42,6 @@ async def meta() -> MetaOut:
         oauth_providers=s.oauth_providers,
         billing_enabled=s.billing_provider.value != "none",
     )
+
+
+_include_modules()

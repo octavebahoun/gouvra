@@ -10,4 +10,6 @@ Service = Callable[[asyncio.Event], Coroutine[Any, Any, None]]
 
 
 def registered_services() -> list[Service]:
-    return []
+    from gouvra.modules.notifications.service import outbox_service
+
+    return [outbox_service]

@@ -42,6 +42,7 @@ dev = [
     "types-jsonschema",
     "types-croniter",
     "types-docker",
+    "asyncpg-stubs>=0.32.0",
 ]
 
 [build-system]
@@ -78,6 +79,7 @@ ignore = [
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S101", "S105", "S106", "PLR0915", "ANN", "S311"]
 "src/gouvra/migrations/**" = ["E501"]
+"src/gouvra/modules/notifications/templates.py" = ["E501"]  # inline-styled e-mail HTML
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Path", "fastapi.Body", "fastapi.Cookie", "fastapi.Security"]
@@ -116,6 +118,8 @@ filterwarnings = ["error"]
 [tool.coverage.run]
 source = ["gouvra"]
 branch = true
+# SQLAlchemy's asyncio layer runs on greenlets: without this, lines after an `await` are lost.
+concurrency = ["greenlet", "thread"]
 omit = ["src/gouvra/migrations/*", "src/gouvra/cli.py"]
 
 [tool.coverage.report]

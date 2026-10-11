@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import os
-from collections.abc import AsyncIterator
+import socket
+from collections.abc import AsyncIterator, Iterator
 from pathlib import Path
 from urllib.parse import quote
 
@@ -40,7 +41,8 @@ REDIS_URL = os.environ.get(
 os.environ.update(
     {
         "APP_ENV": "test",
-        "APP_URL": "http://testserver",
+        "APP_URL": "https://testserver",
+        "API_PUBLIC_URL": "https://testserver",
         "DATABASE_URL": f"postgresql+asyncpg://{PG_BASE}/{TEST_DB_NAME}",
         "REDIS_URL": REDIS_URL,
         "SESSION_SECRET": "test-session-secret-0123456789abcdef0123456789",
@@ -50,6 +52,10 @@ os.environ.update(
         "LOG_FORMAT": "console",
         "LOG_LEVEL": "WARNING",
         "BILLING_PROVIDER": "none",
+        "GITHUB_CLIENT_ID": "Iv1.testclientid0001",
+        "GITHUB_CLIENT_SECRET": "0" * 40,
+        "GOOGLE_CLIENT_ID": "test-client.apps.googleusercontent.com",
+        "GOOGLE_CLIENT_SECRET": "GOCSPX-test-secret-000000",
         "SIGNUP_ENABLED": "true",
     }
 )
@@ -86,6 +92,29 @@ async def _migrate() -> None:
     await engine.dispose()
 
 
+_LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "testserver", "postgres", "valkey"}
+
+
+@pytest.fixture(autouse=True)
+def no_external_network(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> Iterator[None]:
+    """Tests never reach the Internet unless marked `real` (third-party calls must be mocked)."""
+    if request.node.get_closest_marker("real"):
+        yield
+        return
+    real_getaddrinfo = socket.getaddrinfo
+
+    def guarded(host, *args, **kwargs):  # type: ignore[no-untyped-def]
+        name = host.decode() if isinstance(host, bytes) else host
+        if name is not None and name not in _LOCAL_HOSTS and not str(name).startswith("127."):
+            raise OSError(f"external network blocked in tests: {name}")
+        return real_getaddrinfo(host, *args, **kwargs)
+
+    monkeypatch.setattr(socket, "getaddrinfo", guarded)
+    yield
+
+
 @pytest.fixture(scope="session", autouse=True)
 async def database() -> AsyncIterator[None]:
     await _recreate_database()
@@ -118,15 +147,55 @@ async def clean_state(database: None) -> AsyncIterator[None]:
     await get_redis().flushdb()
 
 
-@pytest.fixture
-async def app_client() -> AsyncIterator[AsyncClient]:
+@pytest.fixture(scope="session")
+def app() -> object:
     from gouvra.main import create_app
 
-    app = create_app()
-    transport = ASGITransport(app=app, client=("203.0.113.10", 51000))
-    async with AsyncClient(
-        transport=transport,
-        base_url="http://testserver",
-        headers={"Origin": "http://testserver"},
-    ) as client:
-        yield client
+    return create_app()
+
+
+def _csrf_hook(client: AsyncClient):  # type: ignore[no-untyped-def]
+    async def hook(request):  # type: ignore[no-untyped-def]
+        if request.method in {"POST", "PUT", "PATCH", "DELETE"}:
+            for name in ("__Host-gv_csrf", "gv_csrf"):
+                value = client.cookies.get(name)
+                if value and "x-csrf-token" not in request.headers:
+                    request.headers["x-csrf-token"] = value
+                    break
+
+    return hook
+
+
+@pytest.fixture
+async def make_client(app: object) -> AsyncIterator[object]:
+    """Factory of independent browser-like clients (own cookie jar, CSRF header, distinct IP)."""
+    clients: list[AsyncClient] = []
+    counter = iter(range(10, 250))
+
+    def factory(*, ip: str | None = None, csrf: bool = True) -> AsyncClient:
+        transport = ASGITransport(app=app, client=(ip or f"203.0.113.{next(counter)}", 51000))  # type: ignore[arg-type]
+        client = AsyncClient(
+            transport=transport,
+            base_url="https://testserver",
+            headers={"Origin": "https://testserver"},
+        )
+        if csrf:
+            client.event_hooks["request"].append(_csrf_hook(client))
+        clients.append(client)
+        return client
+
+    yield factory
+    for client in clients:
+        await client.aclose()
+
+
+@pytest.fixture
+async def app_client(make_client: object) -> AsyncClient:
+    return make_client()  # type: ignore[operator, no-any-return]
+
+
+@pytest.fixture
+def outbox() -> object:
+    from tests.helpers import Outbox
+
+    return Outbox()

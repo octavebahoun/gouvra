@@ -50,8 +50,11 @@ class Settings(BaseSettings):
     app_env: Environment = Environment.DEVELOPMENT
     app_name: str = "Gouvra"
     app_version: str = "0.1.0"
-    # Public URL of the web application (used in e-mails, OAuth redirects and Origin checks).
+    # Public URL of the web application (used in e-mails, post-login redirects, Origin checks).
     app_url: str = "http://localhost:8080"
+    # Public URL where the API itself is reachable. OAuth callbacks are registered on it:
+    # http://localhost:8000 in development, usually equal to APP_URL behind the proxy in production.
+    api_public_url: str = "http://localhost:8000"
     log_level: str = "INFO"
     log_format: str = "json"  # json | console
 
@@ -120,7 +123,7 @@ class Settings(BaseSettings):
             return [item.strip() for item in value.split(",") if item.strip()]
         return value
 
-    @field_validator("app_url")
+    @field_validator("app_url", "api_public_url")
     @classmethod
     def _strip_slash(cls, value: str) -> str:
         return value.rstrip("/")

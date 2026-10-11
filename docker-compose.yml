@@ -10,6 +10,7 @@ x-app: &app
   environment: &app-env
     APP_ENV: ${APP_ENV:-development}
     APP_URL: ${APP_URL:-http://localhost:8080}
+    API_PUBLIC_URL: ${API_PUBLIC_URL:-http://localhost:8000}
     LOG_FORMAT: json
     LOG_LEVEL: ${LOG_LEVEL:-INFO}
     DATABASE_URL: postgresql+asyncpg://gouvra:${POSTGRES_PASSWORD:?run scripts/gen-secrets}@postgres:5432/gouvra
@@ -75,7 +76,8 @@ services:
     image: axllent/mailpit:v1.31
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8025:8025"
+      - "127.0.0.1:8025:8025" # web UI + API
+      - "127.0.0.1:1025:1025" # SMTP (local tooling and tests)
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: "1"
       MP_SMTP_AUTH_ALLOW_INSECURE: "1"
