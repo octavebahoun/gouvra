@@ -1,0 +1,124 @@
+[project]
+name = "gouvra"
+version = "0.1.0"
+description = "Gouvra — open-source control room to build, run, evaluate and supervise AI agents."
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.13,<3.14"
+authors = [{ name = "Gouvra contributors" }]
+dependencies = [
+    "fastapi>=0.143",
+    "uvicorn[standard]>=0.54",
+    "pydantic[email]>=2.14",
+    "pydantic-settings>=2.15",
+    "sqlalchemy[asyncio]>=2.1",
+    "asyncpg>=0.32",
+    "alembic>=1.20",
+    "redis>=8.1",
+    "argon2-cffi>=25.1",
+    "cryptography>=50",
+    "httpx>=0.28",
+    "jsonschema>=4.26",
+    "structlog>=26.1",
+    "orjson>=3.13",
+    "python-multipart>=0.0.32",
+    "croniter>=6.2",
+    "stripe>=16",
+    "docker>=7.2",
+]
+
+[project.scripts]
+gouvra = "gouvra.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1",
+    "pytest-asyncio>=1.4",
+    "coverage[toml]>=7.16",
+    "ruff>=0.17",
+    "mypy>=2.4",
+    "respx>=0.23",
+    "pip-audit>=2.10",
+    "types-jsonschema",
+    "types-croniter",
+    "types-docker",
+]
+
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gouvra"]
+
+[tool.uv]
+default-groups = ["dev"]
+
+# ---------------------------------------------------------------- ruff
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "W", "F", "I", "B", "UP", "S", "ASYNC", "C4", "SIM", "RUF", "PT", "N",
+    "TID", "PIE", "RET", "PL", "PERF", "LOG", "G", "T20", "DTZ", "FURB", "TRY", "BLE",
+]
+ignore = [
+    "PLR0913", # FastAPI dependencies make long signatures normal
+    "PLR2004", # magic values are fine in tests and HTTP status checks
+    "TRY003",  # explicit messages on domain errors are intended
+    "PLR0911",
+    "PLR0912",
+    "PLC0415", # local imports are used deliberately to break import cycles
+    "N818",    # HTTP-flavoured error names (NotFound, Forbidden...) read better than *Error
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "S105", "S106", "PLR0915", "ANN", "S311"]
+"src/gouvra/migrations/**" = ["E501"]
+
+[tool.ruff.lint.flake8-bugbear]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Path", "fastapi.Body", "fastapi.Cookie", "fastapi.Security"]
+
+[tool.ruff.format]
+quote-style = "double"
+
+# ---------------------------------------------------------------- mypy
+[tool.mypy]
+python_version = "3.13"
+strict = true
+warn_unreachable = true
+plugins = ["pydantic.mypy"]
+mypy_path = "src"
+packages = ["gouvra"]
+
+
+[tool.pydantic-mypy]
+init_forbid_extra = true
+init_typed = true
+warn_required_dynamic_aliases = true
+
+# ---------------------------------------------------------------- pytest
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "session"
+asyncio_default_test_loop_scope = "session"
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = [
+    "real: hits a real third-party API (needs credentials, skipped otherwise)",
+    "docker: needs a reachable Docker daemon",
+]
+filterwarnings = ["error"]
+
+[tool.coverage.run]
+source = ["gouvra"]
+branch = true
+omit = ["src/gouvra/migrations/*", "src/gouvra/cli.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_also = ["if TYPE_CHECKING:", "raise NotImplementedError", "@overload"]
