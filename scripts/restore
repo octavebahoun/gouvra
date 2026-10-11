@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Restore a backup made by scripts/backup. Destructive: replaces the current data (asks first).
+#
+#   scripts/restore backups/gouvra-20261011T120000Z.dump
+#   COMPOSE_FILE=docker-compose.prod.yml scripts/restore backups/<file>.dump
+#   FORCE=1 scripts/restore <file>          # no prompt (automation)
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+file="${1:?usage: scripts/restore backups/gouvra-YYYYmmddTHHMMSSZ.dump}"
+[ -f "$file" ] || { echo "No such file: $file" >&2; exit 1; }
+docker compose exec -T postgres pg_restore --list <"$file" >/dev/null || {
+  echo "$file is not a readable pg_dump archive." >&2
+  exit 1
+}
+
+if [ "${FORCE:-}" != "1" ]; then
+  read -r -p "Every row of the current database will be replaced by ${file}. Type 'restore' to continue: " answer
+  [ "$answer" = "restore" ] || { echo "Cancelled."; exit 1; }
+fi
+
+# Nothing writes during the restore.
+docker compose stop api worker
+docker compose exec -T postgres pg_restore -U gouvra -d gouvra --clean --if-exists --no-owner \
+  --single-transaction <"$file"
+# Bring the schema up to date if the backup predates this version, then restart.
+docker compose run --rm migrate
+docker compose start api worker
+echo "Restored from ${file}."

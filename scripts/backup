@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+# Back up the PostgreSQL database of a Gouvra stack (compressed custom format, checked after writing).
+#
+#   scripts/backup                                          # local stack
+#   COMPOSE_FILE=docker-compose.prod.yml scripts/backup     # production stack
+#
+# The dump contains secrets encrypted with ENCRYPTION_KEYS: store the keys separately and safely,
+# a backup without them cannot decrypt provider keys or tool credentials (see docs/operations.md).
+set -euo pipefail
+cd "$(dirname "$0")/.."
+
+mkdir -p backups
+chmod 700 backups
+stamp="$(date -u +%Y%m%dT%H%M%SZ)"
+file="backups/gouvra-${stamp}.dump"
+
+docker compose exec -T postgres pg_dump -U gouvra -d gouvra --format=custom --compress=9 >"$file"
+chmod 600 "$file"
+# A dump that pg_restore cannot list is not a backup.
+docker compose exec -T postgres pg_restore --list <"$file" >/dev/null
+
+echo "Backup written to ${file} ($(du -h "$file" | cut -f1))."
