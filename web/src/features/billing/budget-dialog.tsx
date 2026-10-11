@@ -105,7 +105,7 @@ export function BudgetDialog({
                     : "border-line text-muted hover:text-ink",
                 )}
               >
-                {value} %
+                {t("budget.threshold", { value })}
               </button>
             ))}
           </div>

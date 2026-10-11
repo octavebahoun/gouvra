@@ -99,7 +99,7 @@ export function PlanCards({ billing, pending, onUpgrade, onManage }: Props) {
               plan.key === current ? "border-brand shadow-[var(--gv-glow-brand)]" : "border-line",
             )}
           >
-            <div className="flex items-center justify-between gap-2">
+            <div className="flex min-h-6 items-center justify-between gap-2">
               <h3 className="text-[15px] font-semibold text-ink">{plan.name}</h3>
               {plan.key === current ? <Badge tone="brand">{t("plans.yours")}</Badge> : null}
             </div>

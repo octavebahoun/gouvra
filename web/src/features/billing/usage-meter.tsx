@@ -21,9 +21,7 @@ export function UsageMeter({
       <div className="flex items-baseline justify-between gap-3 text-[13px]">
         <span className="text-ink">{label}</span>
         <span className="text-muted tabular-nums">
-          {limit
-            ? t("meter.of", { used: used.toLocaleString(), limit: limit.toLocaleString() })
-            : t("meter.unlimited", { used: used.toLocaleString() })}
+          {limit ? t("meter.of", { used, limit }) : t("meter.unlimited", { used })}
         </span>
       </div>
       <div

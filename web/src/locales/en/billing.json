@@ -33,8 +33,8 @@
     "agents": "Agents",
     "members": "Members and invitations",
     "automations": "Automations",
-    "of": "{{used}} of {{limit}}",
-    "unlimited": "{{used}} · unlimited",
+    "of": "{{used, number}} of {{limit, number}}",
+    "unlimited": "{{used, number}} · unlimited",
     "period": "Current period: {{start}} – {{end}} (UTC)."
   },
   "plans": {
@@ -49,22 +49,22 @@
     "downgradePortal": "Cancel in the portal",
     "ownerOnly": "Only the workspace owner can change the plan.",
     "features": {
-      "runs_one": "{{count}} run per month",
-      "runs_other": "{{count}} runs per month",
+      "runs_one": "{{count, number}} run per month",
+      "runs_other": "{{count, number}} runs per month",
       "runsUnlimited": "Unlimited runs",
-      "agents_one": "{{count}} agent",
-      "agents_other": "{{count}} agents",
+      "agents_one": "{{count, number}} agent",
+      "agents_other": "{{count, number}} agents",
       "agentsUnlimited": "Unlimited agents",
-      "members_one": "{{count}} member",
-      "members_other": "{{count}} members",
+      "members_one": "{{count, number}} member",
+      "members_other": "{{count, number}} members",
       "membersUnlimited": "Unlimited members",
-      "automations_one": "{{count}} automation",
-      "automations_other": "{{count}} automations",
+      "automations_one": "{{count, number}} automation",
+      "automations_other": "{{count, number}} automations",
       "automationsUnlimited": "Unlimited automations",
-      "concurrency_one": "{{count}} run at a time",
-      "concurrency_other": "{{count}} runs at a time",
-      "retention_one": "History kept up to {{count}} day",
-      "retention_other": "History kept up to {{count}} days"
+      "concurrency_one": "{{count, number}} run at a time",
+      "concurrency_other": "{{count, number}} runs at a time",
+      "retention_one": "History kept up to {{count, number}} day",
+      "retention_other": "History kept up to {{count, number}} days"
     }
   },
   "checkout": {
@@ -91,6 +91,7 @@
     "of": "of {{limit}}",
     "none": "No budget: runs are never stopped for cost.",
     "alertsAt": "Alerts at {{list}}",
+    "threshold": "{{value}}%",
     "stops": "Stops new runs at 100%",
     "dialogTitle": "Monthly budget",
     "dialogDescription": "Owners and admins get an e-mail and an alert at each threshold, once per month.",

@@ -1,6 +1,6 @@
 {
   "title": "Workspace settings",
-  "description": "Manage the profile, members and service keys of {{workspace}}.",
+  "description": "Manage the profile, members, keys, billing and data of {{workspace}}.",
   "tabs": {
     "label": "Settings sections",
     "general": "General",

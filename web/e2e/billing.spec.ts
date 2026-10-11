@@ -88,12 +88,12 @@ test("a budget, retention and exports, from the interface", async ({ browser }) 
   await page.getByRole("button", { name: "Set a budget" }).click();
   const dialog = page.getByRole("dialog");
   await dialog.getByRole("textbox", { name: /Limit per month/ }).fill("25");
-  await dialog.getByRole("button", { name: "90 %" }).click();
+  await dialog.getByRole("button", { name: "90%" }).click();
   await dialog.getByRole("switch", { name: "Stop new runs at 100%" }).click();
   await dialog.getByRole("button", { name: "Save" }).click();
   await expect(page.getByText("Budget saved")).toBeVisible();
   await expect(page.getByText("of $25.00")).toBeVisible();
-  await expect(page.getByText("Alerts at 50 %, 80 %, 90 %, 100 %")).toBeVisible();
+  await expect(page.getByText("Alerts at 50%, 80%, 90%, 100%")).toBeVisible();
   await expect(page.getByText("Stops new runs at 100%")).toBeVisible();
   await expect(page.getByRole("meter", { name: "Monthly budget" })).toBeVisible();
 

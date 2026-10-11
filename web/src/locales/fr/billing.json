@@ -33,8 +33,8 @@
     "agents": "Agents",
     "members": "Membres et invitations",
     "automations": "Automatisations",
-    "of": "{{used}} sur {{limit}}",
-    "unlimited": "{{used}} · illimité",
+    "of": "{{used, number}} sur {{limit, number}}",
+    "unlimited": "{{used, number}} · illimité",
     "period": "Période en cours : {{start}} – {{end}} (UTC)."
   },
   "plans": {
@@ -49,22 +49,22 @@
     "downgradePortal": "Résilier dans le portail",
     "ownerOnly": "Seul le propriétaire de l'espace peut changer d'offre.",
     "features": {
-      "runs_one": "{{count}} run par mois",
-      "runs_other": "{{count}} runs par mois",
+      "runs_one": "{{count, number}} run par mois",
+      "runs_other": "{{count, number}} runs par mois",
       "runsUnlimited": "Runs illimités",
-      "agents_one": "{{count}} agent",
-      "agents_other": "{{count}} agents",
+      "agents_one": "{{count, number}} agent",
+      "agents_other": "{{count, number}} agents",
       "agentsUnlimited": "Agents illimités",
-      "members_one": "{{count}} membre",
-      "members_other": "{{count}} membres",
+      "members_one": "{{count, number}} membre",
+      "members_other": "{{count, number}} membres",
       "membersUnlimited": "Membres illimités",
-      "automations_one": "{{count}} automatisation",
-      "automations_other": "{{count}} automatisations",
+      "automations_one": "{{count, number}} automatisation",
+      "automations_other": "{{count, number}} automatisations",
       "automationsUnlimited": "Automatisations illimitées",
-      "concurrency_one": "{{count}} run à la fois",
-      "concurrency_other": "{{count}} runs à la fois",
-      "retention_one": "Historique conservé jusqu'à {{count}} jour",
-      "retention_other": "Historique conservé jusqu'à {{count}} jours"
+      "concurrency_one": "{{count, number}} run à la fois",
+      "concurrency_other": "{{count, number}} runs à la fois",
+      "retention_one": "Historique conservé jusqu'à {{count, number}} jour",
+      "retention_other": "Historique conservé jusqu'à {{count, number}} jours"
     }
   },
   "checkout": {
@@ -91,6 +91,7 @@
     "of": "sur {{limit}}",
     "none": "Aucun budget : les runs ne sont jamais arrêtés pour leur coût.",
     "alertsAt": "Alertes à {{list}}",
+    "threshold": "{{value}} %",
     "stops": "Bloque les nouveaux runs à 100 %",
     "dialogTitle": "Budget mensuel",
     "dialogDescription": "Propriétaires et admins reçoivent un e-mail et une alerte à chaque seuil, une fois par mois.",

@@ -1,6 +1,6 @@
 {
   "title": "Paramètres du workspace",
-  "description": "Gérez le profil, les membres et les clés de service de {{workspace}}.",
+  "description": "Gérez le profil, les membres, les clés, la facturation et les données de {{workspace}}.",
   "tabs": {
     "label": "Sections des paramètres",
     "general": "Général",

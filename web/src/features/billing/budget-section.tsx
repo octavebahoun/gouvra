@@ -85,7 +85,9 @@ export function BudgetCard() {
             <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-muted">
               <span>
                 {t("budget.alertsAt", {
-                  list: settings.thresholds.map((v) => `${v} %`).join(", "),
+                  list: settings.thresholds
+                    .map((value) => t("budget.threshold", { value }))
+                    .join(", "),
                 })}
               </span>
               {settings.hard_stop ? <Badge tone="warning">{t("budget.stops")}</Badge> : null}
@@ -99,6 +101,19 @@ export function BudgetCard() {
         <BudgetDialog open onOpenChange={setEditing} workspaceId={workspace.id} budget={settings} />
       ) : null}
     </Card>
+  );
+}
+
+/** The budget card, with the alerts beside it when there are any. */
+export function BudgetOverview() {
+  const { workspace } = useCurrentWorkspace();
+  const alerts = useAlerts(workspace.id);
+  const active = (alerts.data ?? []).some((alert) => !alert.dismissed_at);
+  return (
+    <div className={cn("mb-6 grid gap-6", active && "lg:grid-cols-2")}>
+      <BudgetCard />
+      {active ? <AlertsCard /> : null}
+    </div>
   );
 }
 

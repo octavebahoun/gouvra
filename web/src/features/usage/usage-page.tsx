@@ -18,7 +18,7 @@ import {
 import { cn } from "@/lib/cn";
 import { useDocumentTitle } from "@/lib/use-document-title";
 import { PageContainer, PageHeader } from "@/components/layout/page-header";
-import { AlertsCard, BudgetCard, ExportButtons } from "@/features/billing/budget-section";
+import { BudgetOverview, ExportButtons } from "@/features/billing/budget-section";
 import { fadeUp, staggerChildren } from "@/components/motion/presets";
 import { AnimatedNumber } from "@/components/ui/animated-number";
 import { Card, CardHeader, Skeleton } from "@/components/ui/feedback";
@@ -76,10 +76,7 @@ export function UsagePage() {
           </>
         }
       />
-      <div className="mb-6 grid gap-6 empty:hidden lg:grid-cols-2">
-        <BudgetCard />
-        <AlertsCard />
-      </div>
+      <BudgetOverview />
       {usage.isPending ? (
         <div className="grid gap-4">
           <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
