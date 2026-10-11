@@ -7,6 +7,22 @@ import { expect, type Page } from "@playwright/test";
  */
 export async function expectAccessible(page: Page, label: string): Promise<void> {
   await page.waitForTimeout(400);
+  // Entrance animations (Motion runs opacity and transform on the Web Animations API) must have
+  // finished; endless ones (spinners, "running" pulses) are not waited for.
+  await page
+    .waitForFunction(
+      () =>
+        document
+          .getAnimations()
+          .every(
+            (animation) =>
+              animation.playState !== "running" ||
+              animation.effect?.getTiming().iterations === Infinity,
+          ),
+      undefined,
+      { timeout: 4_000 },
+    )
+    .catch(() => undefined);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     // Animated, aria-hidden illustrations (e.g. the site hero replaying a run) are excluded:

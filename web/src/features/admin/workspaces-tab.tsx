@@ -22,6 +22,9 @@ import { SearchField } from "./search-field";
 
 const GRANTABLE = ["free", "team", "business"] as const;
 
+// Rows below the fold appear at once: a long list should not take seconds to settle.
+const ANIMATED_ROWS = 12;
+
 /** Every workspace of the instance: who owns it, its plan and activity; suspend or grant a plan. */
 export function WorkspacesTab() {
   const { t } = useTranslation("admin");
@@ -78,9 +81,10 @@ export function WorkspacesTab() {
             animate="visible"
             className={cn("divide-y divide-line", workspaces.isPlaceholderData && "opacity-60")}
           >
-            {rows.map((workspace) => (
+            {rows.map((workspace, index) => (
               <WorkspaceRow
                 key={workspace.id}
+                animated={index < ANIMATED_ROWS}
                 workspace={workspace}
                 canGrant={billing !== undefined && billing !== "none"}
                 onPlan={(plan) => change(workspace, { plan })}
@@ -113,12 +117,14 @@ export function WorkspacesTab() {
 
 function WorkspaceRow({
   workspace,
+  animated,
   canGrant,
   onPlan,
   onSuspend,
   onRestore,
 }: {
   workspace: AdminWorkspace;
+  animated: boolean;
   canGrant: boolean;
   onPlan: (plan: (typeof GRANTABLE)[number]) => void;
   onSuspend: () => void;
@@ -132,7 +138,7 @@ function WorkspaceRow({
   );
   return (
     <motion.li
-      variants={listItem}
+      variants={animated ? listItem : undefined}
       className="flex flex-wrap items-center gap-x-6 gap-y-3 px-5 py-4"
     >
       <div className="min-w-0 flex-1 basis-56">

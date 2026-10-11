@@ -17,6 +17,9 @@ import { useAdminUsers, useUpdateAdminUser, type AdminUser } from "./api";
 import { LoadMore } from "./load-more";
 import { SearchField } from "./search-field";
 
+// Rows below the fold appear at once: a long list should not take seconds to settle.
+const ANIMATED_ROWS = 12;
+
 /** Every account of the instance; disabling one signs it out everywhere. */
 export function UsersTab() {
   const { t } = useTranslation("admin");
@@ -66,9 +69,10 @@ export function UsersTab() {
             animate="visible"
             className={cn("divide-y divide-line", users.isPlaceholderData && "opacity-60")}
           >
-            {rows.map((user) => (
+            {rows.map((user, index) => (
               <UserRow
                 key={user.id}
+                animated={index < ANIMATED_ROWS}
                 user={user}
                 self={user.id === session.user.id}
                 onDisable={() => setDisabling(user)}
@@ -100,11 +104,13 @@ export function UsersTab() {
 
 function UserRow({
   user,
+  animated,
   self,
   onDisable,
   onEnable,
 }: {
   user: AdminUser;
+  animated: boolean;
   self: boolean;
   onDisable: () => void;
   onEnable: () => void;
@@ -114,7 +120,7 @@ function UserRow({
   const disabled = user.status === "disabled";
   return (
     <motion.li
-      variants={listItem}
+      variants={animated ? listItem : undefined}
       className="flex flex-wrap items-center gap-x-4 gap-y-3 px-5 py-3.5"
     >
       <Avatar name={user.display_name || user.email} size="sm" />
