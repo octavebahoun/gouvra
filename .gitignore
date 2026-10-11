@@ -44,6 +44,12 @@ exports/
 
 # Source design docs (converted copies in docs/*.md are kept)
 docs/*.docx
+docs/AgentHub_document_de_conception_v1-1.docx
+docs/AgentHub_identite_frontend_et_specifications_UI_v1-1.docx
+
+# Working notes — stay local
+BRIEF.md
+PROGRESS.md
 
 # Editor swap/backup files (may contain secrets)
 *.swp
