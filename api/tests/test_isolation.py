@@ -78,6 +78,30 @@ ROUTES: list[Route] = [
     Route("GET", "/workspaces/{ws}/workflows"),
     Route("POST", "/workspaces/{ws}/workflows", {"name": "Stolen flow"}),
     Route("GET", "/workspaces/{ws}/workflow-runs"),
+    Route("GET", "/workspaces/{ws}/registry"),
+    Route("GET", "/workspaces/{ws}/connections"),
+    Route(
+        "POST",
+        "/workspaces/{ws}/connections",
+        {
+            "connector": "slack",
+            "name": "Stolen",
+            "credentials": {"webhook_url": "https://hooks.slack.com/services/T0/B0/stolen"},
+        },
+    ),
+    Route("GET", "/workspaces/{ws}/automations"),
+    Route(
+        "POST",
+        "/workspaces/{ws}/automations",
+        {
+            "name": "Stolen",
+            "kind": "schedule",
+            "target_type": "agent",
+            "agent_id": "{agent}",
+            "cron": "@daily",
+            "input": "x",
+        },
+    ),
 ]
 
 # Routes addressing one resource by id (the workspace is derived from the resource).
@@ -135,6 +159,16 @@ RESOURCE_ROUTES: list[Route] = [
     Route("GET", "/workflow-runs/{wfrun}"),
     Route("POST", "/workflow-runs/{wfrun}/cancel"),
     Route("GET", "/workflow-runs/{wfrun}/stream"),
+    Route("GET", "/automations/{automation}"),
+    Route("PATCH", "/automations/{automation}", {"enabled": False}),
+    Route("DELETE", "/automations/{automation}"),
+    Route("POST", "/automations/{automation}/rotate-secret"),
+    Route("POST", "/automations/{automation}/run", {}),
+    Route("GET", "/automations/{automation}/fires"),
+    Route("GET", "/connections/{connection}"),
+    Route("PATCH", "/connections/{connection}", {"name": "pwned"}),
+    Route("DELETE", "/connections/{connection}"),
+    Route("POST", "/connections/{connection}/check"),
 ]
 
 
@@ -194,6 +228,18 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
     flow_id = workflow.json()["id"]
     await owner.client.post(f"/api/v1/workflows/{flow_id}/publish", json={})
     wfrun = await owner.client.post(f"/api/v1/workflows/{flow_id}/runs", json={"input": "hi"})
+    connection = await owner.client.post(
+        f"/api/v1/workspaces/{workspace['id']}/connections",
+        json={
+            "connector": "slack",
+            "name": "Alerts",
+            "credentials": {"webhook_url": "https://hooks.slack.com/services/T1/B1/secret"},
+        },
+    )
+    automation = await owner.client.post(
+        f"/api/v1/workspaces/{workspace['id']}/automations",
+        json={"name": "Hook", "kind": "webhook", "target_type": "agent", "agent_id": agent["id"]},
+    )
     return Tenant(
         owner=owner,
         member=member,
@@ -211,6 +257,8 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
             "run": run.json()["id"],
             "workflow": flow_id,
             "wfrun": wfrun.json()["id"],
+            "automation": automation.json()["id"],
+            "connection": connection.json()["id"],
         },
     )
 
@@ -335,6 +383,8 @@ def _normalise(path: str) -> str:
         "{run}": "{run_id}",
         "{workflow}": "{workflow_id}",
         "{wfrun}": "{run_id}",
+        "{automation}": "{automation_id}",
+        "{connection}": "{connection_id}",
         "/versions/1": "/versions/{number}",
     }
     path = path.split("?", 1)[0]
@@ -359,6 +409,8 @@ NOT_WORKSPACE_RESOURCES = {
     ("GET", "/auth/oauth/{provider}/start"),
     ("GET", "/auth/oauth/{provider}/callback"),
     ("DELETE", "/me/sessions/{session_id}"),
+    # Public inbound webhooks: addressed by an unguessable token, authenticated by signature.
+    ("POST", "/hooks/{token}"),
 }
 
 

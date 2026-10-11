@@ -1530,6 +1530,216 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspace_id}/automations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List automations */
+        get: operations["automations_list_automations"];
+        put?: never;
+        /** Create a schedule or a webhook (a webhook's secret is shown once) */
+        post: operations["automations_create_automation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/automations/cron-preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a cron expression and list its next runs */
+        post: operations["automations_cron_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/automations/{automation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get an automation */
+        get: operations["automations_get_automation"];
+        put?: never;
+        post?: never;
+        /** Delete an automation (the runs it started stay in the history) */
+        delete: operations["automations_delete_automation"];
+        options?: never;
+        head?: never;
+        /** Edit, pause or resume an automation */
+        patch: operations["automations_update_automation"];
+        trace?: never;
+    };
+    "/api/v1/automations/{automation_id}/rotate-secret": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Replace a webhook's signing secret (shown once; the old one stops working) */
+        post: operations["automations_rotate_secret"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/automations/{automation_id}/run": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run now: a schedule with its input, a webhook with a sample payload */
+        post: operations["automations_run_automation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/automations/{automation_id}/fires": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Deliveries and scheduled runs */
+        get: operations["automations_list_fires"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/hooks/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Inbound webhook: signed deliveries start the automation's agent or workflow */
+        post: operations["webhooks_receive_hook"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connectors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The connector library */
+        get: operations["connectors_list_connectors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Connections of the workspace */
+        get: operations["connectors_list_connections"];
+        put?: never;
+        /** Connect a service: its operations become tools */
+        post: operations["connectors_create_connection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/connections/{connection_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a connection */
+        get: operations["connectors_get_connection"];
+        put?: never;
+        post?: never;
+        /** Remove a connection: credentials erased, tools archived */
+        delete: operations["connectors_remove_connection"];
+        options?: never;
+        head?: never;
+        /** Rename a connection or replace its credentials */
+        patch: operations["connectors_update_connection"];
+        trace?: never;
+    };
+    "/api/v1/connections/{connection_id}/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check the credentials (no side effect) */
+        post: operations["connectors_check_connection"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/registry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Models and tools, with their use */
+        get: operations["registry_registry"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1929,6 +2139,289 @@ export interface components {
              */
             created_at: string;
         };
+        /** AutomationCreateIn */
+        AutomationCreateIn: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description?: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "schedule" | "webhook";
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "agent" | "workflow";
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Workflow Id */
+            workflow_id?: string | null;
+            /**
+             * Input
+             * @description Schedules: the input of every run
+             */
+            input?: string | {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Input Template
+             * @description Webhooks: build the run input from the payload, e.g. {{input.ticket.title}}
+             */
+            input_template?: string | null;
+            /**
+             * Cron
+             * @description Five-field cron expression, e.g. 0 9 * * 1-5
+             */
+            cron?: string | null;
+            /**
+             * Timezone
+             * @description IANA time zone
+             * @default UTC
+             */
+            timezone?: string;
+            /**
+             * Overlap
+             * @description skip: no new run while one is running (default for schedules); allow: every delivery runs (default for webhooks)
+             */
+            overlap?: ("skip" | "allow") | null;
+            /**
+             * Signature Format
+             * @default gouvra
+             * @enum {string}
+             */
+            signature_format?: "gouvra" | "github";
+            /**
+             * Enabled
+             * @default true
+             */
+            enabled?: boolean;
+        };
+        /** AutomationCreatedOut */
+        AutomationCreatedOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "schedule" | "webhook";
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "agent" | "workflow";
+            /** Agent Id */
+            agent_id: string | null;
+            /** Workflow Id */
+            workflow_id: string | null;
+            /** Target Name */
+            target_name: string | null;
+            /**
+             * Target Problem
+             * @description Why the target cannot run, if it cannot
+             */
+            target_problem: string | null;
+            /** Input */
+            input: {
+                [key: string]: unknown;
+            } | null;
+            /** Input Template */
+            input_template: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Paused Reason */
+            paused_reason: string | null;
+            /** Cron */
+            cron: string | null;
+            /** Timezone */
+            timezone: string | null;
+            /** Next Run At */
+            next_run_at: string | null;
+            /**
+             * Upcoming
+             * @description Next scheduled runs
+             */
+            upcoming: string[];
+            /**
+             * Overlap
+             * @enum {string}
+             */
+            overlap: "skip" | "allow";
+            /** Hook Url */
+            hook_url: string | null;
+            /**
+             * Signature Format
+             * @enum {string}
+             */
+            signature_format: "gouvra" | "github";
+            /** Secret Hint */
+            secret_hint: string | null;
+            /** Last Fired At */
+            last_fired_at: string | null;
+            /** Last Status */
+            last_status: ("pending" | "launched" | "skipped" | "rejected" | "failed") | null;
+            /** Fire Count */
+            fire_count: number;
+            /** Consecutive Failures */
+            consecutive_failures: number;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /**
+             * Secret
+             * @description Webhooks only: shown once, store it now
+             */
+            secret: string | null;
+        };
+        /** AutomationOut */
+        AutomationOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "schedule" | "webhook";
+            /**
+             * Target Type
+             * @enum {string}
+             */
+            target_type: "agent" | "workflow";
+            /** Agent Id */
+            agent_id: string | null;
+            /** Workflow Id */
+            workflow_id: string | null;
+            /** Target Name */
+            target_name: string | null;
+            /**
+             * Target Problem
+             * @description Why the target cannot run, if it cannot
+             */
+            target_problem: string | null;
+            /** Input */
+            input: {
+                [key: string]: unknown;
+            } | null;
+            /** Input Template */
+            input_template: string | null;
+            /** Enabled */
+            enabled: boolean;
+            /** Paused Reason */
+            paused_reason: string | null;
+            /** Cron */
+            cron: string | null;
+            /** Timezone */
+            timezone: string | null;
+            /** Next Run At */
+            next_run_at: string | null;
+            /**
+             * Upcoming
+             * @description Next scheduled runs
+             */
+            upcoming: string[];
+            /**
+             * Overlap
+             * @enum {string}
+             */
+            overlap: "skip" | "allow";
+            /** Hook Url */
+            hook_url: string | null;
+            /**
+             * Signature Format
+             * @enum {string}
+             */
+            signature_format: "gouvra" | "github";
+            /** Secret Hint */
+            secret_hint: string | null;
+            /** Last Fired At */
+            last_fired_at: string | null;
+            /** Last Status */
+            last_status: ("pending" | "launched" | "skipped" | "rejected" | "failed") | null;
+            /** Fire Count */
+            fire_count: number;
+            /** Consecutive Failures */
+            consecutive_failures: number;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** AutomationUpdateIn */
+        AutomationUpdateIn: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Target Type */
+            target_type?: ("agent" | "workflow") | null;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Workflow Id */
+            workflow_id?: string | null;
+            /** Input */
+            input?: string | {
+                [key: string]: unknown;
+            } | null;
+            /** Input Template */
+            input_template?: string | null;
+            /** Cron */
+            cron?: string | null;
+            /** Timezone */
+            timezone?: string | null;
+            /** Overlap */
+            overlap?: ("skip" | "allow") | null;
+            /** Signature Format */
+            signature_format?: ("gouvra" | "github") | null;
+            /** Enabled */
+            enabled?: boolean | null;
+        };
         /** BreakdownRow */
         BreakdownRow: {
             /** Agent Id */
@@ -2088,6 +2581,18 @@ export interface components {
             /** New Password */
             new_password: string;
         };
+        /** CheckOut */
+        CheckOut: {
+            /** Ok */
+            ok: boolean;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "unverified" | "ok" | "error";
+            /** Message */
+            message: string;
+        };
         /** ComparisonOut */
         ComparisonOut: {
             base: components["schemas"]["RunOut"];
@@ -2140,6 +2645,66 @@ export interface components {
              */
             case_sensitive?: boolean;
         };
+        /** ConnectionCreateIn */
+        ConnectionCreateIn: {
+            /** Connector */
+            connector: string;
+            /** Name */
+            name: string;
+            /** Credentials */
+            credentials: {
+                [key: string]: string;
+            };
+        };
+        /** ConnectionOut */
+        ConnectionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Connector */
+            connector: string;
+            /** Connector Name */
+            connector_name: string;
+            /** Name */
+            name: string;
+            /** Secret Hint */
+            secret_hint: string | null;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "unverified" | "ok" | "error";
+            /** Status Message */
+            status_message: string | null;
+            /** Last Checked At */
+            last_checked_at: string | null;
+            /** Tools */
+            tools: components["schemas"]["ConnectionToolOut"][];
+            /**
+             * Agent Count
+             * @description Agents allowed to use one of its tools
+             */
+            agent_count: number;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
         /** ConnectionTestOut */
         ConnectionTestOut: {
             /** Ok */
@@ -2154,6 +2719,56 @@ export interface components {
              * Format: date-time
              */
             tested_at: string;
+        };
+        /** ConnectionToolOut */
+        ConnectionToolOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+            /** Display Name */
+            display_name: string;
+            /** Operation */
+            operation: string;
+            /** Status */
+            status: string;
+        };
+        /** ConnectionUpdateIn */
+        ConnectionUpdateIn: {
+            /** Name */
+            name?: string | null;
+            /**
+             * Credentials
+             * @description Replaces every credential (they are never shown again)
+             */
+            credentials?: {
+                [key: string]: string;
+            } | null;
+        };
+        /** ConnectorOut */
+        ConnectorOut: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Category */
+            category: string;
+            /** Docs Url */
+            docs_url: string;
+            /** Fields */
+            fields: components["schemas"]["CredentialFieldOut"][];
+            /** Operations */
+            operations: components["schemas"]["OperationOut"][];
+            /**
+             * Verifiable
+             * @description Whether the credentials can be checked without side effects
+             */
+            verifiable: boolean;
         };
         /** ContainsGrader */
         ContainsGrader: {
@@ -2216,6 +2831,38 @@ export interface components {
             by_source: {
                 [key: string]: string;
             };
+        };
+        /** CredentialFieldOut */
+        CredentialFieldOut: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Help */
+            help: string;
+            /** Placeholder */
+            placeholder: string;
+            /** Required */
+            required: boolean;
+        };
+        /** CronPreviewIn */
+        CronPreviewIn: {
+            /** Cron */
+            cron: string;
+            /**
+             * Timezone
+             * @default UTC
+             */
+            timezone?: string;
+        };
+        /** CronPreviewOut */
+        CronPreviewOut: {
+            /** Valid */
+            valid: boolean;
+            /** Message */
+            message: string | null;
+            /** Upcoming */
+            upcoming: string[];
         };
         /** Edge */
         Edge: {
@@ -2489,6 +3136,52 @@ export interface components {
             /** Total Tokens */
             total_tokens: number;
         };
+        /** FireOut */
+        FireOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "schedule" | "webhook" | "manual" | "test";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "launched" | "skipped" | "rejected" | "failed";
+            /** Reason */
+            reason: {
+                [key: string]: unknown;
+            } | null;
+            /** Scheduled For */
+            scheduled_for: string | null;
+            /** Delivery Id */
+            delivery_id: string | null;
+            /** Execution Id */
+            execution_id: string | null;
+            /** Workflow Run Id */
+            workflow_run_id: string | null;
+            /**
+             * Run Status
+             * @description State of the run it started
+             */
+            run_status: string | null;
+            /** Payload Preview */
+            payload_preview: string | null;
+            /** Request Meta */
+            request_meta: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** GraderPreviewIn */
         GraderPreviewIn: {
             /** Grader */
@@ -2520,6 +3213,30 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HookAcceptedOut */
+        HookAcceptedOut: {
+            /** Delivery Id */
+            delivery_id: string;
+            /**
+             * Fire Id
+             * Format: uuid
+             */
+            fire_id: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "pending" | "launched" | "skipped" | "rejected" | "failed";
+            /**
+             * Duplicate
+             * @default false
+             */
+            duplicate: boolean;
+            /** Execution Id */
+            execution_id: string | null;
+            /** Workflow Run Id */
+            workflow_run_id: string | null;
         };
         /** InvitationCreateIn */
         InvitationCreateIn: {
@@ -2752,6 +3469,21 @@ export interface components {
              */
             optional: boolean;
         };
+        /** OperationOut */
+        OperationOut: {
+            /** Key */
+            key: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Input Schema */
+            input_schema: {
+                [key: string]: unknown;
+            };
+            /** Writes */
+            writes: boolean;
+        };
         /** OverviewOut */
         OverviewOut: {
             /**
@@ -2818,6 +3550,18 @@ export interface components {
         Page_ExecutionSummary_: {
             /** Data */
             data: components["schemas"]["ExecutionSummary"][];
+            /** Next Cursor */
+            next_cursor: string | null;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+        };
+        /** Page[FireOut] */
+        Page_FireOut_: {
+            /** Data */
+            data: components["schemas"]["FireOut"][];
             /** Next Cursor */
             next_cursor: string | null;
             /**
@@ -3023,6 +3767,16 @@ export interface components {
             /** Default Model */
             default_model?: string | null;
         };
+        /** Ref */
+        Ref: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Name */
+            name: string;
+        };
         /** RegexGrader */
         RegexGrader: {
             /**
@@ -3071,6 +3825,64 @@ export interface components {
              * @constant
              */
             accept_terms: true;
+        };
+        /** RegistryModelOut */
+        RegistryModelOut: {
+            /** Provider Kind */
+            provider_kind: string;
+            /** Provider Label */
+            provider_label: string;
+            model: components["schemas"]["ModelInfoOut"];
+            /**
+             * Providers
+             * @description Configured providers of this kind
+             */
+            providers: components["schemas"]["Ref"][];
+            /**
+             * Agents
+             * @description Agents whose current version uses this model
+             */
+            agents: components["schemas"]["Ref"][];
+        };
+        /** RegistryOut */
+        RegistryOut: {
+            /** Models */
+            models: components["schemas"]["RegistryModelOut"][];
+            /** Tools */
+            tools: components["schemas"]["RegistryToolOut"][];
+        };
+        /** RegistryToolOut */
+        RegistryToolOut: {
+            /**
+             * Id
+             * @description None: a built-in tool not added to the workspace
+             */
+            id: string | null;
+            /** Name */
+            name: string;
+            /** Display Name */
+            display_name: string;
+            /** Description */
+            description: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "builtin" | "http" | "code" | "connector";
+            /** Builtin Key */
+            builtin_key: string | null;
+            /** Connection Id */
+            connection_id: string | null;
+            /** Status */
+            status: string;
+            /** Uses Network */
+            uses_network: boolean;
+            /** Input Schema */
+            input_schema: {
+                [key: string]: unknown;
+            };
+            /** Agents */
+            agents: components["schemas"]["Ref"][];
         };
         /** ResetPasswordIn */
         ResetPasswordIn: {
@@ -3342,6 +4154,16 @@ export interface components {
              */
             created_at: string;
         };
+        /** SecretOut */
+        SecretOut: {
+            /**
+             * Secret
+             * @description Shown once: the previous secret stops working now
+             */
+            secret: string;
+            /** Secret Hint */
+            secret_hint: string;
+        };
         /** SessionItem */
         SessionItem: {
             /**
@@ -3472,6 +4294,16 @@ export interface components {
             default_graders?: (components["schemas"]["ExactGrader"] | components["schemas"]["ContainsGrader"] | components["schemas"]["RegexGrader"] | components["schemas"]["JsonSchemaGrader"] | components["schemas"]["LlmJudgeGrader"])[] | null;
             /** Pass Threshold */
             pass_threshold?: number | null;
+        };
+        /** TestFireIn */
+        TestFireIn: {
+            /**
+             * Input
+             * @description Schedules: override the input; webhooks: the sample payload
+             */
+            input?: string | {
+                [key: string]: unknown;
+            } | null;
         };
         /** TimePoint */
         TimePoint: {
@@ -3640,6 +4472,11 @@ export interface components {
             uses_network: boolean;
             /** Agent Count */
             agent_count: number;
+            /**
+             * Connection Id
+             * @description Connector tools: the connection holding their credentials
+             */
+            connection_id: string | null;
             /**
              * Created At
              * Format: date-time
@@ -7843,6 +8680,618 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_list_automations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_create_automation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationCreatedOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_cron_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CronPreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CronPreviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_get_automation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_delete_automation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_update_automation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AutomationUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AutomationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_rotate_secret: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecretOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_run_automation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TestFireIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FireOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    automations_list_fires: {
+        parameters: {
+            query?: {
+                /** @description Page size (max 100) */
+                limit?: number;
+                /** @description `next_cursor` of the previous page */
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                automation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_FireOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    webhooks_receive_hook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Duplicate delivery: the outcome of the first one */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HookAcceptedOut"];
+                };
+            };
+            /** @description Missing, stale or invalid signature */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No webhook at this address */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description The automation is paused */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Payload too large */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+            /** @description Too many deliveries */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    connectors_list_connectors: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectorOut"][];
+                };
+            };
+        };
+    };
+    connectors_list_connections: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connectors_create_connection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectionCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connectors_get_connection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connectors_remove_connection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connectors_update_connection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConnectionUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    connectors_check_connection: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                connection_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CheckOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    registry_registry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RegistryOut"];
                 };
             };
             /** @description Validation Error */

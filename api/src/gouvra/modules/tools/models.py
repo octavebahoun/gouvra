@@ -32,7 +32,7 @@ class Tool(Base, IdMixin, TimestampMixin):
     name: Mapped[str] = mapped_column(String(64))
     display_name: Mapped[str] = mapped_column(String(80))
     description: Mapped[str] = mapped_column(String(1024))
-    kind: Mapped[str] = mapped_column(String(16))  # builtin | http | code
+    kind: Mapped[str] = mapped_column(String(16))  # builtin | http | code | connector
     builtin_key: Mapped[str | None] = mapped_column(String(40))
     input_schema: Mapped[dict[str, Any]] = mapped_column(JSONB)
     config: Mapped[dict[str, Any]] = mapped_column(
@@ -43,6 +43,10 @@ class Tool(Base, IdMixin, TimestampMixin):
     secret_last4: Mapped[str | None] = mapped_column(String(8))
     status: Mapped[str] = mapped_column(String(16), default="active", server_default="active")
     timeout_ms: Mapped[int] = mapped_column(Integer, default=15_000, server_default="15000")
+    # Connector tools: the connection holding their credentials.
+    connection_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("connections.id", ondelete="SET NULL"), index=True
+    )
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")
     )

@@ -67,6 +67,8 @@ class ToolUpdateIn(BaseModel):
 
 
 class ToolOut(BaseModel):
+    model_config = ConfigDict(json_schema_serialization_defaults_required=True)
+
     id: uuid.UUID
     workspace_id: uuid.UUID
     name: str
@@ -82,6 +84,9 @@ class ToolOut(BaseModel):
     timeout_ms: int
     uses_network: bool
     agent_count: int
+    connection_id: uuid.UUID | None = Field(
+        default=None, description="Connector tools: the connection holding their credentials"
+    )
     created_at: datetime
     updated_at: datetime
 

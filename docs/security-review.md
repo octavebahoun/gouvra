@@ -45,6 +45,15 @@ Last review: 2026-10-11 (end of phase 5 — foundation stabilised).
   container; the sandbox is a small, single-purpose service that builds every container spec
   itself, and hosts that need more can set `SANDBOX_RUNTIME=runsc` (gVisor) or run Docker
   rootless.
+- **Inbound webhooks**: unguessable address (192-bit token) and a per-webhook secret sealed in the
+  database; timestamped HMAC-SHA256 signature checked in constant time with a 5-minute window;
+  idempotent per delivery (unique per webhook); size and rate limits; refusals recorded. The
+  endpoint uses no cookie, so CSRF does not apply. GitHub's format relies on the delivery id for
+  replay protection (documented).
+- **Connectors**: credentials sealed with the key ring (purpose-bound associated data), never
+  returned; requests built server-side from schema-checked arguments (e.g. `owner/name` patterns
+  block path tricks), sent only to the connector's hosts, public addresses only, bounded answers;
+  Discord mentions disabled. Credentials are erased when a connection is removed.
 - **Dependencies**: `pip-audit` (production requirements) and `pnpm audit` report no known
   vulnerability on 2026-10-11.
 
@@ -52,6 +61,5 @@ Last review: 2026-10-11 (end of phase 5 — foundation stabilised).
 
 | Item | Closes in |
 |---|---|
-| Signed, idempotent inbound webhooks | Phase 8 |
 | Stripe webhook signature verification, budgets, quotas, retention policies | Phase 9 |
 | Full re-review of the finished product | Phase 10 |

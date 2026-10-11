@@ -158,6 +158,10 @@ async def run_tool(tool: Tool, arguments: Any) -> ToolResult:
                 from gouvra.modules.tools.sandbox_client import run_code_tool
 
                 output = await run_code_tool(tool, arguments)
+            elif tool.kind == "connector":
+                from gouvra.modules.connectors.runtime import run_connector_tool
+
+                output = await run_connector_tool(tool, arguments)
             else:
                 return done(
                     ToolResult(

@@ -5567,6 +5567,842 @@
           }
         }
       }
+    },
+    "/api/v1/workspaces/{workspace_id}/automations": {
+      "get": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "List automations",
+        "operationId": "automations_list_automations",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AutomationOut"
+                  },
+                  "title": "Response Automations List Automations"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Create a schedule or a webhook (a webhook's secret is shown once)",
+        "operationId": "automations_create_automation",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutomationCreateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationCreatedOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/automations/cron-preview": {
+      "post": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Check a cron expression and list its next runs",
+        "operationId": "automations_cron_preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CronPreviewIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CronPreviewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/automations/{automation_id}": {
+      "get": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Get an automation",
+        "operationId": "automations_get_automation",
+        "parameters": [
+          {
+            "name": "automation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Automation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Edit, pause or resume an automation",
+        "operationId": "automations_update_automation",
+        "parameters": [
+          {
+            "name": "automation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Automation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AutomationUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AutomationOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Delete an automation (the runs it started stay in the history)",
+        "operationId": "automations_delete_automation",
+        "parameters": [
+          {
+            "name": "automation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Automation Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/automations/{automation_id}/rotate-secret": {
+      "post": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Replace a webhook's signing secret (shown once; the old one stops working)",
+        "operationId": "automations_rotate_secret",
+        "parameters": [
+          {
+            "name": "automation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Automation Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SecretOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/automations/{automation_id}/run": {
+      "post": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Run now: a schedule with its input, a webhook with a sample payload",
+        "operationId": "automations_run_automation",
+        "parameters": [
+          {
+            "name": "automation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Automation Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestFireIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FireOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/automations/{automation_id}/fires": {
+      "get": {
+        "tags": [
+          "automations"
+        ],
+        "summary": "Deliveries and scheduled runs",
+        "operationId": "automations_list_fires",
+        "parameters": [
+          {
+            "name": "automation_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Automation Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (max 100)",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size (max 100)"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "Cursor"
+            },
+            "description": "`next_cursor` of the previous page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_FireOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hooks/{token}": {
+      "post": {
+        "tags": [
+          "webhooks"
+        ],
+        "summary": "Inbound webhook: signed deliveries start the automation's agent or workflow",
+        "operationId": "webhooks_receive_hook",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Token"
+            }
+          }
+        ],
+        "responses": {
+          "202": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HookAcceptedOut"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "Duplicate delivery: the outcome of the first one"
+          },
+          "401": {
+            "description": "Missing, stale or invalid signature"
+          },
+          "404": {
+            "description": "No webhook at this address"
+          },
+          "409": {
+            "description": "The automation is paused"
+          },
+          "413": {
+            "description": "Payload too large"
+          },
+          "429": {
+            "description": "Too many deliveries"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connectors": {
+      "get": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "The connector library",
+        "operationId": "connectors_list_connectors",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectorOut"
+                  },
+                  "type": "array",
+                  "title": "Response Connectors List Connectors"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/connections": {
+      "get": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "Connections of the workspace",
+        "operationId": "connectors_list_connections",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectionOut"
+                  },
+                  "title": "Response Connectors List Connections"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "Connect a service: its operations become tools",
+        "operationId": "connectors_create_connection",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionCreateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{connection_id}": {
+      "get": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "Get a connection",
+        "operationId": "connectors_get_connection",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Connection Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "Rename a connection or replace its credentials",
+        "operationId": "connectors_update_connection",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Connection Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConnectionUpdateIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "Remove a connection: credentials erased, tools archived",
+        "operationId": "connectors_remove_connection",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Connection Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/connections/{connection_id}/check": {
+      "post": {
+        "tags": [
+          "connectors"
+        ],
+        "summary": "Check the credentials (no side effect)",
+        "operationId": "connectors_check_connection",
+        "parameters": [
+          {
+            "name": "connection_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Connection Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CheckOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/registry": {
+      "get": {
+        "tags": [
+          "registry"
+        ],
+        "summary": "Models and tools, with their use",
+        "operationId": "registry_registry",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistryOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6739,6 +7575,917 @@
         ],
         "title": "AuditEventOut"
       },
+      "AutomationCreateIn": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500,
+            "title": "Description",
+            "default": ""
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "schedule",
+              "webhook"
+            ],
+            "title": "Kind"
+          },
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "workflow"
+            ],
+            "title": "Target Type"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "workflow_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Id"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input",
+            "description": "Schedules: the input of every run"
+          },
+          "input_template": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Template",
+            "description": "Webhooks: build the run input from the payload, e.g. {{input.ticket.title}}"
+          },
+          "cron": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cron",
+            "description": "Five-field cron expression, e.g. 0 9 * * 1-5"
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Timezone",
+            "description": "IANA time zone",
+            "default": "UTC"
+          },
+          "overlap": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "skip",
+                  "allow"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overlap",
+            "description": "skip: no new run while one is running (default for schedules); allow: every delivery runs (default for webhooks)"
+          },
+          "signature_format": {
+            "type": "string",
+            "enum": [
+              "gouvra",
+              "github"
+            ],
+            "title": "Signature Format",
+            "default": "gouvra"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled",
+            "default": true
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "kind",
+          "target_type"
+        ],
+        "title": "AutomationCreateIn"
+      },
+      "AutomationCreatedOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Workspace Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "schedule",
+              "webhook"
+            ],
+            "title": "Kind"
+          },
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "workflow"
+            ],
+            "title": "Target Type"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "workflow_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Id"
+          },
+          "target_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Name"
+          },
+          "target_problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Problem",
+            "description": "Why the target cannot run, if it cannot"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
+          },
+          "input_template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Template"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "paused_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused Reason"
+          },
+          "cron": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cron"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "upcoming": {
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": "array",
+            "title": "Upcoming",
+            "description": "Next scheduled runs"
+          },
+          "overlap": {
+            "type": "string",
+            "enum": [
+              "skip",
+              "allow"
+            ],
+            "title": "Overlap"
+          },
+          "hook_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hook Url"
+          },
+          "signature_format": {
+            "type": "string",
+            "enum": [
+              "gouvra",
+              "github"
+            ],
+            "title": "Signature Format"
+          },
+          "secret_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Hint"
+          },
+          "last_fired_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Fired At"
+          },
+          "last_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "launched",
+                  "skipped",
+                  "rejected",
+                  "failed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Status"
+          },
+          "fire_count": {
+            "type": "integer",
+            "title": "Fire Count"
+          },
+          "consecutive_failures": {
+            "type": "integer",
+            "title": "Consecutive Failures"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          },
+          "secret": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret",
+            "description": "Webhooks only: shown once, store it now"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "workspace_id",
+          "name",
+          "description",
+          "kind",
+          "target_type",
+          "agent_id",
+          "workflow_id",
+          "target_name",
+          "target_problem",
+          "input",
+          "input_template",
+          "enabled",
+          "paused_reason",
+          "cron",
+          "timezone",
+          "next_run_at",
+          "upcoming",
+          "overlap",
+          "hook_url",
+          "signature_format",
+          "secret_hint",
+          "last_fired_at",
+          "last_status",
+          "fire_count",
+          "consecutive_failures",
+          "created_by",
+          "created_at",
+          "updated_at",
+          "secret"
+        ],
+        "title": "AutomationCreatedOut"
+      },
+      "AutomationOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Workspace Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "schedule",
+              "webhook"
+            ],
+            "title": "Kind"
+          },
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "agent",
+              "workflow"
+            ],
+            "title": "Target Type"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "workflow_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Id"
+          },
+          "target_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Name"
+          },
+          "target_problem": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Problem",
+            "description": "Why the target cannot run, if it cannot"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
+          },
+          "input_template": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Template"
+          },
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "paused_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Paused Reason"
+          },
+          "cron": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cron"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "next_run_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Run At"
+          },
+          "upcoming": {
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": "array",
+            "title": "Upcoming",
+            "description": "Next scheduled runs"
+          },
+          "overlap": {
+            "type": "string",
+            "enum": [
+              "skip",
+              "allow"
+            ],
+            "title": "Overlap"
+          },
+          "hook_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hook Url"
+          },
+          "signature_format": {
+            "type": "string",
+            "enum": [
+              "gouvra",
+              "github"
+            ],
+            "title": "Signature Format"
+          },
+          "secret_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Hint"
+          },
+          "last_fired_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Fired At"
+          },
+          "last_status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "launched",
+                  "skipped",
+                  "rejected",
+                  "failed"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Status"
+          },
+          "fire_count": {
+            "type": "integer",
+            "title": "Fire Count"
+          },
+          "consecutive_failures": {
+            "type": "integer",
+            "title": "Consecutive Failures"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "workspace_id",
+          "name",
+          "description",
+          "kind",
+          "target_type",
+          "agent_id",
+          "workflow_id",
+          "target_name",
+          "target_problem",
+          "input",
+          "input_template",
+          "enabled",
+          "paused_reason",
+          "cron",
+          "timezone",
+          "next_run_at",
+          "upcoming",
+          "overlap",
+          "hook_url",
+          "signature_format",
+          "secret_hint",
+          "last_fired_at",
+          "last_status",
+          "fire_count",
+          "consecutive_failures",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "AutomationOut"
+      },
+      "AutomationUpdateIn": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 500
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "target_type": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "agent",
+                  "workflow"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Type"
+          },
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "workflow_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Id"
+          },
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input"
+          },
+          "input_template": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 20000
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Template"
+          },
+          "cron": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 120,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cron"
+          },
+          "timezone": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 64
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Timezone"
+          },
+          "overlap": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "skip",
+                  "allow"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Overlap"
+          },
+          "signature_format": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "gouvra",
+                  "github"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signature Format"
+          },
+          "enabled": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Enabled"
+          }
+        },
+        "type": "object",
+        "title": "AutomationUpdateIn"
+      },
       "BreakdownRow": {
         "properties": {
           "agent_id": {
@@ -7316,6 +9063,34 @@
         ],
         "title": "ChangePasswordIn"
       },
+      "CheckOut": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unverified",
+              "ok",
+              "error"
+            ],
+            "title": "Status"
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "status",
+          "message"
+        ],
+        "title": "CheckOut"
+      },
       "ComparisonOut": {
         "properties": {
           "base": {
@@ -7468,6 +9243,156 @@
         ],
         "title": "ConditionNode"
       },
+      "ConnectionCreateIn": {
+        "properties": {
+          "connector": {
+            "type": "string",
+            "maxLength": 32,
+            "title": "Connector"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Name"
+          },
+          "credentials": {
+            "additionalProperties": {
+              "type": "string",
+              "maxLength": 2048
+            },
+            "type": "object",
+            "title": "Credentials"
+          }
+        },
+        "type": "object",
+        "required": [
+          "connector",
+          "name",
+          "credentials"
+        ],
+        "title": "ConnectionCreateIn"
+      },
+      "ConnectionOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "workspace_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Workspace Id"
+          },
+          "connector": {
+            "type": "string",
+            "title": "Connector"
+          },
+          "connector_name": {
+            "type": "string",
+            "title": "Connector Name"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "secret_hint": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Secret Hint"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "unverified",
+              "ok",
+              "error"
+            ],
+            "title": "Status"
+          },
+          "status_message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Message"
+          },
+          "last_checked_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Checked At"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ConnectionToolOut"
+            },
+            "type": "array",
+            "title": "Tools"
+          },
+          "agent_count": {
+            "type": "integer",
+            "title": "Agent Count",
+            "description": "Agents allowed to use one of its tools"
+          },
+          "created_by": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created By"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Updated At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "workspace_id",
+          "connector",
+          "connector_name",
+          "name",
+          "secret_hint",
+          "status",
+          "status_message",
+          "last_checked_at",
+          "tools",
+          "agent_count",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ConnectionOut"
+      },
       "ConnectionTestOut": {
         "properties": {
           "ok": {
@@ -7510,6 +9435,130 @@
           "tested_at"
         ],
         "title": "ConnectionTestOut"
+      },
+      "ConnectionToolOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "operation": {
+            "type": "string",
+            "title": "Operation"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "operation",
+          "status"
+        ],
+        "title": "ConnectionToolOut"
+      },
+      "ConnectionUpdateIn": {
+        "properties": {
+          "name": {
+            "anyOf": [
+              {
+                "type": "string",
+                "maxLength": 80,
+                "minLength": 1
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "credentials": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string",
+                  "maxLength": 2048
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Credentials",
+            "description": "Replaces every credential (they are never shown again)"
+          }
+        },
+        "type": "object",
+        "title": "ConnectionUpdateIn"
+      },
+      "ConnectorOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "docs_url": {
+            "type": "string",
+            "title": "Docs Url"
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/CredentialFieldOut"
+            },
+            "type": "array",
+            "title": "Fields"
+          },
+          "operations": {
+            "items": {
+              "$ref": "#/components/schemas/OperationOut"
+            },
+            "type": "array",
+            "title": "Operations"
+          },
+          "verifiable": {
+            "type": "boolean",
+            "title": "Verifiable",
+            "description": "Whether the credentials can be checked without side effects"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "description",
+          "category",
+          "docs_url",
+          "fields",
+          "operations",
+          "verifiable"
+        ],
+        "title": "ConnectorOut"
       },
       "ContainsGrader": {
         "properties": {
@@ -7670,6 +9719,94 @@
           "by_source"
         ],
         "title": "CostSummary"
+      },
+      "CredentialFieldOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "label": {
+            "type": "string",
+            "title": "Label"
+          },
+          "help": {
+            "type": "string",
+            "title": "Help"
+          },
+          "placeholder": {
+            "type": "string",
+            "title": "Placeholder"
+          },
+          "required": {
+            "type": "boolean",
+            "title": "Required"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "label",
+          "help",
+          "placeholder",
+          "required"
+        ],
+        "title": "CredentialFieldOut"
+      },
+      "CronPreviewIn": {
+        "properties": {
+          "cron": {
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Cron"
+          },
+          "timezone": {
+            "type": "string",
+            "maxLength": 64,
+            "title": "Timezone",
+            "default": "UTC"
+          }
+        },
+        "type": "object",
+        "required": [
+          "cron"
+        ],
+        "title": "CronPreviewIn"
+      },
+      "CronPreviewOut": {
+        "properties": {
+          "valid": {
+            "type": "boolean",
+            "title": "Valid"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "upcoming": {
+            "items": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "type": "array",
+            "title": "Upcoming"
+          }
+        },
+        "type": "object",
+        "required": [
+          "valid",
+          "message",
+          "upcoming"
+        ],
+        "title": "CronPreviewOut"
       },
       "Edge": {
         "properties": {
@@ -8432,6 +10569,151 @@
         ],
         "title": "ExecutionUsageOut"
       },
+      "FireOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "schedule",
+              "webhook",
+              "manual",
+              "test"
+            ],
+            "title": "Source"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "launched",
+              "skipped",
+              "rejected",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "scheduled_for": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scheduled For"
+          },
+          "delivery_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivery Id"
+          },
+          "execution_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Id"
+          },
+          "workflow_run_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Run Id"
+          },
+          "run_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Run Status",
+            "description": "State of the run it started"
+          },
+          "payload_preview": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Payload Preview"
+          },
+          "request_meta": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Meta"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "source",
+          "status",
+          "reason",
+          "scheduled_for",
+          "delivery_id",
+          "execution_id",
+          "workflow_run_id",
+          "run_status",
+          "payload_preview",
+          "request_meta",
+          "created_at"
+        ],
+        "title": "FireOut"
+      },
       "GraderPreviewIn": {
         "properties": {
           "grader": {
@@ -8572,6 +10854,69 @@
         },
         "type": "object",
         "title": "HTTPValidationError"
+      },
+      "HookAcceptedOut": {
+        "properties": {
+          "delivery_id": {
+            "type": "string",
+            "title": "Delivery Id"
+          },
+          "fire_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Fire Id"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "launched",
+              "skipped",
+              "rejected",
+              "failed"
+            ],
+            "title": "Status"
+          },
+          "duplicate": {
+            "type": "boolean",
+            "title": "Duplicate",
+            "default": false
+          },
+          "execution_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Execution Id"
+          },
+          "workflow_run_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workflow Run Id"
+          }
+        },
+        "type": "object",
+        "required": [
+          "delivery_id",
+          "fire_id",
+          "status",
+          "duplicate",
+          "execution_id",
+          "workflow_run_id"
+        ],
+        "title": "HookAcceptedOut"
       },
       "InvitationCreateIn": {
         "properties": {
@@ -9094,6 +11439,40 @@
         ],
         "title": "OnboardingStep"
       },
+      "OperationOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "input_schema": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input Schema"
+          },
+          "writes": {
+            "type": "boolean",
+            "title": "Writes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "description",
+          "input_schema",
+          "writes"
+        ],
+        "title": "OperationOut"
+      },
       "OverviewOut": {
         "properties": {
           "generated_at": {
@@ -9301,6 +11680,40 @@
           "has_more"
         ],
         "title": "Page[ExecutionSummary]"
+      },
+      "Page_FireOut_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/FireOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "next_cursor",
+          "has_more"
+        ],
+        "title": "Page[FireOut]"
       },
       "Page_RunOut_": {
         "properties": {
@@ -9916,6 +12329,25 @@
         "type": "object",
         "title": "ProviderUpdateIn"
       },
+      "Ref": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "Ref"
+      },
       "RegexGrader": {
         "properties": {
           "type": {
@@ -9997,6 +12429,167 @@
           "accept_terms"
         ],
         "title": "RegisterIn"
+      },
+      "RegistryModelOut": {
+        "properties": {
+          "provider_kind": {
+            "type": "string",
+            "title": "Provider Kind"
+          },
+          "provider_label": {
+            "type": "string",
+            "title": "Provider Label"
+          },
+          "model": {
+            "$ref": "#/components/schemas/ModelInfoOut"
+          },
+          "providers": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "type": "array",
+            "title": "Providers",
+            "description": "Configured providers of this kind"
+          },
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "type": "array",
+            "title": "Agents",
+            "description": "Agents whose current version uses this model"
+          }
+        },
+        "type": "object",
+        "required": [
+          "provider_kind",
+          "provider_label",
+          "model",
+          "providers",
+          "agents"
+        ],
+        "title": "RegistryModelOut"
+      },
+      "RegistryOut": {
+        "properties": {
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/RegistryModelOut"
+            },
+            "type": "array",
+            "title": "Models"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/RegistryToolOut"
+            },
+            "type": "array",
+            "title": "Tools"
+          }
+        },
+        "type": "object",
+        "required": [
+          "models",
+          "tools"
+        ],
+        "title": "RegistryOut"
+      },
+      "RegistryToolOut": {
+        "properties": {
+          "id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id",
+            "description": "None: a built-in tool not added to the workspace"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "builtin",
+              "http",
+              "code",
+              "connector"
+            ],
+            "title": "Kind"
+          },
+          "builtin_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Builtin Key"
+          },
+          "connection_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connection Id"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "uses_network": {
+            "type": "boolean",
+            "title": "Uses Network"
+          },
+          "input_schema": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Input Schema"
+          },
+          "agents": {
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            },
+            "type": "array",
+            "title": "Agents"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "display_name",
+          "description",
+          "kind",
+          "builtin_key",
+          "connection_id",
+          "status",
+          "uses_network",
+          "input_schema",
+          "agents"
+        ],
+        "title": "RegistryToolOut"
       },
       "ResetPasswordIn": {
         "properties": {
@@ -10763,6 +13356,25 @@
         ],
         "title": "RunSummaryRef"
       },
+      "SecretOut": {
+        "properties": {
+          "secret": {
+            "type": "string",
+            "title": "Secret",
+            "description": "Shown once: the previous secret stops working now"
+          },
+          "secret_hint": {
+            "type": "string",
+            "title": "Secret Hint"
+          }
+        },
+        "type": "object",
+        "required": [
+          "secret",
+          "secret_hint"
+        ],
+        "title": "SecretOut"
+      },
       "SessionItem": {
         "properties": {
           "id": {
@@ -11164,6 +13776,28 @@
         },
         "type": "object",
         "title": "SuiteUpdateIn"
+      },
+      "TestFireIn": {
+        "properties": {
+          "input": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input",
+            "description": "Schedules: override the input; webhooks: the sample payload"
+          }
+        },
+        "type": "object",
+        "title": "TestFireIn"
       },
       "TimePoint": {
         "properties": {
@@ -11577,6 +14211,19 @@
             "type": "integer",
             "title": "Agent Count"
           },
+          "connection_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Connection Id",
+            "description": "Connector tools: the connection holding their credentials"
+          },
           "created_at": {
             "type": "string",
             "format": "date-time",
@@ -11605,6 +14252,7 @@
           "timeout_ms",
           "uses_network",
           "agent_count",
+          "connection_id",
           "created_at",
           "updated_at"
         ],

@@ -32,6 +32,10 @@ language. When it shows a cost, the number comes from the provider or from a pub
   unavailable; never an invented number. Usage by period, agent and model.
 - **Workflows** — chain agents, tools, conditions and transforms in a visual editor; test the
   draft, publish versions, and watch each run move through the graph live.
+- **Automations** — schedules (cron, time zones) and signed, idempotent webhooks (GitHub's format
+  too) that start agents or workflows; every delivery recorded with its outcome.
+- **Connectors** — Slack, Discord, GitHub and signed outgoing webhooks become tools for your
+  agents, credentials sealed; a registry shows every model and tool, its price and who uses it.
 - **Evaluations** — suites of cases graded by exact match, keywords, regex, JSON Schema or an LLM
   judge; run them on a version or a variant and compare two runs case by case.
 - **Teams** — workspaces, roles (owner, admin, member, viewer), invitations, service keys, audit
@@ -80,6 +84,7 @@ Configuration, backups and restores, secret rotation and upgrades are described 
 - [Architecture](docs/architecture.md) — components, request and execution lifecycles, security
   model.
 - [Operations](docs/operations.md) — configuration, deployment, backups, rotation, upgrades.
+- [Automations](docs/automations.md) — schedules, signing webhooks, idempotency, connectors.
 - [API reference](docs/api/openapi.json) — OpenAPI 3.1, also served at `/api/docs`.
 - [Security policy](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 

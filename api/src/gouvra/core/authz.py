@@ -155,6 +155,8 @@ class Actor:
     def label(self) -> str:
         if self.user is not None:
             return self.user.email
+        if self.extra.get("automation_name"):
+            return f"automation “{self.extra['automation_name']}”"
         return f"service key {self.api_key_name or self.api_key_id}"
 
 

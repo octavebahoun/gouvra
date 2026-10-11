@@ -81,5 +81,25 @@ async def rotate_secrets() -> RotationReport:
             )
         ).scalars()
         _rotate(tools, TOOL_PURPOSE, active, report)
+        from gouvra.modules.automations.models import Automation
+        from gouvra.modules.automations.service import SECRET_PURPOSE as AUTOMATION_PURPOSE
+
+        automations = (
+            await db.execute(
+                select(Automation)
+                .where(Automation.secret_ciphertext.is_not(None))
+                .with_for_update()
+            )
+        ).scalars()
+        _rotate(automations, AUTOMATION_PURPOSE, active, report)
+        from gouvra.modules.connectors.models import Connection
+        from gouvra.modules.connectors.service import SECRET_PURPOSE as CONNECTION_PURPOSE
+
+        connections = (
+            await db.execute(
+                select(Connection).where(Connection.archived_at.is_(None)).with_for_update()
+            )
+        ).scalars()
+        _rotate(connections, CONNECTION_PURPOSE, active, report)
         await db.commit()
     return report

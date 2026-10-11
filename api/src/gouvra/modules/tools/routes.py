@@ -70,9 +70,10 @@ async def tool_out(db: DbSession, tool: Tool) -> ToolOut:
         status="archived" if tool.archived_at else tool.status,
         timeout_ms=tool.timeout_ms,
         uses_network=bool(builtin and builtin.uses_network)
-        or tool.kind == "http"
+        or tool.kind in ("http", "connector")
         or bool(tool.kind == "code" and (tool.config or {}).get("network")),
         agent_count=await agent_count(db, tool.id),
+        connection_id=tool.connection_id,
         created_at=tool.created_at,
         updated_at=tool.updated_at,
     )

@@ -26,5 +26,10 @@ All notable changes are documented here. The format follows
   and restores; runs drawn live on the graph, step by step, with each step's input and output.
 - Code tools (Python, JavaScript) run in a separate sandbox service: one throwaway container per
   call, without network, read-only, unprivileged and limited, through a filtered Docker socket.
+- Automations: cron schedules in any time zone and signed, idempotent inbound webhooks (Gouvra's
+  timestamped signature or GitHub's) starting agents or workflows, with a delivery log, overlap
+  control and automatic pause after repeated failures.
+- Connectors (Slack, Discord, GitHub, signed outgoing webhooks) whose operations become tools,
+  and a registry of models and tools with prices and usage.
 - Public site, English and French interface, light and dark themes, accessibility audits.
 - Production deployment with automatic HTTPS, backups and restores, secret rotation commands.

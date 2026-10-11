@@ -10,9 +10,16 @@ Service = Callable[[asyncio.Event], Coroutine[Any, Any, None]]
 
 
 def registered_services() -> list[Service]:
+    from gouvra.modules.automations.worker import automation_service
     from gouvra.modules.evaluations.worker import evaluation_service
     from gouvra.modules.executions.worker import execution_service
     from gouvra.modules.notifications.service import outbox_service
     from gouvra.modules.workflows.worker import workflow_service
 
-    return [outbox_service, execution_service, evaluation_service, workflow_service]
+    return [
+        outbox_service,
+        execution_service,
+        evaluation_service,
+        workflow_service,
+        automation_service,
+    ]

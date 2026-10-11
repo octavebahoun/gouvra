@@ -98,6 +98,22 @@ run outside the lock. Data moves through checked templates (`{{input.x}}`,
 `{{steps.id.output}}`), never through code. Each change publishes the whole run state, which the
 interface draws live.
 
+## Automations and connectors
+
+**Schedules** (five-field cron in an IANA time zone) and **signed inbound webhooks** start agents
+or published workflows through one launcher, which records every trigger ("fire") with its
+outcome. The worker's scheduler locks due schedules (`SKIP LOCKED`), plans the next tick *before*
+launching (a failing launch never repeats a tick), skips a tick while the previous run is still
+going (configurable), and pauses an automation after five failures in a row. Webhooks verify a
+timestamped HMAC signature (or GitHub's), de-duplicate deliveries (explicit delivery id, or the
+signed request itself) and refuse paused or oversized deliveries; rejected ones are recorded too.
+
+**Connectors** are a code-defined library (Slack, Discord, GitHub, signed outgoing webhooks). A
+connection seals its credentials and publishes each operation as a tool (`kind: connector`) with
+a strict schema; the request is built on the server and sent through the guarded HTTP client to
+the connector's own hosts only. The **registry** lists every model (with published prices) and
+tool, and which agents use them.
+
 ## Code sandbox
 
 Code tools never run in the API or the worker. The worker calls the **sandbox** service (its own

@@ -157,6 +157,12 @@ async def update_tool(
         if value is not None and value != getattr(tool, field_name):
             setattr(tool, field_name, value)
             changes.append(field_name)
+    if tool.kind == "connector" and (
+        payload.input_schema is not None or payload.config is not None or payload.secret
+    ):
+        raise _invalid(
+            "config", "This tool is managed by its connection: edit the connection instead."
+        )
     if payload.input_schema is not None:
         if tool.kind == "builtin":
             raise _invalid("input_schema", "The schema of a built-in tool cannot be changed.")
