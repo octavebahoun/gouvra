@@ -1,0 +1,81 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Gouvra API",
+    "description": "\nGouvra is an open-source control room to build, run, evaluate and supervise AI agents.\n\n**Authentication** — browser sessions use an `HttpOnly` cookie plus the `X-CSRF-Token` header\non unsafe methods. Programmatic clients use a workspace service key:\n`Authorization: Bearer gvr_...`.\n\n**Errors** follow [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) (`application/problem+json`)\nwith a stable `code` and the `request_id` to quote when reporting a problem.\n\n**Pagination** is cursor-based: pass `limit` and the `next_cursor` of the previous page.\n\n**Idempotency** — creation endpoints accept an `Idempotency-Key` header; retrying with the same\nkey and payload within 24 h returns the original response instead of creating a duplicate.\n",
+    "license": {
+      "name": "Apache-2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v1/meta": {
+      "get": {
+        "tags": [
+          "meta"
+        ],
+        "summary": "Public instance metadata",
+        "description": "What the web app needs before sign-in: enabled sign-in methods and features.",
+        "operationId": "meta_meta",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetaOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MetaOut": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          },
+          "signup_enabled": {
+            "type": "boolean",
+            "title": "Signup Enabled"
+          },
+          "oauth_providers": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Oauth Providers"
+          },
+          "billing_enabled": {
+            "type": "boolean",
+            "title": "Billing Enabled"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "version",
+          "environment",
+          "signup_enabled",
+          "oauth_providers",
+          "billing_enabled"
+        ],
+        "title": "MetaOut"
+      }
+    }
+  }
+}
