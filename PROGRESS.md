@@ -4,8 +4,8 @@
 
 ## État
 
-- **Phases en cours : 2 (écrans web — sous-agent) et 3 (écrans web)**. Backend des phases 2 et 3 terminé et commité.
-- **Tâche suivante :** relire le travail web du sous-agent (captures, a11y), puis écrans phase 3 : Providers (O), Tools (N), Agents (H, I, J), lancement (K), Executions (L) et détail d'exécution animé (M).
+- **Backend terminé et commité pour les phases 2, 3, 4 et 6.** Écrans web : phase 2 en cours (sous-agent), phases 3, 4 et 6 à faire.
+- **Tâche suivante :** relire le travail web du sous-agent (captures, a11y), puis écrans : Providers (O), Tools (N), Agents (H, I, J), lancement (K), Executions (L), détail d'exécution animé (M), Overview (G), Usage (P), Évaluations.
 
 ## Brief mis à jour — 2026-10-11 03:56 (relu en entier)
 
@@ -39,9 +39,9 @@
 | 1 | Fondations | **fait** (2026-10-11) | `docker compose up` démarre tout, CI verte |
 | 2 | Identité | backend **fait** ; web en cours | Tests des flux + isolation inter-workspace verts |
 | 3 | Agent simple | backend **fait** (exécution réelle DeepSeek OK) ; web à faire | Une exécution réelle, tracée de bout en bout |
-| 4 | Exploitation | à faire | Diagnostic d'un échec depuis l'UI |
+| 4 | Exploitation | backend **fait** (vue d'ensemble, usage, stats, audit, export, limites) ; web à faire | Diagnostic d'un échec depuis l'UI |
 | 5 | Stabilisation du socle | à faire | Section 9 du brief validée sur le socle |
-| 6 | Évaluations | à faire | Comparaison de deux versions d'agent |
+| 6 | Évaluations | backend **fait** (comparaison v1/v2 vérifiée par l'API) ; web à faire | Comparaison de deux versions d'agent |
 | 7 | Workflows | à faire | Workflow multi-étapes exécuté et visualisé en direct |
 | 8 | Automatisation | à faire | Tâche planifiée et webhook signé testés |
 | 9 | SaaS | à faire | Parcours d'abonnement testé en mode test |
@@ -72,3 +72,14 @@
 - Tests réels : appel d'outil DeepSeek avec et sans réflexion + streaming ✔ ; exécution complète via le moteur (fournisseur testé, agent + calculatrice, résultat 7006652, coût estimé USD > 0, trace ordonnée) ✔.
 - Stack Docker : exécution réelle traitée par le worker conteneurisé, SSE en direct (événements + 7 fragments de texte), coût 0,00016 $ ✔. Bug trouvé et corrigé à cette occasion : le worker n'importait pas tous les modèles (clé étrangère non résolue) ; le « reaper » avait bien rattrapé l'exécution. Test de démarrage de processus ajouté.
 - Isolation étendue : 55 tests anti-IDOR (routes de workspace, routes par ressource fournisseurs/outils/agents/exécutions, mélange d'identifiants, clés de service d'un autre workspace) + garde-fous de couverture.
+
+### Phase 4 (backend) + démo — 2026-10-11
+- Vue d'ensemble, agrégats d'usage avec provenance des coûts, stats par agent, journal d'audit, export d'exécution, historique des appels d'outil, limites de workspace.
+- `gouvra seed-demo` : compte et workspace étiquetés « demo », 36 exécutions scriptées étalées sur 14 jours, 2 exécutions DeepSeek réelles, 1 en file ; idempotent. `gouvra rotate-secrets` (rotation de clé de chiffrement) et `gouvra create-superadmin`.
+
+### Phase 6 (backend) — 2026-10-11
+- 260 tests (hors réels) ✔, couverture 87 %, mypy strict 115 fichiers ✔, ruff ✔ ; migration 0004 montée / `alembic check` / descente complète / remontée ✔ sur base vierge.
+- Critère de sortie (côté API) : une suite lancée sur la v1 (texte) puis la v2 (mode JSON) d'un agent ⇒ 0 % puis 100 % de réussite, comparaison « 3 améliorés, 0 régressé » ✔.
+- Juge réel DeepSeek (`deepseek-flash`) ✔ ; ReDoS coupé à 0,5 s ✔ ; annulation d'un run ✔ ; worker de notation réveillé par le moteur ✔.
+- **Correction honnête du journal phase 2/3** : le garde-fou « toute nouvelle route doit être couverte » ne vérifiait plus rien depuis FastAPI 0.143 (D-088). Réparé ; toutes les routes existantes étaient bien couvertes (isolation : 78 tests ✔).
+

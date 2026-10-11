@@ -82,3 +82,15 @@ Priorité en cas de conflit : `BRIEF.md` > `docs/ui.md` / `docs/conception.md` >
 - **D-078 — Récupération des exécutions orphelines** : bail de 45 s renouvelé toutes les 10 s ; un « reaper » marque `failed / worker_lost (retryable)` les exécutions dont le bail a expiré. Arrêt du worker : 30 s pour finir, puis `worker_shutdown`.
 - **D-079 — Idempotence des lancements** : `Idempotency-Key` unique par workspace pendant 24 h ; même requête ⇒ 200 avec l'exécution d'origine, requête différente ⇒ 422 `idempotency_mismatch`.
 - **D-080 — Adaptateur de test scripté** (`gouvra-test-1`) piloté par directives (`[tool:…]`, `[fail:…]`, `[sleep:…]`, `[json]`, `[think]`) : déterministe, hors réseau, utilisé par les tests, la CI, les E2E et la démo hors ligne. Son coût est « indisponible » (aucun faux prix).
+
+## Évaluations (phase 6)
+
+- **D-081 — Un cas = une exécution ordinaire** (déclencheur `evaluation`, priorité −1) : même moteur, mêmes traces, coûts, limites, quotas et concurrence qu'en production. Une évaluation ne contourne jamais les garde-fous.
+- **D-082 — Variantes sans nouvelle version** : modèle, fournisseur et instructions peuvent être surchargés pour un run seulement (`config_overrides` sur l'exécution, annoncés dans l'événement `execution.started`). L'historique des versions de l'agent reste propre ; un fournisseur d'un autre workspace est refusé (422) et ignoré par le moteur.
+- **D-083 — Critères** : exact (normalisé), contient (tous / au moins un / aucun, score partiel), regex (bibliothèque `regex`, délai 0,5 s contre le ReDoS, motif ≤ 500 caractères), JSON Schema 2020-12, juge LLM (réponse JSON, score 0–1 ou 0–10, réflexion coupée). Un cas réussit si tous les critères passent et si le score pondéré atteint le seuil. Un critère qui ne peut pas s'exécuter rend le cas « en erreur » : jamais de verdict deviné.
+- **D-084 — Critère par défaut** : égalité avec la réponse attendue (texte) ou « contient » (JSON attendu) ; sans attendu ni critère, le cas est « en erreur : no_graders » plutôt que réussi en silence.
+- **D-085 — Appels du juge comptés à part** (`usage.kind = judge`, `judge_cost_amount`) : le coût de l'agent évalué reste comparable d'un run à l'autre.
+- **D-086 — Comparaison** : cas appariés par identifiant (même suite) ou par nom (suites différentes) ; « amélioré / régressé » si le verdict bascule ou si le score bouge d'au moins 0,05.
+- **D-087 — Directive `[score:X]` du modèle scripté** : juge déterministe pour les tests et la démo hors ligne.
+- **D-088 — Garde-fous d'isolation lus dans OpenAPI** : FastAPI 0.143 ne met plus à plat les routeurs inclus, ce qui avait vidé en silence l'ancien garde-fou (il ne vérifiait plus rien). Il lit désormais la table des routes publiée, échoue si elle paraît vide, et couvre aussi les routes par ressource.
+
