@@ -390,6 +390,8 @@ async def _agent_loop(state: RunState, adapter: ModelAdapter) -> dict[str, Any]:
                 "content": _preview(response.content),
                 "reasoning": _preview(response.reasoning),
                 "tool_calls": [{"id": c.id, "name": c.name} for c in response.tool_calls],
+                # The list above is capped in events; the count is always exact.
+                "tool_call_count": len(response.tool_calls),
                 "usage": {
                     "input_tokens": response.usage.input_tokens,
                     "output_tokens": response.usage.output_tokens,

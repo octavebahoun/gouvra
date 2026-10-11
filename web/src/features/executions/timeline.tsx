@@ -14,7 +14,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { useState, type ReactNode } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { duration as motionDuration, ease } from "@/components/motion/presets";
@@ -163,14 +164,16 @@ function ModelCard({
   const pending = !item.response && !item.error;
   const usage = (response?.usage ?? {}) as Data;
   const toolCalls = Array.isArray(response?.tool_calls) ? (response.tool_calls as Data[]) : [];
+  // Long lists are capped in events: the exact number travels separately.
+  const toolCount = num(response?.tool_call_count) ?? toolCalls.length;
   const attempts = num(response?.attempts) ?? 1;
   const first = item.request ?? item.response ?? item.error;
 
   const title = error
     ? t("timeline.events.model_error")
     : response
-      ? toolCalls.length > 0
-        ? t("timeline.responseTools", { count: toolCalls.length })
+      ? toolCount > 0
+        ? t("timeline.responseTools", { count: toolCount })
         : t("timeline.responseText")
       : t("timeline.events.model_request");
 
@@ -388,6 +391,29 @@ function LogRow({ event, origin }: { event: ExecutionEvent; origin: number | nul
 }
 
 /** The trace: a vertical rail of steps; new steps glide in as they happen. */
+function ItemView({
+  item,
+  origin,
+  streams,
+  live,
+}: {
+  item: TimelineItem;
+  origin: number | null;
+  streams: Record<number, StepStream>;
+  live: boolean;
+}) {
+  if (item.kind === "model") {
+    return <ModelCard item={item} origin={origin} stream={streams[item.step]} live={live} />;
+  }
+  if (item.kind === "tool") return <ToolCard item={item} origin={origin} live={live} />;
+  if (item.kind === "log") return <LogRow event={item.event} origin={origin} />;
+  return <LifecycleRow event={item.event} origin={origin} />;
+}
+
+/** Beyond this many items the trace is virtualised: only what is on screen is rendered. */
+export const VIRTUALIZE_AFTER = 120;
+
+/** The trace: a vertical rail of steps; new steps glide in as they happen. */
 export function Timeline({
   events,
   streams,
@@ -401,6 +427,9 @@ export function Timeline({
   const items = buildTimeline(events);
   const started = events.find((e) => e.type === "execution.started") ?? events[0];
   const origin = started ? new Date(started.created_at).getTime() : null;
+  if (items.length > VIRTUALIZE_AFTER) {
+    return <VirtualTimeline items={items} origin={origin} streams={streams} live={live} />;
+  }
   return (
     <ol className="relative flex flex-col gap-3 before:absolute before:top-3 before:bottom-3 before:left-[13px] before:w-px before:bg-line">
       <AnimatePresence initial={false}>
@@ -416,18 +445,80 @@ export function Timeline({
               transition: { duration: motionDuration.base, ease: ease.standard },
             }}
           >
-            {item.kind === "model" ? (
-              <ModelCard item={item} origin={origin} stream={streams[item.step]} live={live} />
-            ) : item.kind === "tool" ? (
-              <ToolCard item={item} origin={origin} live={live} />
-            ) : item.kind === "log" ? (
-              <LogRow event={item.event} origin={origin} />
-            ) : (
-              <LifecycleRow event={item.event} origin={origin} />
-            )}
+            <ItemView item={item} origin={origin} streams={streams} live={live} />
           </motion.li>
         ))}
       </AnimatePresence>
     </ol>
+  );
+}
+
+/**
+ * Long traces (hundreds of tool calls) stay smooth: rows are measured and only the visible ones
+ * are in the DOM. While live, the view follows the newest step unless the reader scrolled up.
+ */
+function VirtualTimeline({
+  items,
+  origin,
+  streams,
+  live,
+}: {
+  items: TimelineItem[];
+  origin: number | null;
+  streams: Record<number, StepStream>;
+  live: boolean;
+}) {
+  // TanStack Virtual returns fresh functions each render: opt this component out of the compiler.
+  "use no memo";
+  const scroller = useRef<HTMLDivElement>(null);
+  const following = useRef(true);
+  // eslint-disable-next-line react-hooks/incompatible-library -- compiler opted out above
+  const virtualizer = useVirtualizer({
+    count: items.length,
+    getScrollElement: () => scroller.current,
+    estimateSize: () => 88,
+    overscan: 8,
+    getItemKey: (index) => {
+      const item = items[index];
+      return item ? `${item.kind}-${String(item.seq)}` : index;
+    },
+  });
+
+  useEffect(() => {
+    if (live && following.current && items.length > 0) {
+      virtualizer.scrollToIndex(items.length - 1, { align: "end" });
+    }
+  }, [items.length, live, virtualizer]);
+
+  return (
+    <div
+      ref={scroller}
+      onScroll={(event) => {
+        const el = event.currentTarget;
+        following.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+      }}
+      className="relative max-h-[72vh] overflow-y-auto pr-1"
+    >
+      <ol
+        className="relative before:absolute before:top-3 before:bottom-3 before:left-[13px] before:w-px before:bg-line"
+        style={{ height: virtualizer.getTotalSize() }}
+      >
+        {virtualizer.getVirtualItems().map((row) => {
+          const item = items[row.index];
+          if (!item) return null;
+          return (
+            <li
+              key={row.key}
+              data-index={row.index}
+              ref={virtualizer.measureElement}
+              className="absolute inset-x-0 top-0 pb-3"
+              style={{ transform: `translateY(${String(row.start)}px)` }}
+            >
+              <ItemView item={item} origin={origin} streams={streams} live={live} />
+            </li>
+          );
+        })}
+      </ol>
+    </div>
   );
 }
