@@ -9,6 +9,9 @@ export async function expectAccessible(page: Page, label: string): Promise<void>
   await page.waitForTimeout(400);
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    // Animated, aria-hidden illustrations (e.g. the site hero replaying a run) are excluded:
+    // their mock text fades in and out, and a sentence describes them for assistive tech.
+    .exclude("[data-decorative]")
     .analyze();
   const blocking = results.violations.filter(
     (violation) => violation.impact === "serious" || violation.impact === "critical",

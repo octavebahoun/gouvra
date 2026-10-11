@@ -1,0 +1,126 @@
+{
+  "nav": {
+    "label": "Site",
+    "features": "Features",
+    "how": "How it works",
+    "openSource": "Open source",
+    "docs": "API reference",
+    "signIn": "Sign in",
+    "getStarted": "Get started",
+    "openApp": "Open Gouvra"
+  },
+  "hero": {
+    "eyebrow": "Open-source control room for AI agents",
+    "verbs": {
+      "build": "Build",
+      "run": "Run",
+      "evaluate": "Evaluate",
+      "supervise": "Supervise"
+    },
+    "titleRest": "your AI agents.",
+    "titleLine2": "See every step.",
+    "titleSr": "Build, run, evaluate and supervise your AI agents. See every step.",
+    "subtitle": "Gouvra connects the models you choose to the tools you trust, runs every agent in the background and shows each step live — model calls, tool calls, tokens, costs and errors.",
+    "primary": "Get started — it's free",
+    "secondary": "View on GitHub",
+    "visualLabel": "Illustration: an execution trace building live, from a model call to a tool call to the answer."
+  },
+  "visual": {
+    "agent": "Support triage",
+    "running": "Running",
+    "succeeded": "Succeeded",
+    "duration": "Duration",
+    "tokens": "Tokens",
+    "cost": "Cost",
+    "steps": {
+      "started": "Started",
+      "startedDetail": "deepseek-flash · 2 tools",
+      "model": "Model call",
+      "modelDetail": "Asked for 1 tool",
+      "tool": "Tool call · calculator",
+      "toolDetail": "2 × 49.99 → 99.98",
+      "answer": "Model answered",
+      "answerDetail": "“Billing — refund of the duplicate charge.”",
+      "done": "Succeeded",
+      "doneDetail": "1.8 s · ≈ $0.0002"
+    },
+    "success": "Success rate",
+    "estimated": "estimated"
+  },
+  "trust": {
+    "label": "Works with",
+    "offline": "an offline scripted model"
+  },
+  "features": {
+    "eyebrow": "Features",
+    "title": "Everything an agent needs to reach production",
+    "subtitle": "One place to build agents, run them safely, measure them and understand them — for a single developer or a whole team.",
+    "items": {
+      "agents": {
+        "title": "Versioned agents",
+        "body": "Instructions, model, tools and limits in one place. Every change is a version you can compare and restore."
+      },
+      "traces": {
+        "title": "Live traces",
+        "body": "Follow each model call and tool call as it happens, with durations, tokens and costs."
+      },
+      "tools": {
+        "title": "Safe tools",
+        "body": "Strict JSON Schema arguments, allow-listed HTTP hosts and an isolated sandbox for code."
+      },
+      "evaluations": {
+        "title": "Evaluations",
+        "body": "Suites with exact, regex, schema and LLM-judge graders. Compare two versions before you ship."
+      },
+      "costs": {
+        "title": "Honest costs",
+        "body": "Reported by the provider, estimated from published prices, or marked unavailable — never invented."
+      },
+      "teams": {
+        "title": "Built for teams",
+        "body": "Workspaces, roles, encrypted keys, an audit log and isolation tested on every route."
+      }
+    }
+  },
+  "steps": {
+    "eyebrow": "How it works",
+    "title": "From zero to a traced execution in minutes",
+    "items": {
+      "connect": {
+        "title": "Connect a model",
+        "body": "Add DeepSeek, Anthropic or any OpenAI-compatible API. The key is encrypted and tested at once."
+      },
+      "build": {
+        "title": "Build an agent",
+        "body": "Write its instructions, pick a model and allow only the tools it needs."
+      },
+      "run": {
+        "title": "Watch it run",
+        "body": "Launch it and follow its trace live. When something fails, Gouvra tells you why and what to do."
+      }
+    }
+  },
+  "openSource": {
+    "eyebrow": "Open source",
+    "title": "Self-hosted, Apache-2.0, yours",
+    "body": "One command starts the whole stack — API, worker, database, queue and interface — with a demo account to explore.",
+    "copy": "command",
+    "points": {
+      "license": "Apache-2.0 licence",
+      "data": "Your data stays on your servers",
+      "api": "Documented, versioned REST API"
+    }
+  },
+  "cta": {
+    "title": "Take control of your agents",
+    "body": "Create an account, connect a model and run your first agent today.",
+    "button": "Create your account"
+  },
+  "footer": {
+    "tagline": "The control room for your AI agents.",
+    "docs": "API reference",
+    "github": "GitHub",
+    "license": "Apache-2.0",
+    "security": "Security policy"
+  }
+}

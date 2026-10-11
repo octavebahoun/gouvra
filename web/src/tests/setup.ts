@@ -1,5 +1,7 @@
 import "@testing-library/jest-dom/vitest";
-import "@/lib/i18n";
+import { i18nReady } from "@/lib/i18n";
+
+await i18nReady;
 
 // jsdom lacks these browser APIs used by the UI.
 Object.defineProperty(window, "matchMedia", {

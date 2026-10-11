@@ -1,0 +1,126 @@
+{
+  "nav": {
+    "label": "Site",
+    "features": "Fonctionnalités",
+    "how": "Fonctionnement",
+    "openSource": "Open source",
+    "docs": "Référence API",
+    "signIn": "Se connecter",
+    "getStarted": "Commencer",
+    "openApp": "Ouvrir Gouvra"
+  },
+  "hero": {
+    "eyebrow": "La salle de contrôle open source pour agents IA",
+    "verbs": {
+      "build": "Construisez",
+      "run": "Exécutez",
+      "evaluate": "Évaluez",
+      "supervise": "Supervisez"
+    },
+    "titleRest": "vos agents IA.",
+    "titleLine2": "Voyez chaque étape.",
+    "titleSr": "Construisez, exécutez, évaluez et supervisez vos agents IA. Voyez chaque étape.",
+    "subtitle": "Gouvra relie les modèles que vous choisissez aux outils de confiance, exécute chaque agent en arrière-plan et montre chaque étape en direct — appels au modèle, appels d'outils, tokens, coûts et erreurs.",
+    "primary": "Commencer — c'est gratuit",
+    "secondary": "Voir sur GitHub",
+    "visualLabel": "Illustration : une trace d'exécution qui se construit en direct, d'un appel au modèle à un appel d'outil jusqu'à la réponse."
+  },
+  "visual": {
+    "agent": "Tri du support",
+    "running": "En cours",
+    "succeeded": "Réussie",
+    "duration": "Durée",
+    "tokens": "Tokens",
+    "cost": "Coût",
+    "steps": {
+      "started": "Démarrée",
+      "startedDetail": "deepseek-flash · 2 outils",
+      "model": "Appel au modèle",
+      "modelDetail": "A demandé 1 outil",
+      "tool": "Appel d'outil · calculator",
+      "toolDetail": "2 × 49,99 → 99,98",
+      "answer": "Réponse du modèle",
+      "answerDetail": "« Facturation — remboursement du double prélèvement. »",
+      "done": "Réussie",
+      "doneDetail": "1,8 s · ≈ 0,0002 $"
+    },
+    "success": "Taux de réussite",
+    "estimated": "estimé"
+  },
+  "trust": {
+    "label": "Fonctionne avec",
+    "offline": "un modèle scripté hors ligne"
+  },
+  "features": {
+    "eyebrow": "Fonctionnalités",
+    "title": "Tout ce qu'il faut à un agent pour passer en production",
+    "subtitle": "Un seul endroit pour construire des agents, les exécuter en sécurité, les mesurer et les comprendre — seul ou en équipe.",
+    "items": {
+      "agents": {
+        "title": "Agents versionnés",
+        "body": "Instructions, modèle, outils et limites au même endroit. Chaque modification est une version comparable et restaurable."
+      },
+      "traces": {
+        "title": "Traces en direct",
+        "body": "Suivez chaque appel au modèle et chaque appel d'outil au moment où il se produit, avec durées, tokens et coûts."
+      },
+      "tools": {
+        "title": "Outils sûrs",
+        "body": "Arguments validés par schéma JSON strict, hôtes HTTP autorisés et bac à sable isolé pour le code."
+      },
+      "evaluations": {
+        "title": "Évaluations",
+        "body": "Des suites avec critères exact, regex, schéma et juge LLM. Comparez deux versions avant de livrer."
+      },
+      "costs": {
+        "title": "Des coûts honnêtes",
+        "body": "Communiqués par le fournisseur, estimés d'après les tarifs publiés, ou signalés indisponibles — jamais inventés."
+      },
+      "teams": {
+        "title": "Pensé pour les équipes",
+        "body": "Workspaces, rôles, clés chiffrées, journal d'audit et isolation testée sur chaque route."
+      }
+    }
+  },
+  "steps": {
+    "eyebrow": "Fonctionnement",
+    "title": "De zéro à une exécution tracée en quelques minutes",
+    "items": {
+      "connect": {
+        "title": "Connectez un modèle",
+        "body": "Ajoutez DeepSeek, Anthropic ou toute API compatible OpenAI. La clé est chiffrée et testée aussitôt."
+      },
+      "build": {
+        "title": "Construisez un agent",
+        "body": "Écrivez ses instructions, choisissez un modèle et autorisez seulement les outils dont il a besoin."
+      },
+      "run": {
+        "title": "Regardez-le travailler",
+        "body": "Lancez-le et suivez sa trace en direct. En cas d'échec, Gouvra vous dit pourquoi et quoi faire."
+      }
+    }
+  },
+  "openSource": {
+    "eyebrow": "Open source",
+    "title": "Auto-hébergé, Apache-2.0, à vous",
+    "body": "Une seule commande démarre toute la pile — API, worker, base de données, file d'attente et interface — avec un compte de démo à explorer.",
+    "copy": "la commande",
+    "points": {
+      "license": "Licence Apache-2.0",
+      "data": "Vos données restent sur vos serveurs",
+      "api": "API REST documentée et versionnée"
+    }
+  },
+  "cta": {
+    "title": "Prenez le contrôle de vos agents",
+    "body": "Créez un compte, connectez un modèle et lancez votre premier agent dès aujourd'hui.",
+    "button": "Créer votre compte"
+  },
+  "footer": {
+    "tagline": "La salle de contrôle de vos agents IA.",
+    "docs": "Référence API",
+    "github": "GitHub",
+    "license": "Apache-2.0",
+    "security": "Politique de sécurité"
+  }
+}

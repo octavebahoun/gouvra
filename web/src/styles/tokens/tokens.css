@@ -55,6 +55,12 @@
   --gv-chart-4: #9333ea;
   --gv-chart-5: #db2777;
   --gv-chart-grid: #e3e9f2;
+  /* Terminal blocks stay dark in both themes. */
+  --gv-terminal-bg: #0b1220;
+  --gv-terminal-line: rgb(255 255 255 / 0.1);
+  --gv-terminal-ink: #dbe4ff;
+  --gv-terminal-muted: #8ea0c8;
+  --gv-terminal-accent: #5eead4;
 
   /* Elevation */
   --gv-shadow-sm: 0 1px 2px rgb(23 43 77 / 0.06), 0 1px 1px rgb(23 43 77 / 0.04);

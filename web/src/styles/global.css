@@ -40,6 +40,11 @@
   --color-chart-4: var(--gv-chart-4);
   --color-chart-5: var(--gv-chart-5);
   --color-chart-grid: var(--gv-chart-grid);
+  --color-terminal: var(--gv-terminal-bg);
+  --color-terminal-line: var(--gv-terminal-line);
+  --color-terminal-ink: var(--gv-terminal-ink);
+  --color-terminal-muted: var(--gv-terminal-muted);
+  --color-terminal-accent: var(--gv-terminal-accent);
 
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono:
