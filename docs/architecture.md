@@ -27,9 +27,10 @@ flowchart LR
 | Path | Content |
 |---|---|
 | `api/src/gouvra/core` | Settings, database, errors (RFC 9457), middleware, authentication helpers, central authorisation, rate limiting, crypto, SSRF guard, pagination, logging with redaction. |
-| `api/src/gouvra/modules/*` | One package per domain: `identity`, `workspaces`, `notifications`, `audit`, `api_keys`, `providers`, `tools`, `agents`, `executions`, `usage`, `evaluations`, `admin`. Each has `models`, `schemas`, `service`, `routes`. |
+| `api/src/gouvra/modules/*` | One package per domain: `identity`, `workspaces`, `notifications`, `audit`, `api_keys`, `providers`, `tools`, `agents`, `executions`, `usage`, `evaluations`, `workflows`, `automations`, `connectors`, `registry`, `billing`, `budgets`, `retention`, `exports`, `admin`. Each has (as needed) `models`, `schemas`, `service`, `routes`, `worker`. |
 | `api/src/gouvra/migrations` | Alembic migrations (checked against the models in CI with `alembic check`). |
-| `api/src/gouvra/worker` | Worker process: services run side by side (executions, e-mail outbox, evaluation grading). |
+| `api/src/gouvra/worker` | Worker process: services run side by side — e-mail outbox, executions, evaluation grading, workflow orchestration, automation scheduler, budget and alert evaluation, retention purge. |
+| `api/src/gouvra/sandbox` | The code sandbox service (`gouvra sandbox`): its own process and container, no application secret. |
 | `api/tests` | Pytest suites against a real PostgreSQL and Valkey (no mocks of our own storage). |
 | `web/src` | Interface: `app` (router, providers), `components` (design system), `features/*` (one folder per screen family), `lib` (API client, auth, i18n, formatting), `locales` (EN, FR). |
 | `web/e2e` | Playwright journeys, accessibility audits, screenshot specs. |
@@ -114,6 +115,20 @@ a strict schema; the request is built on the server and sent through the guarded
 the connector's own hosts only. The **registry** lists every model (with published prices) and
 tool, and which agents use them.
 
+## Plans, billing and administration
+
+The **workspace is the organisation**: plans, subscriptions, budgets, retention and exports
+attach to it. Plans are defined in code (`billing/plans.py`); with billing off (the default when
+self-hosting) every workspace has the unlimited *Self-hosted* plan. One guard (`usage/guard.py`)
+is called by every launch path (executions, workflow runs and their steps, evaluation runs,
+automations) and applies, in order: suspension, the plan's monthly run quota, a budget's hard
+stop; resource creation checks the plan's limits. **Stripe** is the only judge of what is paid:
+the plan changes when a signed event arrives (each applied once, the subscription read back
+from Stripe), never on the redirect from Checkout. The worker evaluates budgets and quotas every
+minute (one alert per month and threshold, e-mailed once) and purges data past each workspace's
+retention every hour. `/admin` (super-admins, granted from the command line only) lists the
+instance's workspaces and accounts with batched queries, page by page.
+
 ## Code sandbox
 
 Code tools never run in the API or the worker. The worker calls the **sandbox** service (its own
@@ -137,6 +152,42 @@ back as JSON, with what it printed.
 - Accessibility: WCAG 2.2 AA targets, labelled controls with errors tied to fields, focus
   management on navigation, announcements of execution state changes; every screen is audited
   with axe at three widths in both themes.
+
+## Screens
+
+Every screen has a route (lazy-loaded chunk), the permission that opens it, and the same states:
+**loading** (skeletons shaped like the content), **empty** (what to do next), **error** (cause,
+diagnostic ID, retry), **not found** (also for another workspace's resources) and, where an
+action needs more rights, a read-only view or an access notice. Permissions are those of the
+API (`core/authz.py`): *viewer* reads, *member* builds and runs, *admin* configures, *owner*
+owns the workspace and its subscription.
+
+| Screen | Route | Opens for | Actions need |
+|---|---|---|---|
+| A. Public site | `/` | everyone | — |
+| B. Sign in · C. Sign up | `/login`, `/register` | signed out | — |
+| D. E-mail verification | `/verify-email`, `/confirm-email` | link holder | — |
+| E. Password reset | `/forgot-password`, `/reset-password` | link holder | — |
+| F. Onboarding | `/onboarding` | verified account | — |
+| G. Overview | `/w/:slug/overview` | viewer | — |
+| H. Agents | `/w/:slug/agents` | viewer | member (create, duplicate, archive) |
+| I. Agent editor | `/w/:slug/agents/new`, `/w/:slug/agents/:id/edit` | member | member |
+| J. Agent detail | `/w/:slug/agents/:id` | viewer | member (run, restore a version) |
+| K. Launch | dialog on agents and agent detail | member | member |
+| L. Executions | `/w/:slug/executions` | viewer | member (cancel, retry) |
+| M. Execution detail | `/w/:slug/executions/:id` | viewer | member (cancel, retry), export |
+| N. Tools | `/w/:slug/tools`, `/w/:slug/tools/:id` | viewer | member (create, test, edit) |
+| O. Providers | `/w/:slug/providers` | viewer | admin (add, edit, test, remove) |
+| P. Usage | `/w/:slug/usage` | viewer | admin (budget), member (CSV exports) |
+| Q. Workspace settings | `/w/:slug/settings/{general,members,api-keys,billing,data,audit}` (and `settings/billing/checkout` in simulated billing) | viewer (sections by permission) | admin (settings, members, keys, audit, retention), owner (plan, ownership, deletion) |
+| R. Profile & preferences | `/account` | signed in | — |
+| S. Evaluations | `/w/:slug/evaluations`, `…/suites/:id`, `…/runs/:id`, `…/compare` | viewer | member |
+| T. Workflows | `/w/:slug/workflows`, `/w/:slug/workflows/:id`, `…/runs/:id` | viewer | member |
+| Automations | `/w/:slug/automations`, `/w/:slug/automations/:id` | viewer | admin |
+| Connectors | `/w/:slug/connectors` | viewer | admin |
+| Registry | `/w/:slug/registry` | viewer | — |
+| Invitation | `/invite` | link holder | — |
+| Instance administration | `/admin/{workspaces,users,audit}` | super-admin (404 otherwise) | super-admin |
 
 ## Quality gates
 
