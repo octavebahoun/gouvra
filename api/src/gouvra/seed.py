@@ -36,6 +36,7 @@ from gouvra.modules.providers.service import create_provider, test_provider
 from gouvra.modules.tools.schemas import ToolCreateIn
 from gouvra.modules.tools.service import create_tool
 from gouvra.modules.workspaces.models import Membership, Role, Workspace
+from gouvra.seed_extras import seed_extras
 
 DEMO_EMAIL = "demo@gouvra.dev"
 DEMO_WORKSPACE = "Demo · Acme Support"
@@ -251,6 +252,9 @@ async def seed_demo(*, with_real_runs: bool = True, if_missing: bool = True) -> 
                 )
                 await _run_now(execution.id)
             _out("Two real DeepSeek executions recorded.")
+
+        # Evaluations, a workflow, automations and a budget (queued: the worker runs them).
+        await seed_extras(db, ctx, offline)
 
         # A queued run left for the UI's live views (the worker will pick it up).
         await launch(

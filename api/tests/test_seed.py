@@ -11,6 +11,7 @@ from gouvra.modules.executions.models import Execution
 from gouvra.modules.identity.models import User
 from gouvra.modules.workspaces.models import Workspace
 from gouvra.seed import DEMO_EMAIL, seed_demo
+from gouvra.seed_extras import CASES
 from tests.helpers import Outbox
 
 pytestmark = pytest.mark.usefixtures("outbox")
@@ -49,7 +50,8 @@ async def test_demo_seed_is_idempotent_and_labelled(
         )
     assert statuses["succeeded"] > 0
     assert statuses["failed"] > 0
-    assert statuses["queued"] == 1
+    # The live run, and the cases of two evaluation runs, wait for the worker.
+    assert statuses["queued"] == 1 + 2 * len(CASES)
     assert await seed_demo(with_real_runs=False) == 0  # second run: nothing to do
     client = make_client()
     login = await client.post(
@@ -57,6 +59,16 @@ async def test_demo_seed_is_idempotent_and_labelled(
     )
     assert login.status_code == 200
     assert login.json()["workspaces"][0]["is_demo"] is True
+    # Every part of the product has something to show.
+    base = f"/api/v1/workspaces/{workspace.id}"
+    suites = (await client.get(f"{base}/evaluations/suites")).json()
+    assert [s["name"] for s in suites] == ["Ticket replies"]
+    flows = (await client.get(f"{base}/workflows")).json()
+    assert [(w["name"], w["current_version"]) for w in flows] == [("Ticket routing", 1)]
+    automations = (await client.get(f"{base}/automations")).json()
+    assert sorted(a["kind"] for a in automations) == ["schedule", "webhook"]
+    budget = (await client.get(f"{base}/budget")).json()
+    assert budget["budget"]["monthly_limit"] == "25.00"
 
 
 async def test_seed_requires_a_password(monkeypatch: pytest.MonkeyPatch) -> None:
