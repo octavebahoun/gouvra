@@ -13,12 +13,20 @@ x-logging: &logging
     max-size: "20m"
     max-file: "5"
 
+x-hardening: &hardening
+  security_opt: ["no-new-privileges:true"]
+
 x-app: &app
   image: gouvra/api:${GOUVRA_VERSION:-latest}
   build:
     context: ./api
   restart: unless-stopped
   logging: *logging
+  # The application needs no Linux capability and never writes outside /tmp.
+  <<: *hardening
+  cap_drop: [ALL]
+  read_only: true
+  tmpfs: [/tmp]
   environment:
     APP_ENV: production
     APP_URL: ${APP_URL:?set APP_URL, e.g. https://gouvra.example.com}
@@ -61,6 +69,7 @@ services:
     image: postgres:17.11-alpine
     restart: unless-stopped
     logging: *logging
+    <<: *hardening
     environment:
       POSTGRES_USER: gouvra
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run scripts/gen-secrets}
@@ -78,6 +87,7 @@ services:
     image: valkey/valkey:8.1-alpine
     restart: unless-stopped
     logging: *logging
+    <<: *hardening
     command: ["valkey-server", "--requirepass", "${VALKEY_PASSWORD:?run scripts/gen-secrets}", "--appendonly", "yes"]
     environment:
       VALKEY_PASSWORD: ${VALKEY_PASSWORD}
@@ -132,6 +142,12 @@ services:
       context: ./web
     restart: unless-stopped
     logging: *logging
+    <<: *hardening
+    # Binding 80/443 is the only privilege Caddy needs; certificates live in the /data volume.
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    read_only: true
+    tmpfs: [/tmp]
     environment:
       DOMAIN: ${DOMAIN:?set DOMAIN, e.g. gouvra.example.com}
       ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL for certificate notices}
