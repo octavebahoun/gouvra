@@ -6,6 +6,7 @@ The last user message (or the tool results) drives the behaviour through directi
   [sleep:MS]                      take MS milliseconds, streaming as it goes
   [json]                          answer with a JSON object
   [think]                         emit a short reasoning trace first
+  [score:X]                       answer like an evaluation judge: {"score": X, ...}
 Without directives it answers "Echo: <input>". Same input, same output — every time.
 """
 
@@ -33,6 +34,7 @@ from gouvra.modules.providers.gateway.types import (
 TOOL_RE = re.compile(r"\[tool:([a-zA-Z0-9_\-]+)\s*(\{.*?\})?\]", re.DOTALL)
 FAIL_RE = re.compile(r"\[fail:([a-z_]+)\]")
 SLEEP_RE = re.compile(r"\[sleep:(\d{1,6})\]")
+SCORE_RE = re.compile(r"\[score:(\d+(?:\.\d+)?)\]")
 MODELS = ["gouvra-test-1"]
 
 
@@ -41,7 +43,7 @@ def _words(text: str) -> int:
 
 
 def _strip(text: str) -> str:
-    return re.sub(r"\[(?:tool|fail|sleep|json|think)[^\]]*\]", "", text).strip()
+    return re.sub(r"\[(?:tool|fail|sleep|json|think|score)[^\]]*\]", "", text).strip()
 
 
 class ScriptedModelAdapter:
@@ -152,6 +154,8 @@ class ScriptedModelAdapter:
     def _answer(
         request: ChatRequest, user_text: str, tool_results: list[ChatMessage] | None
     ) -> str:
+        if (score := SCORE_RE.search(user_text)) and tool_results is None:
+            return json.dumps({"score": float(score.group(1)), "reasoning": "Scripted verdict."})
         if tool_results is not None:
             summary = "; ".join(
                 f"{r.tool_name or 'tool'} → {(r.content or '')[:200]}" for r in tool_results

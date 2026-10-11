@@ -1114,6 +1114,198 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspace_id}/evaluations/suites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List evaluation suites */
+        get: operations["evaluations_list_suites"];
+        put?: never;
+        /** Create a suite */
+        post: operations["evaluations_create_suite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/suites/{suite_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get a suite */
+        get: operations["evaluations_get_suite"];
+        put?: never;
+        post?: never;
+        /** Archive a suite */
+        delete: operations["evaluations_archive_suite"];
+        options?: never;
+        head?: never;
+        /** Update a suite */
+        patch: operations["evaluations_update_suite"];
+        trace?: never;
+    };
+    "/api/v1/evaluations/suites/{suite_id}/cases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the cases of a suite */
+        get: operations["evaluations_list_cases"];
+        put?: never;
+        /** Add a case */
+        post: operations["evaluations_add_case"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/suites/{suite_id}/cases/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Import cases in bulk (optionally replacing all) */
+        post: operations["evaluations_import_cases"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/cases/{case_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a case */
+        delete: operations["evaluations_delete_case"];
+        options?: never;
+        head?: never;
+        /** Edit a case */
+        patch: operations["evaluations_update_case"];
+        trace?: never;
+    };
+    "/api/v1/evaluations/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run a suite against an agent version (or a model variant) */
+        post: operations["evaluations_start_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/evaluations/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List evaluation runs */
+        get: operations["evaluations_list_runs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A run with its per-case results */
+        get: operations["evaluations_get_run"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/runs/{run_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a running evaluation */
+        post: operations["evaluations_cancel_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compare two runs case by case */
+        get: operations["evaluations_compare"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/evaluations/graders/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Try a deterministic grader on a sample output */
+        post: operations["evaluations_preview_grader"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1501,12 +1693,136 @@ export interface components {
             /** Uses Network */
             uses_network: boolean;
         };
+        /** CaseComparison */
+        CaseComparison: {
+            /** Case Id */
+            case_id: string | null;
+            /** Case Name */
+            case_name: string;
+            base: components["schemas"]["ResultOut"] | null;
+            candidate: components["schemas"]["ResultOut"] | null;
+            /**
+             * Change
+             * @enum {string}
+             */
+            change: "improved" | "regressed" | "unchanged" | "new" | "removed" | "pending";
+            /** Score Delta */
+            score_delta: number | null;
+        };
+        /** CaseImportIn */
+        CaseImportIn: {
+            /** Cases */
+            cases: components["schemas"]["CaseIn"][];
+            /**
+             * Replace
+             * @default false
+             */
+            replace: boolean;
+        };
+        /** CaseIn */
+        CaseIn: {
+            /** Name */
+            name: string;
+            /** Input */
+            input: string | {
+                [key: string]: unknown;
+            };
+            /** Expected */
+            expected?: string | {
+                [key: string]: unknown;
+            } | null;
+            /** Graders */
+            graders?: (components["schemas"]["ExactGrader"] | components["schemas"]["ContainsGrader"] | components["schemas"]["RegexGrader"] | components["schemas"]["JsonSchemaGrader"] | components["schemas"]["LlmJudgeGrader"])[] | null;
+            /** Tags */
+            tags?: string[];
+        };
+        /** CaseOut */
+        CaseOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Suite Id
+             * Format: uuid
+             */
+            suite_id: string;
+            /** Name */
+            name: string;
+            /** Input */
+            input: {
+                [key: string]: unknown;
+            };
+            /** Expected */
+            expected: {
+                [key: string]: unknown;
+            } | null;
+            /** Graders */
+            graders: {
+                [key: string]: unknown;
+            }[] | null;
+            /** Tags */
+            tags: string[];
+            /** Position */
+            position: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** CaseUpdateIn */
+        CaseUpdateIn: {
+            /** Name */
+            name?: string | null;
+            /** Input */
+            input?: string | {
+                [key: string]: unknown;
+            } | null;
+            /** Expected */
+            expected?: string | {
+                [key: string]: unknown;
+            } | null;
+            /** Graders */
+            graders?: (components["schemas"]["ExactGrader"] | components["schemas"]["ContainsGrader"] | components["schemas"]["RegexGrader"] | components["schemas"]["JsonSchemaGrader"] | components["schemas"]["LlmJudgeGrader"])[] | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Position */
+            position?: number | null;
+        };
         /** ChangePasswordIn */
         ChangePasswordIn: {
             /** Current Password */
             current_password?: string | null;
             /** New Password */
             new_password: string;
+        };
+        /** ComparisonOut */
+        ComparisonOut: {
+            base: components["schemas"]["RunOut"];
+            candidate: components["schemas"]["RunOut"];
+            /** Pass Rate Delta */
+            pass_rate_delta: number | null;
+            /** Avg Score Delta */
+            avg_score_delta: number | null;
+            /** Cost Delta */
+            cost_delta: string | null;
+            /** Avg Duration Delta Ms */
+            avg_duration_delta_ms: number | null;
+            /** Improved */
+            improved: number;
+            /** Regressed */
+            regressed: number;
+            /** Unchanged */
+            unchanged: number;
+            /** Cases */
+            cases: components["schemas"]["CaseComparison"][];
         };
         /** ConnectionTestOut */
         ConnectionTestOut: {
@@ -1522,6 +1838,32 @@ export interface components {
              * Format: date-time
              */
             tested_at: string;
+        };
+        /** ContainsGrader */
+        ContainsGrader: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "contains";
+            /** Values */
+            values: string[];
+            /**
+             * Mode
+             * @default all
+             * @enum {string}
+             */
+            mode: "all" | "any" | "none";
+            /**
+             * Case Sensitive
+             * @default false
+             */
+            case_sensitive: boolean;
+            /**
+             * Weight
+             * @default 1
+             */
+            weight: number;
         };
         /** CostOut */
         CostOut: {
@@ -1601,6 +1943,34 @@ export interface components {
             next_after: number | null;
             /** Has More */
             has_more: boolean;
+        };
+        /** ExactGrader */
+        ExactGrader: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "exact";
+            /**
+             * Expected
+             * @description Defaults to the case's expected text
+             */
+            expected?: string | null;
+            /**
+             * Case Sensitive
+             * @default false
+             */
+            case_sensitive: boolean;
+            /**
+             * Trim
+             * @default true
+             */
+            trim: boolean;
+            /**
+             * Weight
+             * @default 1
+             */
+            weight: number;
         };
         /** ExecutionEventOut */
         ExecutionEventOut: {
@@ -1760,6 +2130,17 @@ export interface components {
             /** Input Preview */
             input_preview: string;
         };
+        /** GraderPreviewIn */
+        GraderPreviewIn: {
+            /** Grader */
+            grader: components["schemas"]["ExactGrader"] | components["schemas"]["ContainsGrader"] | components["schemas"]["RegexGrader"] | components["schemas"]["JsonSchemaGrader"] | components["schemas"]["LlmJudgeGrader"];
+            /** Output */
+            output: string;
+            /** Expected */
+            expected?: string | {
+                [key: string]: unknown;
+            } | null;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1831,6 +2212,23 @@ export interface components {
              */
             status: "pending" | "expired" | "accepted" | "revoked";
         };
+        /** JsonSchemaGrader */
+        JsonSchemaGrader: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "json_schema";
+            /** Schema */
+            schema: {
+                [key: string]: unknown;
+            };
+            /**
+             * Weight
+             * @default 1
+             */
+            weight: number;
+        };
         /** LastExecution */
         LastExecution: {
             /**
@@ -1858,6 +2256,30 @@ export interface components {
             max_execution_timeout_s: number;
             /** Max Input Bytes */
             max_input_bytes: number;
+        };
+        /** LlmJudgeGrader */
+        LlmJudgeGrader: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "llm_judge";
+            /** Provider Id */
+            provider_id: string;
+            /** Model */
+            model: string;
+            /** Rubric */
+            rubric: string;
+            /**
+             * Pass Threshold
+             * @default 0.7
+             */
+            pass_threshold: number;
+            /**
+             * Weight
+             * @default 1
+             */
+            weight: number;
         };
         /** LoginIn */
         LoginIn: {
@@ -2029,6 +2451,18 @@ export interface components {
              */
             has_more: boolean;
         };
+        /** Page[RunOut] */
+        Page_RunOut_: {
+            /** Data */
+            data: components["schemas"]["RunOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+        };
         /** PresetOut */
         PresetOut: {
             /** Label */
@@ -2189,6 +2623,31 @@ export interface components {
             /** Default Model */
             default_model?: string | null;
         };
+        /** RegexGrader */
+        RegexGrader: {
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            type: "regex";
+            /** Pattern */
+            pattern: string;
+            /**
+             * Ignore Case
+             * @default false
+             */
+            ignore_case: boolean;
+            /**
+             * Should Match
+             * @default true
+             */
+            should_match: boolean;
+            /**
+             * Weight
+             * @default 1
+             */
+            weight: number;
+        };
         /** RegisterIn */
         RegisterIn: {
             /**
@@ -2220,6 +2679,40 @@ export interface components {
             /** Password */
             password: string;
         };
+        /** ResultOut */
+        ResultOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Case Id */
+            case_id: string | null;
+            /** Case Name */
+            case_name: string;
+            /** Execution Id */
+            execution_id: string | null;
+            /** Status */
+            status: string;
+            /** Score */
+            score: number | null;
+            /** Grader Results */
+            grader_results: {
+                [key: string]: unknown;
+            }[];
+            /** Output Text */
+            output_text: string | null;
+            /** Error */
+            error: {
+                [key: string]: unknown;
+            } | null;
+            /** Duration Ms */
+            duration_ms: number | null;
+            /** Cost Amount */
+            cost_amount: string | null;
+            /** Cost Source */
+            cost_source: string;
+        };
         /** RoleUpdateIn */
         RoleUpdateIn: {
             /**
@@ -2227,6 +2720,227 @@ export interface components {
              * @enum {string}
              */
             role: "admin" | "member" | "viewer";
+        };
+        /** RunCreateIn */
+        RunCreateIn: {
+            /**
+             * Suite Id
+             * Format: uuid
+             */
+            suite_id: string;
+            /**
+             * Agent Id
+             * Format: uuid
+             */
+            agent_id: string;
+            /**
+             * Agent Version
+             * @description Defaults to the current version
+             */
+            agent_version?: number | null;
+            /** Model */
+            model?: string | null;
+            /** Provider Id */
+            provider_id?: string | null;
+            /** Instructions */
+            instructions?: string | null;
+            /** Label */
+            label?: string | null;
+        };
+        /** RunDetailOut */
+        RunDetailOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /**
+             * Suite Id
+             * Format: uuid
+             */
+            suite_id: string;
+            /** Suite Name */
+            suite_name: string;
+            /** Label */
+            label: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "completed" | "cancelled" | "failed";
+            /** Agent Id */
+            agent_id: string | null;
+            /** Agent Name */
+            agent_name: string | null;
+            /** Agent Version */
+            agent_version: number | null;
+            /** Model */
+            model: string | null;
+            /** Overrides */
+            overrides: {
+                [key: string]: unknown;
+            };
+            /** Pass Threshold */
+            pass_threshold: number;
+            summary: components["schemas"]["RunSummary"];
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Results */
+            results: components["schemas"]["ResultOut"][];
+        };
+        /** RunOut */
+        RunOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /**
+             * Suite Id
+             * Format: uuid
+             */
+            suite_id: string;
+            /** Suite Name */
+            suite_name: string;
+            /** Label */
+            label: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "running" | "completed" | "cancelled" | "failed";
+            /** Agent Id */
+            agent_id: string | null;
+            /** Agent Name */
+            agent_name: string | null;
+            /** Agent Version */
+            agent_version: number | null;
+            /** Model */
+            model: string | null;
+            /** Overrides */
+            overrides: {
+                [key: string]: unknown;
+            };
+            /** Pass Threshold */
+            pass_threshold: number;
+            summary: components["schemas"]["RunSummary"];
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+        };
+        /** RunSummary */
+        RunSummary: {
+            /**
+             * Cases
+             * @default 0
+             */
+            cases: number;
+            /**
+             * Pending
+             * @default 0
+             */
+            pending: number;
+            /**
+             * Passed
+             * @default 0
+             */
+            passed: number;
+            /**
+             * Failed
+             * @default 0
+             */
+            failed: number;
+            /**
+             * Errored
+             * @default 0
+             */
+            errored: number;
+            /**
+             * Cancelled
+             * @default 0
+             */
+            cancelled: number;
+            /** Pass Rate */
+            pass_rate?: number | null;
+            /** Avg Score */
+            avg_score?: number | null;
+            /** Cost Amount */
+            cost_amount?: string | null;
+            /** Cost Currency */
+            cost_currency?: string | null;
+            /**
+             * Cost Source
+             * @default unavailable
+             * @enum {string}
+             */
+            cost_source: "provider_reported" | "estimated" | "unavailable";
+            /**
+             * Cost Partial
+             * @default false
+             */
+            cost_partial: boolean;
+            /** Judge Cost Amount */
+            judge_cost_amount?: string | null;
+            /** Avg Duration Ms */
+            avg_duration_ms?: number | null;
+            /** P95 Duration Ms */
+            p95_duration_ms?: number | null;
+            /**
+             * Input Tokens
+             * @default 0
+             */
+            input_tokens: number;
+            /**
+             * Output Tokens
+             * @default 0
+             */
+            output_tokens: number;
+        };
+        /** RunSummaryRef */
+        RunSummaryRef: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Label */
+            label: string;
+            /** Status */
+            status: string;
+            /** Pass Rate */
+            pass_rate: number | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** SessionItem */
         SessionItem: {
@@ -2264,6 +2978,80 @@ export interface components {
             user: components["schemas"]["UserOut"];
             /** Workspaces */
             workspaces: components["schemas"]["WorkspaceSummary"][];
+        };
+        /** SuiteCreateIn */
+        SuiteCreateIn: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Default Graders */
+            default_graders?: (components["schemas"]["ExactGrader"] | components["schemas"]["ContainsGrader"] | components["schemas"]["RegexGrader"] | components["schemas"]["JsonSchemaGrader"] | components["schemas"]["LlmJudgeGrader"])[];
+            /**
+             * Pass Threshold
+             * @default 1
+             */
+            pass_threshold: number;
+        };
+        /** SuiteOut */
+        SuiteOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Workspace Id
+             * Format: uuid
+             */
+            workspace_id: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Agent Id */
+            agent_id: string | null;
+            /** Agent Name */
+            agent_name: string | null;
+            /** Default Graders */
+            default_graders: {
+                [key: string]: unknown;
+            }[];
+            /** Pass Threshold */
+            pass_threshold: number;
+            /** Case Count */
+            case_count: number;
+            last_run: components["schemas"]["RunSummaryRef"] | null;
+            /** Archived */
+            archived: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** SuiteUpdateIn */
+        SuiteUpdateIn: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Default Graders */
+            default_graders?: (components["schemas"]["ExactGrader"] | components["schemas"]["ContainsGrader"] | components["schemas"]["RegexGrader"] | components["schemas"]["JsonSchemaGrader"] | components["schemas"]["LlmJudgeGrader"])[] | null;
+            /** Pass Threshold */
+            pass_threshold?: number | null;
         };
         /** TimePoint */
         TimePoint: {
@@ -5159,6 +5947,535 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Page_AuditEventOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_list_suites: {
+        parameters: {
+            query?: {
+                include_archived?: boolean;
+            };
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuiteOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_create_suite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuiteCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_get_suite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_archive_suite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_update_suite: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuiteUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SuiteOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_list_cases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_add_case: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_import_cases: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                suite_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseImportIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_delete_case: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_update_case: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaseUpdateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_start_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RunCreateIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_list_runs: {
+        parameters: {
+            query?: {
+                suite_id?: string | null;
+                /** @description Page size (max 100) */
+                limit?: number;
+                /** @description `next_cursor` of the previous page */
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_RunOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_get_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunDetailOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_cancel_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_compare: {
+        parameters: {
+            query: {
+                /** @description Reference run */
+                base: string;
+                /** @description Run compared to the reference */
+                candidate: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ComparisonOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    evaluations_preview_grader: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GraderPreviewIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

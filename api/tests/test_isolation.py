@@ -72,6 +72,9 @@ ROUTES: list[Route] = [
     Route("GET", "/workspaces/{ws}/audit-events"),
     Route("GET", "/workspaces/{ws}/settings"),
     Route("PATCH", "/workspaces/{ws}/settings", {"max_concurrent_executions": 1}),
+    Route("GET", "/workspaces/{ws}/evaluations/suites"),
+    Route("POST", "/workspaces/{ws}/evaluations/suites", {"name": "Stolen suite"}),
+    Route("GET", "/workspaces/{ws}/evaluations/runs"),
 ]
 
 # Routes addressing one resource by id (the workspace is derived from the resource).
@@ -102,6 +105,20 @@ RESOURCE_ROUTES: list[Route] = [
     Route("GET", "/executions/{execution}/export"),
     Route("GET", "/agents/{agent}/stats"),
     Route("GET", "/tools/{tool}/calls"),
+    Route("GET", "/evaluations/suites/{suite}"),
+    Route("PATCH", "/evaluations/suites/{suite}", {"name": "pwned"}),
+    Route("DELETE", "/evaluations/suites/{suite}"),
+    Route("GET", "/evaluations/suites/{suite}/cases"),
+    Route("POST", "/evaluations/suites/{suite}/cases", {"name": "x", "input": "y"}),
+    Route(
+        "POST", "/evaluations/suites/{suite}/cases/import", {"cases": [{"name": "x", "input": "y"}]}
+    ),
+    Route("PATCH", "/evaluations/cases/{case}", {"name": "pwned"}),
+    Route("DELETE", "/evaluations/cases/{case}"),
+    Route("POST", "/evaluations/runs", {"suite_id": "{suite}", "agent_id": "{agent}"}),
+    Route("GET", "/evaluations/runs/{run}"),
+    Route("POST", "/evaluations/runs/{run}/cancel"),
+    Route("GET", "/evaluations/compare?base={run}&candidate={run}"),
 ]
 
 
@@ -130,6 +147,17 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
     execution = await owner.client.post(
         f"/api/v1/agents/{agent['id']}/executions", json={"input": "hello"}
     )
+    suite = await owner.client.post(
+        f"/api/v1/workspaces/{workspace['id']}/evaluations/suites", json={"name": "Quality"}
+    )
+    case = await owner.client.post(
+        f"/api/v1/evaluations/suites/{suite.json()['id']}/cases",
+        json={"name": "Greeting", "input": "hi", "expected": "Echo: hi"},
+    )
+    run = await owner.client.post(
+        "/api/v1/evaluations/runs",
+        json={"suite_id": suite.json()["id"], "agent_id": agent["id"]},
+    )
     return Tenant(
         owner=owner,
         member=member,
@@ -142,6 +170,9 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
             "tool": tool["id"],
             "agent": agent["id"],
             "execution": execution.json()["id"],
+            "suite": suite.json()["id"],
+            "case": case.json()["id"],
+            "run": run.json()["id"],
         },
     )
 
@@ -236,26 +267,68 @@ async def test_victim_data_is_untouched(world: tuple[Tenant, Tenant]) -> None:
     assert [k["revoked_at"] for k in keys] == [None]
 
 
-async def test_every_workspace_route_is_covered() -> None:
-    """Guard: a new /workspaces/{workspace_id}/... route must be added to ROUTES."""
-    from fastapi.routing import APIRoute
-
+def _declared_routes() -> set[tuple[str, str]]:
+    """Every documented route (read from OpenAPI: included routers are not flattened)."""
     from gouvra.main import create_app
 
+    methods = {"get", "post", "put", "patch", "delete"}
+    paths = create_app().openapi()["paths"]
     declared = {
-        (method, route.path.removeprefix("/api/v1").replace("{workspace_id}", "{ws}"))
-        for route in create_app().routes
-        if isinstance(route, APIRoute) and "{workspace_id}" in route.path
-        for method in route.methods
+        (method.upper(), path.removeprefix("/api/v1"))
+        for path, operations in paths.items()
+        for method in operations
+        if method in methods
     }
-    normalised = {
-        (
-            r.method,
-            r.path.replace("{member}", "{user_id}")
-            .replace("{invitation}", "{invitation_id}")
-            .replace("{api_key}", "{key_id}"),
-        )
-        for r in ROUTES
+    assert len(declared) > 50, "the route table could not be read"
+    return declared
+
+
+def _normalise(path: str) -> str:
+    replacements = {
+        "{member}": "{user_id}",
+        "{invitation}": "{invitation_id}",
+        "{api_key}": "{key_id}",
+        "{provider}": "{provider_id}",
+        "{tool}": "{tool_id}",
+        "{agent}": "{agent_id}",
+        "{execution}": "{execution_id}",
+        "{suite}": "{suite_id}",
+        "{case}": "{case_id}",
+        "{run}": "{run_id}",
+        "/versions/1": "/versions/{number}",
     }
-    missing = declared - normalised
+    path = path.split("?", 1)[0]
+    for old, new in replacements.items():
+        path = path.replace(old, new)
+    return path
+
+
+def test_every_workspace_route_is_covered() -> None:
+    """Guard: a new /workspaces/{workspace_id}/... route must be added to ROUTES."""
+    declared = {
+        (method, path.replace("{workspace_id}", "{ws}"))
+        for method, path in _declared_routes()
+        if "{workspace_id}" in path
+    }
+    missing = declared - {(r.method, _normalise(r.path)) for r in ROUTES}
     assert not missing, f"routes without an isolation test: {sorted(missing)}"
+
+
+# Routes addressed by id that are not workspace resources (covered by the identity tests).
+NOT_WORKSPACE_RESOURCES = {
+    ("GET", "/auth/oauth/{provider}/start"),
+    ("GET", "/auth/oauth/{provider}/callback"),
+    ("DELETE", "/me/sessions/{session_id}"),
+}
+
+
+def test_every_resource_route_is_covered() -> None:
+    """Guard: a new route addressing a resource by id must be added to RESOURCE_ROUTES."""
+    declared = {
+        (method, path)
+        for method, path in _declared_routes()
+        if "{" in path and "{workspace_id}" not in path
+    }
+    covered = {(r.method, _normalise(r.path)) for r in RESOURCE_ROUTES}
+    missing = declared - covered - NOT_WORKSPACE_RESOURCES
+    assert not missing, f"resource routes without an isolation test: {sorted(missing)}"

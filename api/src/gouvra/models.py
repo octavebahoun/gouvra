@@ -6,6 +6,7 @@ from gouvra.core.db import Base
 from gouvra.modules.agents.models import Agent, AgentVersion
 from gouvra.modules.api_keys.models import ApiKey
 from gouvra.modules.audit.models import AuditEvent
+from gouvra.modules.evaluations.models import EvalCase, EvalResult, EvalRun, EvalSuite
 from gouvra.modules.executions.models import Execution, ExecutionEvent, UsageRecord
 from gouvra.modules.identity.models import EmailToken, OAuthAccount, User, UserSession
 from gouvra.modules.notifications.models import EmailOutbox
@@ -21,6 +22,10 @@ __all__ = [
     "Base",
     "EmailOutbox",
     "EmailToken",
+    "EvalCase",
+    "EvalResult",
+    "EvalRun",
+    "EvalSuite",
     "Execution",
     "ExecutionEvent",
     "Invitation",

@@ -101,6 +101,10 @@ class Execution(Base, IdMixin, TimestampMixin):
     metadata_: Mapped[dict[str, Any]] = mapped_column(
         "metadata", JSONB, default=dict, server_default=text("'{}'::jsonb")
     )
+    # Evaluation variants: model, provider, instructions or parameters applied over the version.
+    config_overrides: Mapped[dict[str, Any]] = mapped_column(
+        JSONB, default=dict, server_default=text("'{}'::jsonb")
+    )
     priority: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     available_at: Mapped[datetime] = mapped_column(server_default=func.now(), default=utcnow)
     started_at: Mapped[datetime | None]

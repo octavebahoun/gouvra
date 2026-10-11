@@ -71,9 +71,43 @@ class ExecutionFailure(Exception):
 
 
 @dataclass
+class VersionConfig:
+    """What actually runs: the agent version, plus evaluation overrides when present."""
+
+    number: int
+    model: str
+    instructions: str
+    parameters: dict[str, Any]
+    limits: dict[str, Any]
+    tool_ids: list[str]
+    provider_config_id: uuid.UUID | None
+    overridden: list[str] = field(default_factory=list)
+
+    @classmethod
+    def build(cls, version: AgentVersion, overrides: dict[str, Any] | None) -> VersionConfig:
+        overrides = overrides or {}
+        provider = overrides.get("provider_id")
+        config = cls(
+            number=version.number,
+            model=str(overrides.get("model") or version.model),
+            instructions=str(overrides["instructions"])
+            if "instructions" in overrides
+            else version.instructions,
+            parameters={**(version.parameters or {}), **(overrides.get("parameters") or {})},
+            limits=dict(version.limits or {}),
+            tool_ids=list(version.tool_ids or []),
+            provider_config_id=uuid.UUID(str(provider)) if provider else version.provider_config_id,
+        )
+        config.overridden = sorted(
+            k for k in ("model", "provider_id", "instructions", "parameters") if k in overrides
+        )
+        return config
+
+
+@dataclass
 class RunState:
     execution: Execution
-    version: AgentVersion
+    version: VersionConfig
     provider: ProviderConfig
     tools: dict[str, Tool]
     emitter: EventEmitter
@@ -105,7 +139,7 @@ def _preview(text: str | None) -> str | None:
 
 async def _load(
     execution_id: uuid.UUID,
-) -> tuple[Execution, AgentVersion, ProviderConfig, dict[str, Tool]]:
+) -> tuple[Execution, VersionConfig, ProviderConfig, dict[str, Tool]]:
     async with get_sessionmaker()() as db:
         execution = await db.get(Execution, execution_id)
         if execution is None:
@@ -119,17 +153,20 @@ async def _load(
             raise ExecutionFailure(
                 "agent_version_missing", "The agent version of this execution no longer exists."
             )
+        config = VersionConfig.build(version, execution.config_overrides)
         provider = (
-            await db.get(ProviderConfig, version.provider_config_id)
-            if version.provider_config_id
+            await db.get(ProviderConfig, config.provider_config_id)
+            if config.provider_config_id
             else None
         )
+        if provider is not None and provider.workspace_id != execution.workspace_id:
+            provider = None  # an override can never reach another workspace's credentials
         if provider is None or provider.archived_at is not None:
             raise ExecutionFailure(
                 "provider_missing",
                 "The agent has no usable provider. Choose a provider in the agent settings.",
             )
-        tool_ids = [uuid.UUID(t) for t in version.tool_ids or []]
+        tool_ids = [uuid.UUID(t) for t in config.tool_ids]
         tools = (
             list(
                 (
@@ -145,7 +182,7 @@ async def _load(
         )
         return (
             execution,
-            version,
+            config,
             provider,
             {t.name: t for t in tools if t.status == "active" and t.archived_at is None},
         )
@@ -518,6 +555,10 @@ async def _finish(
     if event is not None:
         await publish_event(event)
     await publish_status(snapshot)
+    if snapshot.trigger == "evaluation":
+        from gouvra.modules.evaluations.service import notify_evaluations
+
+        await notify_evaluations()
     if snapshot.agent_id is not None:
         from gouvra.modules.agents.models import Agent
 
@@ -546,6 +587,7 @@ async def run_execution(
                 "worker": worker_id,
                 "attempt": execution.attempt,
                 "agent_version": version.number,
+                "overrides": version.overridden,
                 "model": version.model,
                 "provider": provider.kind,
                 "provider_name": provider.name,

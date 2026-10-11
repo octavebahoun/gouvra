@@ -26,6 +26,7 @@ dependencies = [
     "stripe>=16",
     "docker>=7.2",
     "anthropic>=1.13",
+    "regex>=2025.9",
 ]
 
 [project.scripts]
@@ -43,6 +44,7 @@ dev = [
     "types-jsonschema",
     "types-croniter",
     "types-docker",
+    "types-regex",
     "asyncpg-stubs>=0.32.0",
 ]
 
