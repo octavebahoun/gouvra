@@ -86,3 +86,45 @@ async def add_member(
     token = await outbox.token_for(member.email)
     accepted = await member.client.post("/api/v1/invitations/accept", json={"token": token})
     assert accepted.status_code == 200, accepted.text
+
+
+async def create_provider(
+    account: Account, workspace_id: str, kind: str = "test", **extra: Any
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {"name": extra.pop("name", f"{kind} provider"), "kind": kind, **extra}
+    if kind != "test" and "api_key" not in payload:
+        payload["api_key"] = "sk-test-0123456789abcdef"
+    response = await account.client.post(
+        f"/api/v1/workspaces/{workspace_id}/providers", json=payload
+    )
+    assert response.status_code == 201, response.text
+    body: dict[str, Any] = response.json()
+    return body
+
+
+async def create_builtin_tool(
+    account: Account, workspace_id: str, key: str, **config: Any
+) -> dict[str, Any]:
+    response = await account.client.post(
+        f"/api/v1/workspaces/{workspace_id}/tools",
+        json={"kind": "builtin", "builtin_key": key, "config": config},
+    )
+    assert response.status_code == 201, response.text
+    body: dict[str, Any] = response.json()
+    return body
+
+
+async def create_agent(
+    account: Account, workspace_id: str, provider_id: str, name: str = "Helper", **extra: Any
+) -> dict[str, Any]:
+    payload: dict[str, Any] = {
+        "name": name,
+        "provider_id": provider_id,
+        "model": "gouvra-test-1",
+        "instructions": "Be helpful.",
+        **extra,
+    }
+    response = await account.client.post(f"/api/v1/workspaces/{workspace_id}/agents", json=payload)
+    assert response.status_code == 201, response.text
+    body: dict[str, Any] = response.json()
+    return body

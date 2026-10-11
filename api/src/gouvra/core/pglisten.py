@@ -51,9 +51,14 @@ class PgListener:
         self, channel: str, *, max_wait: float, stop: asyncio.Event | None = None
     ) -> list[str]:
         """Wait for a notification on `channel` (or the timeout / stop). Returns payloads."""
+        return (await self.wait_any([channel], max_wait=max_wait, stop=stop))[channel]
+
+    async def wait_any(
+        self, channels: list[str], *, max_wait: float, stop: asyncio.Event | None = None
+    ) -> dict[str, list[str]]:
+        """Wait until any of `channels` is notified (or timeout / stop); drain their payloads."""
         await self._ensure()
-        event = self.events[channel]
-        waiters = [asyncio.create_task(event.wait())]
+        waiters = [asyncio.create_task(self.events[c].wait()) for c in channels]
         if stop is not None:
             waiters.append(asyncio.create_task(stop.wait()))
         try:
@@ -61,9 +66,11 @@ class PgListener:
         finally:
             for task in waiters:
                 task.cancel()
-        event.clear()
-        payloads, self.payloads[channel] = self.payloads[channel], []
-        return payloads
+        out: dict[str, list[str]] = {}
+        for channel in channels:
+            self.events[channel].clear()
+            out[channel], self.payloads[channel] = self.payloads[channel], []
+        return out
 
     async def close(self) -> None:
         if self._conn is not None and not self._conn.is_closed():

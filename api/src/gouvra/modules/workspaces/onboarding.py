@@ -60,3 +60,51 @@ async def evaluate(db: AsyncSession, workspace_id: uuid.UUID) -> list[tuple[Step
         (step, await step.check(db, workspace_id))
         for step in sorted(_STEPS.values(), key=lambda s: s.order)
     ]
+
+
+async def _has_provider(db: AsyncSession, workspace_id: uuid.UUID) -> bool:
+    from gouvra.modules.providers.models import ProviderConfig
+
+    return bool(
+        (
+            await db.execute(
+                select(func.count())
+                .select_from(ProviderConfig)
+                .where(
+                    ProviderConfig.workspace_id == workspace_id,
+                    ProviderConfig.archived_at.is_(None),
+                )
+            )
+        ).scalar_one()
+    )
+
+
+async def _has_agent(db: AsyncSession, workspace_id: uuid.UUID) -> bool:
+    from gouvra.modules.agents.models import Agent
+
+    return bool(
+        (
+            await db.execute(
+                select(func.count()).select_from(Agent).where(Agent.workspace_id == workspace_id)
+            )
+        ).scalar_one()
+    )
+
+
+async def _has_execution(db: AsyncSession, workspace_id: uuid.UUID) -> bool:
+    from gouvra.modules.executions.models import Execution
+
+    return bool(
+        (
+            await db.execute(
+                select(func.count())
+                .select_from(Execution)
+                .where(Execution.workspace_id == workspace_id, Execution.status == "succeeded")
+            )
+        ).scalar_one()
+    )
+
+
+register_step("configure_provider", 10, _has_provider)
+register_step("create_agent", 20, _has_agent)
+register_step("run_execution", 30, _has_execution)

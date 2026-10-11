@@ -37,6 +37,8 @@ x-app: &app
     SANDBOX_URL: http://sandbox:8090
     SANDBOX_TOKEN: ${SANDBOX_TOKEN:?run scripts/gen-secrets}
     TRUSTED_PROXY_HOPS: "1"
+    # Extra browser origins allowed to call the API (Vite dev server on :5173 in development).
+    CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
 
 services:
   postgres:

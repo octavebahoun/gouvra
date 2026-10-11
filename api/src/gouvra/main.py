@@ -59,6 +59,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 
 
 def create_app(settings: Settings | None = None) -> FastAPI:
+    import gouvra.models  # noqa: F401 - registers every table before any query
+
     settings = settings or get_settings()
     configure_logging(settings.log_level, settings.log_format)
     app = FastAPI(

@@ -15,7 +15,16 @@ from typing import Any
 
 import pytest
 
-from tests.helpers import Account, Outbox, add_member, create_workspace, signup
+from tests.helpers import (
+    Account,
+    Outbox,
+    add_member,
+    create_agent,
+    create_builtin_tool,
+    create_provider,
+    create_workspace,
+    signup,
+)
 
 pytestmark = pytest.mark.usefixtures("outbox")
 
@@ -46,6 +55,45 @@ ROUTES: list[Route] = [
     Route("GET", "/workspaces/{ws}/api-keys"),
     Route("POST", "/workspaces/{ws}/api-keys", {"name": "stolen"}),
     Route("DELETE", "/workspaces/{ws}/api-keys/{api_key}", sub_resource="api_key"),
+    Route("GET", "/workspaces/{ws}/providers"),
+    Route("POST", "/workspaces/{ws}/providers", {"name": "stolen", "kind": "test"}),
+    Route("GET", "/workspaces/{ws}/tools"),
+    Route(
+        "POST",
+        "/workspaces/{ws}/tools",
+        {"kind": "builtin", "builtin_key": "calculator", "name": "calc_two"},
+    ),
+    Route("GET", "/workspaces/{ws}/agents"),
+    Route("POST", "/workspaces/{ws}/agents", {"name": "Intruder"}),
+    Route("GET", "/workspaces/{ws}/executions"),
+    Route("GET", "/workspaces/{ws}/stream"),
+]
+
+# Routes addressing one resource by id (the workspace is derived from the resource).
+RESOURCE_ROUTES: list[Route] = [
+    Route("GET", "/providers/{provider}"),
+    Route("PATCH", "/providers/{provider}", {"name": "pwned"}),
+    Route("DELETE", "/providers/{provider}"),
+    Route("POST", "/providers/{provider}/test"),
+    Route("GET", "/tools/{tool}"),
+    Route("PATCH", "/tools/{tool}", {"description": "pwned"}),
+    Route("DELETE", "/tools/{tool}"),
+    Route("POST", "/tools/{tool}/test", {"arguments": {"expression": "1+1"}}),
+    Route("GET", "/agents/{agent}"),
+    Route("PATCH", "/agents/{agent}", {"instructions": "pwned"}),
+    Route("DELETE", "/agents/{agent}"),
+    Route("POST", "/agents/{agent}/duplicate", {}),
+    Route("POST", "/agents/{agent}/archive"),
+    Route("POST", "/agents/{agent}/restore"),
+    Route("GET", "/agents/{agent}/versions"),
+    Route("GET", "/agents/{agent}/versions/1"),
+    Route("POST", "/agents/{agent}/versions/1/restore"),
+    Route("POST", "/agents/{agent}/executions", {"input": "steal"}),
+    Route("GET", "/executions/{execution}"),
+    Route("GET", "/executions/{execution}/events"),
+    Route("GET", "/executions/{execution}/stream"),
+    Route("POST", "/executions/{execution}/cancel"),
+    Route("POST", "/executions/{execution}/retry"),
 ]
 
 
@@ -68,6 +116,12 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
     api_key = await owner.client.post(
         f"/api/v1/workspaces/{workspace['id']}/api-keys", json={"name": "ci"}
     )
+    provider = await create_provider(owner, workspace["id"])
+    tool = await create_builtin_tool(owner, workspace["id"], "calculator")
+    agent = await create_agent(owner, workspace["id"], provider["id"], tool_ids=[tool["id"]])
+    execution = await owner.client.post(
+        f"/api/v1/agents/{agent['id']}/executions", json={"input": "hello"}
+    )
     return Tenant(
         owner=owner,
         member=member,
@@ -76,6 +130,10 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
             "member": member.user_id,
             "invitation": invitation.json()["id"],
             "api_key": api_key.json()["id"],
+            "provider": provider["id"],
+            "tool": tool["id"],
+            "agent": agent["id"],
+            "execution": execution.json()["id"],
         },
     )
 
@@ -124,6 +182,33 @@ async def test_foreign_resource_id_under_own_workspace_is_404(
     assert route.sub_resource is not None
     mixed = {**attacker.ids, route.sub_resource: victim.ids[route.sub_resource]}
     assert await _call(attacker.owner, route, mixed) == 404
+
+
+@pytest.mark.parametrize("route", RESOURCE_ROUTES, ids=lambda r: f"{r.method} {r.path}")
+async def test_outsider_gets_404_on_foreign_resources(
+    world: tuple[Tenant, Tenant], route: Route
+) -> None:
+    victim, attacker = world
+    assert await _call(attacker.owner, route, victim.ids) == 404
+
+
+async def test_service_keys_cannot_reach_other_workspaces(
+    world: tuple[Tenant, Tenant], make_client
+) -> None:  # type: ignore[no-untyped-def]
+    victim, attacker = world
+    key = (
+        await attacker.owner.client.post(
+            f"/api/v1/workspaces/{attacker.ids['ws']}/api-keys",
+            json={"name": "probe", "role": "admin"},
+        )
+    ).json()["key"]
+    robot = make_client(csrf=False)
+    robot.headers["Authorization"] = f"Bearer {key}"
+    for route in [r for r in RESOURCE_ROUTES if r.method == "GET"] + [
+        r for r in ROUTES if r.method == "GET"
+    ]:
+        path = "/api/v1" + _fill(route.path, victim.ids)
+        assert (await robot.get(path)).status_code == 404, path
 
 
 async def test_victim_data_is_untouched(world: tuple[Tenant, Tenant]) -> None:

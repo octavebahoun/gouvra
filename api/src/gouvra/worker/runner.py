@@ -45,6 +45,8 @@ def services() -> list[Service]:
 
 
 async def run_worker(stop: asyncio.Event | None = None) -> None:
+    import gouvra.models  # noqa: F401 - registers every table: the ORM resolves all foreign keys
+
     settings = get_settings()
     configure_logging(settings.log_level, settings.log_format)
     stop = stop or asyncio.Event()

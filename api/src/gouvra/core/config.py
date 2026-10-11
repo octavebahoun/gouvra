@@ -99,6 +99,11 @@ class Settings(BaseSettings):
     # Sign-up policy
     signup_enabled: bool = True
 
+    # Outbound network policy (SSRF protection). Enable only on trusted self-hosted setups,
+    # e.g. to reach a local Ollama server or an internal API from an HTTP tool.
+    provider_allow_private_networks: bool = False
+    http_tool_allow_private_networks: bool = False
+
     # Sandbox service (untrusted code tools)
     sandbox_url: str = "http://sandbox:8090"
     sandbox_token: SecretStr = SecretStr("")
