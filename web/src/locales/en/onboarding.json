@@ -1,0 +1,88 @@
+{
+  "title": "Set up Gouvra",
+  "progressLabel": "Setup steps",
+  "stepOf": "Step {{current}} of {{total}}",
+  "steps": {
+    "welcome": "Welcome",
+    "workspace": "Workspace",
+    "invite": "Team",
+    "checklist": "Checklist"
+  },
+  "welcome": {
+    "title": "Welcome to Gouvra, {{name}}",
+    "body": "Gouvra is where your team builds AI agents, runs them and keeps an eye on every step, error and cost.",
+    "workspaceTitle": "Everything starts with a workspace",
+    "points": {
+      "agents": "Your agents, the tools they may use and their runs",
+      "providers": "Model providers and their encrypted keys",
+      "team": "Members, roles and service keys"
+    },
+    "start": "Create my workspace",
+    "existing": "Back to {{name}}"
+  },
+  "workspace": {
+    "title": "Name your workspace",
+    "subtitle": "Usually your team, company or project. You can rename it any time.",
+    "submit": "Create workspace",
+    "submitting": "Creating…"
+  },
+  "invite": {
+    "title": "Invite your teammates",
+    "subtitle": "Optional. They'll get an e-mail with a link to join {{workspace}}. You can also invite people later from the workspace settings.",
+    "skip": "Skip for now",
+    "continue": "Continue",
+    "allSent": "Invitations sent. Continue when you're ready."
+  },
+  "checklist": {
+    "title": "Get your workspace ready",
+    "subtitle": "A few steps to your first traced execution.",
+    "progress": "Required steps done: {{completed}} of {{total}}",
+    "complete": "Required setup is complete",
+    "completeBody": "Optional steps stay available whenever you need them.",
+    "optional": "Optional",
+    "done": "Done",
+    "todo": "To do",
+    "dismiss": "Hide checklist",
+    "dismissed": "Checklist hidden",
+    "dismissFailed": "Couldn't hide the checklist. Try again.",
+    "dismissNoPermission": "Only admins and the owner can hide the checklist.",
+    "loadError": "The checklist is unavailable right now.",
+    "goToWorkspace": "Go to {{workspace}}",
+    "items": {
+      "create_workspace": {
+        "title": "Create a workspace",
+        "description": "The home for your agents, providers and team.",
+        "cta": "Open settings"
+      },
+      "invite_teammate": {
+        "title": "Invite a teammate",
+        "description": "Share the workspace and choose what each person can do.",
+        "cta": "Invite people"
+      },
+      "configure_provider": {
+        "title": "Connect a model provider",
+        "description": "Add a provider such as DeepSeek or Anthropic and choose a default model.",
+        "cta": "Connect a provider"
+      },
+      "create_agent": {
+        "title": "Create your first agent",
+        "description": "Give it instructions, a model and the tools it may use.",
+        "cta": "Create an agent"
+      },
+      "run_execution": {
+        "title": "Run an execution",
+        "description": "Launch your agent and follow its trace live.",
+        "cta": "Run an agent"
+      },
+      "fallback": {
+        "title": "Complete “{{name}}”",
+        "description": "Finish this step to complete the setup.",
+        "cta": "Open"
+      }
+    }
+  },
+  "checklistStep": {
+    "title": "{{workspace}} is ready",
+    "subtitle": "Here's what's left before your first traced execution. You'll find this checklist on the overview too."
+  }
+}

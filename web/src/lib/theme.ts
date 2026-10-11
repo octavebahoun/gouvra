@@ -18,6 +18,10 @@ function readPreference(): ThemePreference {
 
 let preference: ThemePreference = typeof window === "undefined" ? "system" : readPreference();
 
+export function getThemePreference(): ThemePreference {
+  return preference;
+}
+
 export function resolveTheme(pref: ThemePreference): ResolvedTheme {
   if (pref === "system") return media().matches ? "dark" : "light";
   return pref;

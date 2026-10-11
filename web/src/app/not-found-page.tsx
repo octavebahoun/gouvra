@@ -8,6 +8,7 @@ export function NotFoundPage() {
   return (
     <main className="flex min-h-dvh items-center justify-center">
       <NotFoundState
+        headingLevel="h1"
         action={
           <Button asChild variant="secondary">
             <Link to="/">{t("actions.back")}</Link>

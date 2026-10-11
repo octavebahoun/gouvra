@@ -3,9 +3,11 @@
  * Source of truth for colour, elevation and motion. Components never use raw colours:
  * they use the semantic utilities generated from these tokens (bg-surface, text-muted...).
  * Every text/background pair below is checked for WCAG 2.2 AA (see scripts/check-contrast.py).
+ * `data-theme-scope` forces one theme on a subtree (e.g. the theme previews in preferences).
  */
 
-:root {
+:root,
+[data-theme-scope="light"] {
   color-scheme: light;
 
   /* Surfaces */
@@ -61,7 +63,8 @@
   --gv-glow-brand: 0 0 0 4px rgb(37 99 235 / 0.14);
 }
 
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+[data-theme-scope="dark"] {
   color-scheme: dark;
 
   --gv-canvas: #0b111c;

@@ -24,13 +24,15 @@ export const buttonVariants = cva(
         link: "h-auto p-0 text-brand-text underline-offset-4 hover:underline active:scale-100",
       },
       size: {
-        sm: "h-8 px-3 text-[13px] [&_svg]:size-3.5",
-        md: "h-9 px-4 text-sm [&_svg]:size-4",
+        sm: "h-8 px-3 text-[13px] max-md:h-10 [&_svg]:size-3.5",
+        md: "h-9 px-4 text-sm max-md:h-10 [&_svg]:size-4",
         lg: "h-11 px-5 text-[15px] [&_svg]:size-4.5",
-        icon: "size-9 [&_svg]:size-4",
-        "icon-sm": "size-8 [&_svg]:size-4",
+        icon: "size-9 max-md:size-10 [&_svg]:size-4",
+        "icon-sm": "size-8 max-md:size-10 [&_svg]:size-4",
       },
     },
+    // Links stay inline whatever the size: no box height or padding.
+    compoundVariants: [{ variant: "link", class: "h-auto px-0 py-0 max-md:h-auto" }],
     defaultVariants: { variant: "primary", size: "md" },
   },
 );

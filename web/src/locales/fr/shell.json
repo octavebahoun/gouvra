@@ -1,0 +1,103 @@
+{
+  "session": {
+    "expired": "Votre session a pris fin. Reconnectez-vous pour continuer.",
+    "loadError": "Impossible de vérifier votre session"
+  },
+  "preferences": {
+    "saveFailed": "Impossible d'enregistrer cette préférence dans votre profil. Elle reste appliquée sur cet appareil."
+  },
+  "language": {
+    "label": "Langue",
+    "current": "Langue : {{language}}"
+  },
+  "signOut": {
+    "failed": "Impossible de vous déconnecter. Vérifiez votre connexion et réessayez."
+  },
+  "workspace": {
+    "switched": "Vous travaillez maintenant dans {{name}}",
+    "switchedDescription": "Les pages, les membres et les paramètres sont désormais ceux de ce workspace.",
+    "notFoundTitle": "Workspace introuvable",
+    "notFoundBody": "Il n'existe pas, ou vous n'en êtes pas membre.",
+    "backToWorkspaces": "Voir mes workspaces",
+    "demo": "Démo",
+    "none": "Aucun workspace pour l'instant"
+  },
+  "createWorkspace": {
+    "title": "Créer un workspace",
+    "description": "Un workspace regroupe des agents, des fournisseurs, des membres et leur consommation. Vous en serez le propriétaire.",
+    "submit": "Créer le workspace",
+    "created": "{{name}} est prêt",
+    "createdDescription": "Vous en êtes le propriétaire. Invitez vos collègues depuis les paramètres."
+  },
+  "overview": {
+    "title": "Vue d'ensemble",
+    "description": "Bienvenue, {{name}}. Voici ce qui se passe dans {{workspace}}.",
+    "activityTitle": "Exécutions récentes",
+    "activityEmptyTitle": "Aucune exécution pour l'instant",
+    "activityEmptyBody": "Dès que des agents tourneront dans ce workspace, leurs dernières exécutions apparaîtront ici avec leur état, leur durée et leur coût estimé — chacune reliée à sa trace.",
+    "aboutTitle": "Ce workspace",
+    "yourRole": "Votre rôle",
+    "members": "Membres",
+    "created": "Créé le",
+    "url": "Adresse",
+    "manageMembers": "Gérer les membres",
+    "openSettings": "Paramètres du workspace",
+    "detailsError": "Les détails du workspace sont indisponibles pour le moment."
+  },
+  "sections": {
+    "notAvailable": "Pas encore disponible",
+    "agents": {
+      "description": "Un agent réunit des instructions, un modèle et les outils qu'il a le droit d'utiliser.",
+      "emptyTitle": "Les agents ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page listera vos agents avec leur modèle, leur état et leur dernière exécution, et permettra de les créer, de les versionner et de les archiver."
+    },
+    "executions": {
+      "description": "Chaque lancement d'un agent, avec son état en direct, sa trace, sa durée et son coût.",
+      "emptyTitle": "Les exécutions ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page listera les exécutions avec des filtres par agent, état et date, et ouvrira chaque trace pas à pas."
+    },
+    "tools": {
+      "description": "Les outils que vos agents peuvent appeler, avec leur schéma et leurs permissions.",
+      "emptyTitle": "Les outils ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page listera les outils intégrés et personnalisés, leur schéma JSON et les agents autorisés à les utiliser, avec un test contrôlé."
+    },
+    "workflows": {
+      "description": "Des séquences en plusieurs étapes qui enchaînent agents et contrôles.",
+      "emptyTitle": "Les workflows ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page accueillera l'éditeur visuel de workflows et la vue en direct de leurs exécutions."
+    },
+    "evaluations": {
+      "description": "Des suites de tests qui notent les versions d'agents selon les résultats attendus.",
+      "emptyTitle": "Les évaluations ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page accueillera les suites de tests, les cas et les critères de notation, et comparera les résultats entre versions d'agents."
+    },
+    "automations": {
+      "description": "Exécutions planifiées et déclencheurs par webhook signé.",
+      "emptyTitle": "Les automatisations ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page listera les planifications récurrentes et les webhooks qui lancent des exécutions automatiquement."
+    },
+    "usage": {
+      "description": "Tokens et coûts par fournisseur, par agent et par période.",
+      "emptyTitle": "La consommation n'est pas encore disponible dans cette version",
+      "emptyBody": "Cette page détaillera les tokens et les coûts — rapportés par les fournisseurs ou estimés — avec les budgets et les quotas."
+    },
+    "providers": {
+      "description": "Les fournisseurs de modèles configurés pour ce workspace.",
+      "emptyTitle": "Les fournisseurs ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page permettra aux administrateurs de connecter des fournisseurs comme DeepSeek ou Anthropic, de stocker leurs clés chiffrées, de tester la connexion et de choisir un modèle par défaut."
+    },
+    "connectors": {
+      "description": "Des intégrations prêtes à l'emploi avec des services externes.",
+      "emptyTitle": "Les connecteurs ne sont pas encore disponibles dans cette version",
+      "emptyBody": "Cette page listera les connecteurs utilisables par vos agents et workflows, ainsi que leur configuration."
+    },
+    "registry": {
+      "description": "Le catalogue des modèles et des outils connus de cette instance.",
+      "emptyTitle": "Le registre n'est pas encore disponible dans cette version",
+      "emptyBody": "Cette page listera les modèles avec leurs capacités et leurs tarifs, ainsi que les outils disponibles pour tous les workspaces."
+    }
+  },
+  "account": {
+    "backToApp": "Retour à l'application"
+  }
+}

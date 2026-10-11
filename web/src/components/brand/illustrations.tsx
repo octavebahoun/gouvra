@@ -17,7 +17,9 @@ export type IllustrationName =
   | "locked"
   | "not-found"
   | "automations"
-  | "members";
+  | "members"
+  | "connectors"
+  | "registry";
 
 const stroke = { stroke: "var(--gv-line-strong)", strokeWidth: 1.5, fill: "none" } as const;
 
@@ -312,6 +314,82 @@ export function Illustration({ name, className }: { name: IllustrationName; clas
               />
             </g>
           ))}
+        </Base>
+      );
+    case "connectors":
+      return (
+        <Base className={className}>
+          <Panel x={22} y={36} w={46} h={40} />
+          <Panel x={92} y={36} w={46} h={40} />
+          <Link d="M68 56 H92" />
+          <g
+            className="animate-float"
+            style={{ transformBox: "fill-box", transformOrigin: "center" }}
+          >
+            <rect
+              x="70"
+              y="44"
+              width="20"
+              height="24"
+              rx="6"
+              fill="var(--gv-brand-soft)"
+              stroke="var(--gv-brand)"
+              strokeWidth={1.5}
+            />
+            <path
+              d="M76 44 v-6 M84 44 v-6"
+              stroke="var(--gv-brand)"
+              strokeWidth={2}
+              strokeLinecap="round"
+            />
+            <path d="M80 68 v8" stroke="var(--gv-brand)" strokeWidth={1.5} strokeLinecap="round" />
+          </g>
+          <Node x={45} y={88} r={5} tone="success" delay={0.5} />
+          <Node x={115} y={88} r={5} tone="muted" delay={1} />
+        </Base>
+      );
+    case "registry":
+      return (
+        <Base className={className}>
+          <rect
+            x="44"
+            y="26"
+            width="80"
+            height="56"
+            rx="8"
+            fill="var(--gv-surface-2)"
+            stroke="var(--gv-line)"
+            strokeWidth={1.5}
+          />
+          <rect
+            x="38"
+            y="32"
+            width="80"
+            height="56"
+            rx="8"
+            fill="var(--gv-surface)"
+            stroke="var(--gv-line)"
+            strokeWidth={1.5}
+          />
+          {[0, 1, 2].map((i) => (
+            <g key={i}>
+              <circle
+                cx={50}
+                cy={47 + i * 13}
+                r={3}
+                fill={i === 0 ? "var(--gv-brand)" : "var(--gv-line-strong)"}
+              />
+              <rect
+                x={58}
+                y={45 + i * 13}
+                width={[44, 34, 40][i]}
+                height={4}
+                rx={2}
+                fill="var(--gv-line)"
+              />
+            </g>
+          ))}
+          <Node x={118} y={30} r={7} delay={0.3} />
         </Base>
       );
     case "error":

@@ -1,26 +1,16 @@
 import { Menu as MenuIcon, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { Dialog as DialogPrimitive } from "radix-ui";
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useOutlet } from "react-router";
+import { useMediaQuery } from "@/lib/use-media-query";
 import { duration, ease } from "@/components/motion/presets";
 import { LogoMark } from "@/components/brand/logo";
 import { ConnectionBanner, ThemeToggle } from "./shell-parts";
 import { Sidebar } from "./sidebar";
 
 const COLLAPSE_KEY = "gouvra.sidebar.collapsed";
-
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState(() => window.matchMedia(query).matches);
-  useEffect(() => {
-    const mq = window.matchMedia(query);
-    const onChange = () => setMatches(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, [query]);
-  return matches;
-}
 
 /** Route content with a short cross-fade; keyed by section so tabs inside a page don't re-animate. */
 export function AnimatedOutlet({ depth = 3 }: { depth?: number }) {
@@ -94,15 +84,17 @@ export function AppShell({ basePath, workspaceSwitcher, userMenu, children }: Ap
         <motion.aside
           animate={{ width: collapsed ? 68 : 252 }}
           transition={{ duration: duration.slow, ease: ease.standard }}
-          className="sticky top-0 hidden h-dvh shrink-0 border-r border-line md:block"
+          className="hidden shrink-0 self-stretch border-r border-line bg-surface md:block"
         >
-          <Sidebar
-            basePath={basePath}
-            collapsed={collapsed}
-            onToggleCollapsed={toggleCollapsed}
-            workspaceSwitcher={workspaceSwitcher(collapsed)}
-            footer={userMenu(collapsed)}
-          />
+          <div className="sticky top-0 h-dvh">
+            <Sidebar
+              basePath={basePath}
+              collapsed={collapsed}
+              onToggleCollapsed={toggleCollapsed}
+              workspaceSwitcher={workspaceSwitcher(collapsed)}
+              footer={userMenu(collapsed)}
+            />
+          </div>
         </motion.aside>
       ) : null}
 

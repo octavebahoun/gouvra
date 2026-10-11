@@ -76,3 +76,8 @@ export function toProblem(status: number, body: unknown): ProblemDetails {
     title: `HTTP ${status}`,
   };
 }
+
+/** True when `error` is an API error with one of the given stable codes. */
+export function hasErrorCode(error: unknown, ...codes: string[]): error is ApiError {
+  return isApiError(error) && codes.includes(error.code);
+}

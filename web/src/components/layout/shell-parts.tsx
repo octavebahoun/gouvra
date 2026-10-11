@@ -50,7 +50,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={t("theme.toggle", { mode: t(`theme.${next}`).toLowerCase() })}
       title={t("theme.toggle", { mode: t(`theme.${next}`).toLowerCase() })}
       className={cn(
-        "relative inline-flex size-9 items-center justify-center overflow-hidden rounded-field text-muted transition-colors hover:bg-surface-2 hover:text-ink",
+        "relative inline-flex size-9 items-center justify-center overflow-hidden rounded-field text-muted transition-colors hover:bg-surface-2 hover:text-ink max-md:size-10",
         className,
       )}
     >
@@ -79,6 +79,11 @@ type UserMenuProps = {
   onLanguageChange?: (language: Language) => void;
   onThemeChange?: (theme: ThemePreference) => void;
   collapsed?: boolean;
+  /** Instance administration page, shown to super-admins once it exists. */
+  adminHref?: string;
+  /** Where the menu opens: above the trigger (sidebar footer) or below it (top bars). */
+  placement?: "top" | "bottom";
+  className?: string;
 };
 
 export function UserMenu({
@@ -87,6 +92,9 @@ export function UserMenu({
   onLanguageChange,
   onThemeChange,
   collapsed = false,
+  adminHref,
+  placement = "top",
+  className,
 }: UserMenuProps) {
   const { t, i18n } = useTranslation();
   const { preference } = useTheme();
@@ -97,6 +105,7 @@ export function UserMenu({
         className={cn(
           "flex h-11 w-full items-center gap-2.5 rounded-field px-2 text-left transition-colors hover:bg-surface-2 data-[state=open]:bg-surface-2",
           collapsed && "justify-center px-0",
+          className,
         )}
       >
         <Avatar name={user.display_name} size="sm" />
@@ -109,16 +118,29 @@ export function UserMenu({
           </span>
         ) : null}
       </DropdownMenuTrigger>
-      <DropdownMenuContent side="top" align="start" className="w-64">
+      <DropdownMenuContent
+        side={placement}
+        align={placement === "top" ? "start" : "end"}
+        className="w-64"
+      >
+        {collapsed ? (
+          <>
+            <div className="px-2.5 pt-2 pb-1.5">
+              <p className="truncate text-[13px] font-medium text-ink">{user.display_name}</p>
+              <p className="truncate text-xs text-muted">{user.email}</p>
+            </div>
+            <DropdownMenuSeparator />
+          </>
+        ) : null}
         <DropdownMenuItem asChild>
           <Link to="/account">
             <UserRound aria-hidden />
             {t("userMenu.profile")}
           </Link>
         </DropdownMenuItem>
-        {user.is_superadmin ? (
+        {user.is_superadmin && adminHref ? (
           <DropdownMenuItem asChild>
-            <Link to="/admin">
+            <Link to={adminHref}>
               <Shield aria-hidden />
               {t("userMenu.admin")}
             </Link>

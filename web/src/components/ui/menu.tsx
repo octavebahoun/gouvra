@@ -32,7 +32,7 @@ export function DropdownMenuContent({
 }
 
 const itemClass = cn(
-  "relative flex h-8 cursor-default items-center gap-2 rounded-field px-2.5 text-sm text-ink outline-none select-none",
+  "relative flex h-8 cursor-default items-center gap-2 rounded-field px-2.5 text-sm text-ink outline-none select-none max-md:h-10",
   "data-[disabled]:opacity-50 data-[highlighted]:bg-surface-2 [&_svg]:size-4 [&_svg]:text-muted",
 );
 

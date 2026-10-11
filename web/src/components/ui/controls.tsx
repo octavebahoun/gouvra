@@ -66,6 +66,7 @@ type SelectProps = {
   "aria-invalid"?: boolean;
   "aria-describedby"?: string;
   "aria-label"?: string;
+  "aria-labelledby"?: string;
 };
 
 export function Select({
@@ -84,7 +85,7 @@ export function Select({
         id={id}
         className={cn(
           controlClass,
-          "flex h-9 items-center justify-between gap-2 text-left data-[placeholder]:text-placeholder",
+          "flex h-9 items-center justify-between gap-2 text-left data-[placeholder]:text-placeholder max-md:h-10",
           className,
         )}
         {...aria}
@@ -111,7 +112,7 @@ export function Select({
                 value={option.value}
                 disabled={option.disabled}
                 className={cn(
-                  "relative flex cursor-default flex-col rounded-field py-1.5 pr-8 pl-2.5 text-sm outline-none select-none",
+                  "relative flex cursor-default flex-col rounded-field py-1.5 pr-8 pl-2.5 text-sm outline-none select-none max-md:min-h-10 max-md:justify-center",
                   "data-[disabled]:opacity-50 data-[highlighted]:bg-surface-2",
                 )}
               >

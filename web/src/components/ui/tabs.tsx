@@ -1,6 +1,7 @@
 import { motion } from "motion/react";
 import { Tabs as TabsPrimitive } from "radix-ui";
 import { useId, type ComponentProps, type ReactNode } from "react";
+import { NavLink } from "react-router";
 import { cn } from "@/lib/cn";
 import { spring } from "@/components/motion/presets";
 
@@ -50,5 +51,61 @@ export function TabsList({
         </TabsPrimitive.Trigger>
       ))}
     </TabsPrimitive.List>
+  );
+}
+
+type TabLinkItem = { to: string; label: ReactNode; count?: number; end?: boolean };
+
+/**
+ * Route-based sections that look like tabs (e.g. settings). They are links — each section has
+ * its own URL — so they are marked up as navigation with `aria-current`, not as ARIA tabs.
+ */
+export function TabLinks({
+  items,
+  label,
+  className,
+}: {
+  items: TabLinkItem[];
+  label: string;
+  className?: string;
+}) {
+  const layoutId = useId();
+  return (
+    <nav aria-label={label} className={cn("relative border-b border-line", className)}>
+      <ul className="-mb-px flex gap-1 overflow-x-auto">
+        {items.map((item) => (
+          <li key={item.to} className="shrink-0">
+            <NavLink
+              to={item.to}
+              end={item.end}
+              className={({ isActive }) =>
+                cn(
+                  "relative inline-flex h-10 items-center gap-2 rounded-t-field px-3 text-sm font-medium transition-colors max-md:h-11 max-sm:px-2.5",
+                  isActive ? "text-ink" : "text-muted hover:text-ink",
+                )
+              }
+            >
+              {({ isActive }) => (
+                <>
+                  {item.label}
+                  {item.count !== undefined ? (
+                    <span className="hidden rounded-full bg-surface-2 px-1.5 text-xs text-muted tabular-nums sm:inline">
+                      {item.count}
+                    </span>
+                  ) : null}
+                  {isActive ? (
+                    <motion.span
+                      layoutId={layoutId}
+                      transition={spring.layout}
+                      className="absolute inset-x-1 bottom-0 h-0.5 rounded-full bg-brand"
+                    />
+                  ) : null}
+                </>
+              )}
+            </NavLink>
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }

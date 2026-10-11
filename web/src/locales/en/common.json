@@ -128,7 +128,8 @@
       "owner": "Owner",
       "admin": "Admin",
       "member": "Member",
-      "viewer": "Viewer"
+      "viewer": "Viewer",
+      "label": "Role"
     }
   },
   "errors": {
@@ -159,7 +160,8 @@
   "form": {
     "required": "required",
     "showPassword": "Show password",
-    "hidePassword": "Hide password"
+    "hidePassword": "Hide password",
+    "capsLock": "Caps Lock is on"
   },
   "confirm": {
     "typeName": "Type “{{name}}” to confirm"

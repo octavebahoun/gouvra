@@ -56,6 +56,21 @@ export function Dialog({
               <DialogPrimitive.Content
                 asChild
                 forceMount
+                onOpenAutoFocus={(event) => {
+                  // Start where the work is: a marked control, else the first field, else the
+                  // least destructive footer action (Cancel) — never the close button.
+                  const root = event.currentTarget as HTMLElement | null;
+                  const target =
+                    root?.querySelector<HTMLElement>("[data-autofocus]") ??
+                    root?.querySelector<HTMLElement>(
+                      "input:not([type=hidden]):not([disabled]), textarea, select, [role=combobox]",
+                    ) ??
+                    root?.querySelector<HTMLElement>("[data-dialog-footer] button:not([disabled])");
+                  if (target) {
+                    event.preventDefault();
+                    target.focus();
+                  }
+                }}
                 onEscapeKeyDown={(event) => {
                   if (!dismissible) event.preventDefault();
                 }}
@@ -103,7 +118,10 @@ export function Dialog({
                     <div className="min-h-0 flex-1 overflow-y-auto px-6 py-2">{children}</div>
                   ) : null}
                   {footer ? (
-                    <div className="flex flex-col-reverse gap-2 border-t border-line bg-surface-2/50 px-6 py-3 sm:flex-row sm:justify-end">
+                    <div
+                      data-dialog-footer
+                      className="flex flex-col-reverse gap-2 border-t border-line bg-surface-2/50 px-6 py-3 sm:flex-row sm:justify-end"
+                    >
                       {footer}
                     </div>
                   ) : null}

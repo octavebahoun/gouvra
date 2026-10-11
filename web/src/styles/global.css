@@ -117,6 +117,60 @@
   }
 }
 
+/* Auth "control room" visual: slow, calm loops (all neutralised by prefers-reduced-motion). */
+@keyframes gv-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(-24px, 18px, 0);
+  }
+}
+
+@keyframes gv-trace-step {
+  0%,
+  8% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+  14%,
+  82% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  92%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes gv-stream {
+  0% {
+    transform: scaleX(0.08);
+  }
+  70%,
+  100% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes gv-travel {
+  from {
+    offset-distance: 0%;
+    opacity: 0;
+  }
+  15%,
+  85% {
+    opacity: 1;
+  }
+  to {
+    offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
@@ -160,6 +214,11 @@
 
   [hidden] {
     display: none !important;
+  }
+
+  /* Headings receive focus programmatically after a navigation; they aren't controls. */
+  h1[tabindex="-1"]:focus {
+    outline: none;
   }
 }
 

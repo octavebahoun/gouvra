@@ -1,0 +1,107 @@
+{
+  "title": "Profil et préférences",
+  "description": "Vos informations, la sécurité de votre connexion et vos préférences. Elles s'appliquent à tous vos workspaces.",
+  "profile": {
+    "title": "Profil",
+    "description": "Ce que voient les membres de vos workspaces.",
+    "displayName": "Nom affiché",
+    "nameRequired": "Saisissez votre nom.",
+    "nameTooLong": "80 caractères maximum.",
+    "save": "Enregistrer",
+    "saved": "Profil mis à jour"
+  },
+  "email": {
+    "title": "Adresse de connexion",
+    "description": "L'adresse avec laquelle vous vous connectez et où Gouvra envoie les e-mails liés à votre compte.",
+    "verified": "Vérifiée",
+    "unverified": "Non vérifiée",
+    "change": "Changer d'adresse",
+    "dialogTitle": "Changer votre adresse de connexion",
+    "dialogBody": "Nous enverrons un lien de confirmation à la nouvelle adresse. L'adresse actuelle reste active jusqu'à la confirmation.",
+    "newEmail": "Nouvelle adresse e-mail",
+    "password": "Mot de passe actuel",
+    "passwordHelp": "Pour confirmer que c'est bien vous.",
+    "submit": "Envoyer le lien de confirmation",
+    "sent": "Lien de confirmation envoyé à {{email}}",
+    "sentBody": "Ouvrez-le dans les 24 heures pour terminer le changement.",
+    "passwordRequired": "Définissez d'abord un mot de passe : il est nécessaire pour changer d'adresse de connexion.",
+    "unchanged": "C'est déjà votre adresse de connexion.",
+    "wrongPassword": "Ce mot de passe est incorrect."
+  },
+  "password": {
+    "title": "Mot de passe",
+    "changeDescription": "Changer de mot de passe ferme vos autres sessions.",
+    "setDescription": "Vous vous connectez actuellement avec {{providers}}. Définissez un mot de passe pour pouvoir aussi vous connecter avec votre adresse e-mail.",
+    "setDescriptionNoProvider": "Définissez un mot de passe pour vous connecter avec votre adresse e-mail.",
+    "change": "Changer le mot de passe",
+    "set": "Définir un mot de passe",
+    "changeTitle": "Changer votre mot de passe",
+    "setTitle": "Définir un mot de passe",
+    "current": "Mot de passe actuel",
+    "currentRequired": "Saisissez votre mot de passe actuel.",
+    "wrongCurrent": "Le mot de passe actuel est incorrect.",
+    "submitChange": "Changer le mot de passe",
+    "submitSet": "Définir le mot de passe",
+    "changed": "Mot de passe modifié",
+    "changedBody": "Vos autres sessions ont été fermées.",
+    "setDone": "Mot de passe défini",
+    "setDoneBody": "Vous pouvez désormais aussi vous connecter avec votre adresse e-mail."
+  },
+  "connections": {
+    "title": "Comptes connectés",
+    "description": "Les fournisseurs de connexion liés à votre compte.",
+    "connected": "Connecté",
+    "notConnected": "Non connecté",
+    "howToLink": "Pour lier un fournisseur, connectez-vous avec lui depuis la page de connexion en utilisant la même adresse vérifiée.",
+    "none": "Aucun fournisseur de connexion n'est activé sur cette instance."
+  },
+  "preferences": {
+    "title": "Préférences",
+    "description": "Enregistrées dans votre profil et appliquées sur tous vos appareils.",
+    "theme": "Thème",
+    "themeDescriptions": {
+      "light": "Des surfaces claires",
+      "dark": "Plus reposant le soir",
+      "system": "Suit votre appareil"
+    },
+    "language": "Langue"
+  },
+  "sessions": {
+    "title": "Sessions actives",
+    "description": "Les appareils sur lesquels vous êtes connecté. Déconnectez ceux que vous ne reconnaissez pas.",
+    "thisDevice": "Cet appareil",
+    "activeNow": "Actif maintenant",
+    "lastActive": "Actif {{time}}",
+    "signedIn": "Connecté {{time}}",
+    "method": {
+      "password": "mot de passe",
+      "email_link": "lien e-mail",
+      "github": "GitHub",
+      "google": "Google"
+    },
+    "via": "par {{method}}",
+    "unknownIp": "IP inconnue",
+    "unknownDevice": "Appareil inconnu",
+    "unknownBrowser": "Navigateur inconnu",
+    "unknownOs": "système inconnu",
+    "device": "{{browser}} sur {{os}}",
+    "revoke": "Déconnecter",
+    "revokeLabel": "Déconnecter {{device}}",
+    "revokeDialogTitle": "Déconnecter {{device}} ?",
+    "revokeDialogBody": "Cet appareil devra se reconnecter.",
+    "revokeConfirm": "Déconnecter l'appareil",
+    "revoked": "{{device}} a été déconnecté",
+    "revokeOthers": "Déconnecter les autres sessions",
+    "revokeOthersDialogTitle": "Déconnecter toutes les autres sessions ?",
+    "revokeOthersDialogBody": "Tous les appareils, sauf celui-ci, devront se reconnecter.",
+    "revokeOthersConfirm": "Déconnecter les autres sessions",
+    "revokedOthers_one": "{{count}} session déconnectée",
+    "revokedOthers_other": "{{count}} sessions déconnectées",
+    "onlyThis": "C'est votre seule session active.",
+    "loadError": "Vos sessions sont indisponibles pour le moment."
+  },
+  "security": {
+    "title": "Connexion et sécurité",
+    "description": "Votre adresse de connexion et votre mot de passe."
+  }
+}

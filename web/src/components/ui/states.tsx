@@ -11,6 +11,8 @@ import { CopyButton } from "./copy-button";
 
 type EmptyStateProps = {
   title: ReactNode;
+  /** h1 when the state is the whole page (404, access denied), h2 inside a page. */
+  headingLevel?: "h1" | "h2";
   description?: ReactNode;
   action?: ReactNode;
   secondaryAction?: ReactNode;
@@ -27,8 +29,10 @@ export function EmptyState({
   secondaryAction,
   illustration = "empty",
   compact = false,
+  headingLevel = "h2",
   className,
 }: EmptyStateProps) {
+  const Heading = headingLevel;
   return (
     <motion.div
       variants={fadeUp}
@@ -42,7 +46,12 @@ export function EmptyState({
     >
       {!compact ? <Illustration name={illustration} className="h-28 w-40" /> : null}
       <div className="max-w-md space-y-1.5">
-        <h2 className={cn("font-semibold text-ink", compact ? "text-sm" : "text-base")}>{title}</h2>
+        <Heading
+          tabIndex={headingLevel === "h1" ? -1 : undefined}
+          className={cn("font-semibold text-ink", compact ? "text-sm" : "text-base")}
+        >
+          {title}
+        </Heading>
         {description ? (
           <p className="text-[13px] leading-relaxed text-muted">{description}</p>
         ) : null}
@@ -146,10 +155,12 @@ export function NotFoundState({
   className,
   compact = false,
   action,
+  headingLevel,
 }: {
   className?: string;
   compact?: boolean;
   action?: ReactNode;
+  headingLevel?: "h1" | "h2";
 }) {
   const { t } = useTranslation();
   return (
@@ -157,6 +168,7 @@ export function NotFoundState({
       className={className}
       compact={compact}
       illustration="not-found"
+      headingLevel={headingLevel}
       title={
         <span className="inline-flex items-center gap-2">
           {compact ? <SearchX aria-hidden className="size-4 text-muted" /> : null}

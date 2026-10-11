@@ -1,26 +1,62 @@
 import { ApiError, NetworkError, toProblem } from "./errors";
 
 export const API_BASE = "/api/v1";
-const CSRF_COOKIE = "gv_csrf";
+/**
+ * The API names its cookies `__Host-gv_*` when they are `Secure` (production and the local
+ * Docker stack) and `gv_*` otherwise (plain-HTTP development).
+ */
+const CSRF_COOKIES = ["__Host-gv_csrf", "gv_csrf"] as const;
 const UNSAFE = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
 export function readCsrfToken(): string | null {
-  const match = document.cookie.split("; ").find((part) => part.startsWith(`${CSRF_COOKIE}=`));
-  return match ? decodeURIComponent(match.slice(CSRF_COOKIE.length + 1)) : null;
+  const parts = document.cookie.split("; ");
+  for (const name of CSRF_COOKIES) {
+    const match = parts.find((part) => part.startsWith(`${name}=`));
+    if (match) return decodeURIComponent(match.slice(name.length + 1));
+  }
+  return null;
 }
 
-/** Listeners notified when the API answers 401 (session expired) — the auth layer redirects. */
+/**
+ * Listeners notified when a signed-in request answers 401 `unauthorized` (session expired or
+ * revoked). Wrong credentials (`invalid_credentials`) and the session probe itself never count.
+ */
 const unauthorizedListeners = new Set<() => void>();
 export function onUnauthorized(listener: () => void): () => void {
   unauthorizedListeners.add(listener);
   return () => unauthorizedListeners.delete(listener);
 }
 
+/** Listeners notified on 403 `email_not_verified`: the session must be refreshed. */
+const unverifiedListeners = new Set<() => void>();
+export function onEmailNotVerified(listener: () => void): () => void {
+  unverifiedListeners.add(listener);
+  return () => unverifiedListeners.delete(listener);
+}
+
+/** `/auth/*` answers describe the sign-in attempt itself, not an expired session. */
+function isAuthEndpoint(url: string): boolean {
+  return new URL(url, window.location.origin).pathname.startsWith(`${API_BASE}/auth/`);
+}
+
+/** Inspect an API error response and notify the session layer when it concerns the session. */
+export function reportAuthProblem(url: string, status: number, code: string | undefined): void {
+  if (status === 401 && code === "unauthorized" && !isAuthEndpoint(url)) {
+    unauthorizedListeners.forEach((listener) => {
+      listener();
+    });
+  } else if (status === 403 && code === "email_not_verified") {
+    unverifiedListeners.forEach((listener) => {
+      listener();
+    });
+  }
+}
+
 /** Track API reachability for the global "API unavailable" banner. */
-type Reachability = "ok" | "down";
+export type Reachability = "ok" | "down";
 let reachability: Reachability = "ok";
 const reachabilityListeners = new Set<() => void>();
-function setReachability(next: Reachability): void {
+export function setReachability(next: Reachability): void {
   if (next !== reachability) {
     reachability = next;
     reachabilityListeners.forEach((listener) => {
@@ -34,6 +70,11 @@ export function getReachability(): Reachability {
 export function subscribeReachability(listener: () => void): () => void {
   reachabilityListeners.add(listener);
   return () => reachabilityListeners.delete(listener);
+}
+
+/** A gateway error means the API behind the proxy is down; any other answer means it is up. */
+export function reportStatus(status: number): void {
+  setReachability(status === 502 || status === 503 || status === 504 ? "down" : "ok");
 }
 
 export type RequestOptions = {
@@ -76,9 +117,10 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
   if (options.idempotencyKey) headers["Idempotency-Key"] = options.idempotencyKey;
 
+  const url = buildUrl(path, options.query);
   let response: Response;
   try {
-    response = await fetch(buildUrl(path, options.query), {
+    response = await fetch(url, {
       method,
       headers,
       body,
@@ -91,11 +133,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
     throw new NetworkError(error);
   }
 
-  if (response.status === 502 || response.status === 503 || response.status === 504) {
-    setReachability("down");
-  } else {
-    setReachability("ok");
-  }
+  reportStatus(response.status);
 
   if (response.status === 204) return undefined as T;
   const isJson = (response.headers.get("content-type") ?? "").includes("json");
@@ -103,11 +141,7 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
 
   if (!response.ok) {
     const error = new ApiError(toProblem(response.status, payload));
-    if (response.status === 401) {
-      unauthorizedListeners.forEach((listener) => {
-        listener();
-      });
-    }
+    reportAuthProblem(url, response.status, error.code);
     throw error;
   }
   return payload as T;

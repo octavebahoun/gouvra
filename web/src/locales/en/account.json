@@ -1,0 +1,107 @@
+{
+  "title": "Profile & preferences",
+  "description": "Your details, sign-in security and preferences. They apply to every workspace you belong to.",
+  "profile": {
+    "title": "Profile",
+    "description": "How you appear to your teammates.",
+    "displayName": "Display name",
+    "nameRequired": "Enter your name.",
+    "nameTooLong": "Use 80 characters or fewer.",
+    "save": "Save",
+    "saved": "Profile updated"
+  },
+  "email": {
+    "title": "Sign-in address",
+    "description": "The address you sign in with and where Gouvra sends account e-mails.",
+    "verified": "Verified",
+    "unverified": "Not verified",
+    "change": "Change address",
+    "dialogTitle": "Change your sign-in address",
+    "dialogBody": "We'll send a confirmation link to the new address. Your current address keeps working until you confirm.",
+    "newEmail": "New e-mail address",
+    "password": "Current password",
+    "passwordHelp": "Confirms it's really you.",
+    "submit": "Send confirmation link",
+    "sent": "Confirmation link sent to {{email}}",
+    "sentBody": "Open it within 24 hours to finish the change.",
+    "passwordRequired": "Set a password first: changing your sign-in address requires one.",
+    "unchanged": "This is already your sign-in address.",
+    "wrongPassword": "This password is incorrect."
+  },
+  "password": {
+    "title": "Password",
+    "changeDescription": "Changing your password signs out your other sessions.",
+    "setDescription": "You currently sign in with {{providers}}. Set a password to also sign in with your e-mail address.",
+    "setDescriptionNoProvider": "Set a password to sign in with your e-mail address.",
+    "change": "Change password",
+    "set": "Set a password",
+    "changeTitle": "Change your password",
+    "setTitle": "Set a password",
+    "current": "Current password",
+    "currentRequired": "Enter your current password.",
+    "wrongCurrent": "The current password is incorrect.",
+    "submitChange": "Change password",
+    "submitSet": "Set password",
+    "changed": "Password changed",
+    "changedBody": "Your other sessions were signed out.",
+    "setDone": "Password set",
+    "setDoneBody": "You can now also sign in with your e-mail address."
+  },
+  "connections": {
+    "title": "Connected accounts",
+    "description": "Sign-in providers linked to your account.",
+    "connected": "Connected",
+    "notConnected": "Not connected",
+    "howToLink": "To link a provider, sign in with it from the sign-in page using the same verified address.",
+    "none": "No sign-in provider is enabled on this instance."
+  },
+  "preferences": {
+    "title": "Preferences",
+    "description": "Saved to your profile and applied on every device you use.",
+    "theme": "Theme",
+    "themeDescriptions": {
+      "light": "Bright surfaces",
+      "dark": "Easier on the eyes at night",
+      "system": "Follows your device"
+    },
+    "language": "Language"
+  },
+  "sessions": {
+    "title": "Active sessions",
+    "description": "Devices where you're signed in. Sign out of any you don't recognise.",
+    "thisDevice": "This device",
+    "activeNow": "Active now",
+    "lastActive": "Active {{time}}",
+    "signedIn": "Signed in {{time}}",
+    "method": {
+      "password": "password",
+      "email_link": "e-mail link",
+      "github": "GitHub",
+      "google": "Google"
+    },
+    "via": "with {{method}}",
+    "unknownIp": "Unknown IP",
+    "unknownDevice": "Unknown device",
+    "unknownBrowser": "Unknown browser",
+    "unknownOs": "unknown system",
+    "device": "{{browser}} on {{os}}",
+    "revoke": "Sign out",
+    "revokeLabel": "Sign out {{device}}",
+    "revokeDialogTitle": "Sign out {{device}}?",
+    "revokeDialogBody": "That device will need to sign in again.",
+    "revokeConfirm": "Sign out device",
+    "revoked": "{{device}} was signed out",
+    "revokeOthers": "Sign out other sessions",
+    "revokeOthersDialogTitle": "Sign out all other sessions?",
+    "revokeOthersDialogBody": "Every device except this one will need to sign in again.",
+    "revokeOthersConfirm": "Sign out other sessions",
+    "revokedOthers_one": "{{count}} session signed out",
+    "revokedOthers_other": "{{count}} sessions signed out",
+    "onlyThis": "This is your only active session.",
+    "loadError": "Your sessions are unavailable right now."
+  },
+  "security": {
+    "title": "Sign-in & security",
+    "description": "Your sign-in address and password."
+  }
+}

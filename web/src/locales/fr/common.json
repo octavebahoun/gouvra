@@ -128,7 +128,8 @@
       "owner": "Propriétaire",
       "admin": "Admin",
       "member": "Membre",
-      "viewer": "Lecteur"
+      "viewer": "Lecteur",
+      "label": "Rôle"
     }
   },
   "errors": {
@@ -159,7 +160,8 @@
   "form": {
     "required": "obligatoire",
     "showPassword": "Afficher le mot de passe",
-    "hidePassword": "Masquer le mot de passe"
+    "hidePassword": "Masquer le mot de passe",
+    "capsLock": "Verr. Maj. activé"
   },
   "confirm": {
     "typeName": "Saisissez « {{name}} » pour confirmer"

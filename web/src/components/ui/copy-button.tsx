@@ -75,11 +75,26 @@ export function CopyButton({
   );
 }
 
-/** Monospace identifier, shortened for display, copyable in full. */
-export function IdChip({ id, label, chars = 8 }: { id: string; label: string; chars?: number }) {
+/**
+ * Monospace identifier, shortened for display, copyable in full. Time-ordered ids (request ids)
+ * share their beginning, so they read better from the end.
+ */
+export function IdChip({
+  id,
+  label,
+  chars = 8,
+  from = "start",
+}: {
+  id: string;
+  label: string;
+  chars?: number;
+  from?: "start" | "end";
+}) {
+  const shown =
+    id.length <= chars ? id : from === "end" ? `…${id.slice(-chars)}` : id.slice(0, chars);
   return (
     <span className="inline-flex items-center gap-0.5 rounded-field bg-surface-2 pl-2 font-mono text-xs text-muted">
-      <span title={id}>{id.slice(0, chars)}</span>
+      <span title={id}>{shown}</span>
       <CopyButton value={id} label={label} size="xs" />
     </span>
   );

@@ -1,0 +1,103 @@
+{
+  "session": {
+    "expired": "Your session has ended. Sign in again to continue.",
+    "loadError": "We couldn't check your session"
+  },
+  "preferences": {
+    "saveFailed": "Couldn't save this preference to your profile. It still applies on this device."
+  },
+  "language": {
+    "label": "Language",
+    "current": "Language: {{language}}"
+  },
+  "signOut": {
+    "failed": "Couldn't sign you out. Check your connection and try again."
+  },
+  "workspace": {
+    "switched": "Now working in {{name}}",
+    "switchedDescription": "Pages, members and settings now belong to this workspace.",
+    "notFoundTitle": "Workspace not found",
+    "notFoundBody": "It doesn't exist, or you're not a member of it.",
+    "backToWorkspaces": "Go to my workspaces",
+    "demo": "Demo",
+    "none": "No workspace yet"
+  },
+  "createWorkspace": {
+    "title": "Create a workspace",
+    "description": "A workspace groups agents, providers, members and usage. You'll be its owner.",
+    "submit": "Create workspace",
+    "created": "{{name}} is ready",
+    "createdDescription": "You're its owner. Invite your teammates from the settings."
+  },
+  "overview": {
+    "title": "Overview",
+    "description": "Welcome, {{name}}. Here's what's happening in {{workspace}}.",
+    "activityTitle": "Recent executions",
+    "activityEmptyTitle": "No executions yet",
+    "activityEmptyBody": "Once agents run in this workspace, their latest executions appear here with status, duration and estimated cost — each one linked to its trace.",
+    "aboutTitle": "This workspace",
+    "yourRole": "Your role",
+    "members": "Members",
+    "created": "Created",
+    "url": "Address",
+    "manageMembers": "Manage members",
+    "openSettings": "Workspace settings",
+    "detailsError": "Workspace details are unavailable right now."
+  },
+  "sections": {
+    "notAvailable": "Not available yet",
+    "agents": {
+      "description": "Agents combine instructions, a model and the tools they're allowed to use.",
+      "emptyTitle": "Agents aren't available in this version yet",
+      "emptyBody": "This page will list your agents with their model, status and last execution, and let you create, version and archive them."
+    },
+    "executions": {
+      "description": "Every run of an agent, with its live state, trace, duration and cost.",
+      "emptyTitle": "Executions aren't available in this version yet",
+      "emptyBody": "This page will list executions with filters by agent, status and date, and open each trace step by step."
+    },
+    "tools": {
+      "description": "Tools your agents can call, with their schema and permissions.",
+      "emptyTitle": "Tools aren't available in this version yet",
+      "emptyBody": "This page will list built-in and custom tools, their JSON schema and which agents may use them, with a controlled test run."
+    },
+    "workflows": {
+      "description": "Multi-step sequences that chain agents and checks.",
+      "emptyTitle": "Workflows aren't available in this version yet",
+      "emptyBody": "This page will hold the visual editor for multi-step workflows and the live view of their runs."
+    },
+    "evaluations": {
+      "description": "Test suites that score agent versions against expected results.",
+      "emptyTitle": "Evaluations aren't available in this version yet",
+      "emptyBody": "This page will hold test suites, cases and scoring criteria, and compare results between agent versions."
+    },
+    "automations": {
+      "description": "Scheduled runs and signed webhook triggers.",
+      "emptyTitle": "Automations aren't available in this version yet",
+      "emptyBody": "This page will list recurring schedules and webhook triggers that start executions automatically."
+    },
+    "usage": {
+      "description": "Tokens and costs by provider, agent and period.",
+      "emptyTitle": "Usage isn't available in this version yet",
+      "emptyBody": "This page will break down tokens and costs — reported by providers or estimated — with budgets and quotas."
+    },
+    "providers": {
+      "description": "Model providers configured for this workspace.",
+      "emptyTitle": "Providers aren't available in this version yet",
+      "emptyBody": "This page will let admins connect providers such as DeepSeek or Anthropic, store their keys encrypted, test the connection and pick a default model."
+    },
+    "connectors": {
+      "description": "Ready-made integrations with external services.",
+      "emptyTitle": "Connectors aren't available in this version yet",
+      "emptyBody": "This page will list connectors your agents and workflows can use, and their configuration."
+    },
+    "registry": {
+      "description": "The catalogue of models and tools known to this instance.",
+      "emptyTitle": "The registry isn't available in this version yet",
+      "emptyBody": "This page will list models with their capabilities and prices, and the tools available to every workspace."
+    }
+  },
+  "account": {
+    "backToApp": "Back to the app"
+  }
+}

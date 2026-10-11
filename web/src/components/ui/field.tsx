@@ -1,4 +1,4 @@
-import { CircleAlert, Eye, EyeOff } from "lucide-react";
+import { ArrowBigUpDash, CircleAlert, Eye, EyeOff } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import {
   cloneElement,
@@ -8,6 +8,7 @@ import {
   useId,
   useState,
   type ComponentProps,
+  type KeyboardEvent,
   type ReactElement,
   type ReactNode,
 } from "react";
@@ -15,7 +16,13 @@ import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
 import { duration, ease } from "@/components/motion/presets";
 
-type FieldContextValue = { id: string; descriptionId: string; errorId: string; invalid: boolean };
+type FieldContextValue = {
+  id: string;
+  descriptionId: string;
+  hintId: string;
+  errorId: string;
+  invalid: boolean;
+};
 const FieldContext = createContext<FieldContextValue | null>(null);
 
 /** Read the ids of the surrounding <Field> so custom controls can wire ARIA themselves. */
@@ -24,7 +31,7 @@ export function useField(): FieldContextValue | null {
 }
 
 export const controlClass = cn(
-  "block w-full rounded-field border border-line-strong/70 bg-surface px-3 text-sm text-ink shadow-sm",
+  "block w-full rounded-field border border-line-strong/70 bg-surface px-3 text-sm text-ink shadow-sm max-md:text-base",
   "transition-[border-color,box-shadow] duration-150 ease-standard",
   "hover:border-line-strong focus:border-brand focus:shadow-glow focus:outline-none",
   "disabled:cursor-not-allowed disabled:bg-surface-2 disabled:text-muted",
@@ -35,6 +42,8 @@ type FieldProps = {
   label: ReactNode;
   /** Help text shown under the label. */
   description?: ReactNode;
+  /** Help shown under the control (requirements, previews), also linked to the control. */
+  hint?: ReactNode;
   error?: string | null | undefined;
   required?: boolean;
   /** Visually hide the label (it stays available to assistive tech). */
@@ -52,6 +61,7 @@ type FieldProps = {
 export function Field({
   label,
   description,
+  hint,
   error,
   required,
   hideLabel,
@@ -64,9 +74,14 @@ export function Field({
   const childId = isValidElement(children) ? (children.props.id as string | undefined) : undefined;
   const id = childId ?? generated;
   const descriptionId = `${id}-description`;
+  const hintId = `${id}-hint`;
   const errorId = `${id}-error`;
   const invalid = Boolean(error);
-  const describedBy = [description ? descriptionId : null, invalid ? errorId : null]
+  const describedBy = [
+    description ? descriptionId : null,
+    hint ? hintId : null,
+    invalid ? errorId : null,
+  ]
     .filter(Boolean)
     .join(" ");
 
@@ -75,12 +90,13 @@ export function Field({
         id,
         "aria-invalid": invalid || undefined,
         "aria-describedby": describedBy || undefined,
-        "aria-required": required ? true : undefined,
+        // Only set when marked here, so a control can declare aria-required on its own.
+        ...(required ? { "aria-required": true } : {}),
       })
     : children;
 
   return (
-    <FieldContext.Provider value={{ id, descriptionId, errorId, invalid }}>
+    <FieldContext.Provider value={{ id, descriptionId, hintId, errorId, invalid }}>
       <div className={cn("flex flex-col gap-1.5", className)}>
         <div className={cn("flex items-baseline justify-between gap-3", hideLabel && "sr-only")}>
           <label htmlFor={id} className="text-[13px] font-medium text-ink">
@@ -100,6 +116,11 @@ export function Field({
           </p>
         ) : null}
         {control}
+        {hint ? (
+          <div id={hintId} className="text-[13px] text-muted">
+            {hint}
+          </div>
+        ) : null}
         <AnimatePresence initial={false}>
           {invalid ? (
             <motion.p
@@ -126,7 +147,37 @@ export function Field({
 }
 
 export function Input({ className, ...props }: ComponentProps<"input">) {
-  return <input className={cn(controlClass, "h-9", className)} {...props} />;
+  return <input className={cn(controlClass, "h-9 max-md:h-10", className)} {...props} />;
+}
+
+/** Input with a fixed, non-editable prefix (e.g. the host before a workspace URL). */
+export function PrefixedInput({
+  prefix,
+  className,
+  ...props
+}: Omit<ComponentProps<"input">, "prefix"> & { prefix: ReactNode }) {
+  return (
+    <div
+      className={cn(
+        "flex w-full items-stretch overflow-hidden rounded-field border border-line-strong/70 bg-surface shadow-sm",
+        "transition-[border-color,box-shadow] duration-150 ease-standard",
+        "focus-within:border-brand focus-within:shadow-glow hover:border-line-strong",
+        "has-[input:read-only]:bg-surface-2 has-[input[aria-invalid=true]]:border-danger",
+      )}
+    >
+      <span className="flex shrink-0 items-center border-r border-line bg-surface-2 px-3 font-mono text-[13px] text-muted select-none">
+        {prefix}
+      </span>
+      <input
+        className={cn(
+          "h-9 min-w-0 flex-1 bg-transparent px-3 text-sm text-ink outline-none max-md:h-10 max-md:text-base",
+          "read-only:text-muted",
+          className,
+        )}
+        {...props}
+      />
+    </div>
+  );
 }
 
 export function Textarea({ className, rows = 4, ...props }: ComponentProps<"textarea">) {
@@ -139,31 +190,76 @@ export function Textarea({ className, rows = 4, ...props }: ComponentProps<"text
   );
 }
 
-export function PasswordInput({ className, ...props }: Omit<ComponentProps<"input">, "type">) {
+/**
+ * Password control with a show/hide toggle and a Caps Lock warning (shown while typing with
+ * Caps Lock on, announced politely).
+ */
+export function PasswordInput({
+  className,
+  onKeyDown,
+  onKeyUp,
+  onBlur,
+  ...props
+}: Omit<ComponentProps<"input">, "type">) {
   const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
+  const [capsLock, setCapsLock] = useState(false);
+  const detect = (event: KeyboardEvent<HTMLInputElement>) => {
+    setCapsLock(event.getModifierState("CapsLock"));
+  };
   return (
-    <div className="relative">
-      <input
-        type={visible ? "text" : "password"}
-        className={cn(controlClass, "h-9 pr-10", className)}
-        autoCapitalize="none"
-        spellCheck={false}
-        {...props}
-      />
-      <button
-        type="button"
-        onClick={() => setVisible((v) => !v)}
-        className="absolute inset-y-0 right-0 flex w-9 items-center justify-center rounded-r-field text-muted transition-colors hover:text-ink"
-        aria-label={visible ? t("form.hidePassword") : t("form.showPassword")}
-        aria-pressed={visible}
-      >
-        {visible ? (
-          <EyeOff aria-hidden className="size-4" />
-        ) : (
-          <Eye aria-hidden className="size-4" />
-        )}
-      </button>
+    <div>
+      <div className="relative">
+        <input
+          type={visible ? "text" : "password"}
+          className={cn(controlClass, "h-9 pr-11 max-md:h-10", className)}
+          autoCapitalize="none"
+          autoCorrect="off"
+          spellCheck={false}
+          onKeyDown={(event) => {
+            detect(event);
+            onKeyDown?.(event);
+          }}
+          onKeyUp={(event) => {
+            detect(event);
+            onKeyUp?.(event);
+          }}
+          onBlur={(event) => {
+            setCapsLock(false);
+            onBlur?.(event);
+          }}
+          {...props}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          className="absolute inset-y-0 right-0 flex w-10 items-center justify-center rounded-r-field text-muted transition-colors hover:text-ink"
+          aria-label={visible ? t("form.hidePassword") : t("form.showPassword")}
+          aria-pressed={visible}
+        >
+          {visible ? (
+            <EyeOff aria-hidden className="size-4" />
+          ) : (
+            <Eye aria-hidden className="size-4" />
+          )}
+        </button>
+      </div>
+      <div aria-live="polite">
+        <AnimatePresence initial={false}>
+          {capsLock ? (
+            <motion.p
+              key="caps"
+              className="mt-1.5 flex items-center gap-1.5 text-[13px] font-medium text-warning-text"
+              initial={{ opacity: 0, y: -3 }}
+              animate={{ opacity: 1, y: 0, transition: { duration: duration.fast } }}
+              exit={{ opacity: 0, transition: { duration: 0.1 } }}
+            >
+              <ArrowBigUpDash aria-hidden className="size-4 shrink-0" />
+              {t("form.capsLock")}
+            </motion.p>
+          ) : null}
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

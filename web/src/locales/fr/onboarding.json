@@ -1,0 +1,88 @@
+{
+  "title": "Configurer Gouvra",
+  "progressLabel": "Étapes de configuration",
+  "stepOf": "Étape {{current}} sur {{total}}",
+  "steps": {
+    "welcome": "Bienvenue",
+    "workspace": "Workspace",
+    "invite": "Équipe",
+    "checklist": "Checklist"
+  },
+  "welcome": {
+    "title": "Bienvenue sur Gouvra, {{name}}",
+    "body": "Gouvra est l'endroit où votre équipe construit ses agents IA, les exécute et garde un œil sur chaque étape, chaque erreur et chaque coût.",
+    "workspaceTitle": "Tout commence par un workspace",
+    "points": {
+      "agents": "Vos agents, les outils qu'ils peuvent utiliser et leurs exécutions",
+      "providers": "Les fournisseurs de modèles et leurs clés chiffrées",
+      "team": "Les membres, leurs rôles et les clés de service"
+    },
+    "start": "Créer mon workspace",
+    "existing": "Revenir à {{name}}"
+  },
+  "workspace": {
+    "title": "Nommez votre workspace",
+    "subtitle": "En général, votre équipe, votre entreprise ou votre projet. Vous pourrez le renommer à tout moment.",
+    "submit": "Créer le workspace",
+    "submitting": "Création…"
+  },
+  "invite": {
+    "title": "Invitez vos collègues",
+    "subtitle": "Facultatif. Ils recevront un e-mail avec un lien pour rejoindre {{workspace}}. Vous pourrez aussi inviter du monde plus tard depuis les paramètres du workspace.",
+    "skip": "Passer pour l'instant",
+    "continue": "Continuer",
+    "allSent": "Invitations envoyées. Continuez quand vous êtes prêt."
+  },
+  "checklist": {
+    "title": "Préparez votre workspace",
+    "subtitle": "Quelques étapes jusqu'à votre première exécution tracée.",
+    "progress": "Étapes obligatoires terminées : {{completed}} sur {{total}}",
+    "complete": "La configuration obligatoire est terminée",
+    "completeBody": "Les étapes facultatives restent disponibles quand vous en avez besoin.",
+    "optional": "Facultatif",
+    "done": "Terminé",
+    "todo": "À faire",
+    "dismiss": "Masquer la checklist",
+    "dismissed": "Checklist masquée",
+    "dismissFailed": "Impossible de masquer la checklist. Réessayez.",
+    "dismissNoPermission": "Seuls les administrateurs et le propriétaire peuvent masquer la checklist.",
+    "loadError": "La checklist est indisponible pour le moment.",
+    "goToWorkspace": "Aller dans {{workspace}}",
+    "items": {
+      "create_workspace": {
+        "title": "Créer un workspace",
+        "description": "Le point de départ de vos agents, fournisseurs et collègues.",
+        "cta": "Ouvrir les paramètres"
+      },
+      "invite_teammate": {
+        "title": "Inviter un collègue",
+        "description": "Partagez le workspace et choisissez ce que chacun peut faire.",
+        "cta": "Inviter des personnes"
+      },
+      "configure_provider": {
+        "title": "Connecter un fournisseur de modèles",
+        "description": "Ajoutez un fournisseur comme DeepSeek ou Anthropic et choisissez un modèle par défaut.",
+        "cta": "Connecter un fournisseur"
+      },
+      "create_agent": {
+        "title": "Créer votre premier agent",
+        "description": "Donnez-lui des instructions, un modèle et les outils qu'il peut utiliser.",
+        "cta": "Créer un agent"
+      },
+      "run_execution": {
+        "title": "Lancer une exécution",
+        "description": "Lancez votre agent et suivez sa trace en direct.",
+        "cta": "Lancer un agent"
+      },
+      "fallback": {
+        "title": "Terminer « {{name}} »",
+        "description": "Terminez cette étape pour compléter la configuration.",
+        "cta": "Ouvrir"
+      }
+    }
+  },
+  "checklistStep": {
+    "title": "{{workspace}} est prêt",
+    "subtitle": "Voici ce qu'il reste à faire avant votre première exécution tracée. Vous retrouverez cette checklist dans la vue d'ensemble."
+  }
+}
