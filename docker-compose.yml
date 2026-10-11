@@ -36,6 +36,7 @@ x-app: &app
     STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
     SANDBOX_URL: http://sandbox:8090
     SANDBOX_TOKEN: ${SANDBOX_TOKEN:?run scripts/gen-secrets}
+    DEMO_PASSWORD: ${DEMO_PASSWORD:-}
     TRUSTED_PROXY_HOPS: "1"
     # Extra browser origins allowed to call the API (Vite dev server on :5173 in development).
     CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
@@ -92,6 +93,19 @@ services:
       disable: true
     depends_on:
       postgres:
+        condition: service_healthy
+
+  # Creates the demo account and workspace once (idempotent). Credentials: DEMO_PASSWORD in .env.
+  seed:
+    <<: *app
+    restart: "no"
+    command: ["gouvra", "seed-demo"]
+    healthcheck:
+      disable: true
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      valkey:
         condition: service_healthy
 
   api:

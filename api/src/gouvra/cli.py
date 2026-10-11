@@ -39,6 +39,39 @@ def cmd_export_openapi(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_rotate_secrets(_: argparse.Namespace) -> int:
+    import asyncio
+
+    from gouvra.core.rotation import rotate_secrets
+
+    report = asyncio.run(rotate_secrets())
+    sys.stdout.write(
+        f"Secrets checked: {report.checked}, re-encrypted: {report.rotated},"
+        f" failed: {report.failed}\n"
+    )
+    if report.failed:
+        sys.stdout.write(
+            "Some secrets could not be decrypted: keep their old key in ENCRYPTION_KEYS.\n"
+        )
+    return 1 if report.failed else 0
+
+
+def cmd_create_superadmin(args: argparse.Namespace) -> int:
+    import asyncio
+
+    from gouvra.modules.admin.bootstrap import promote_superadmin
+
+    return asyncio.run(promote_superadmin(args.email))
+
+
+def cmd_seed_demo(args: argparse.Namespace) -> int:
+    import asyncio
+
+    from gouvra.seed import seed_demo
+
+    return asyncio.run(seed_demo(with_real_runs=not args.offline))
+
+
 def cmd_check_config(args: argparse.Namespace) -> int:
     from gouvra.core.config_check import main as check_main
 
@@ -56,6 +89,19 @@ def main(argv: list[str] | None = None) -> int:
     export = sub.add_parser("export-openapi", help="Write the OpenAPI schema to a file")
     export.add_argument("--output", default="openapi.json")
     export.set_defaults(func=cmd_export_openapi)
+
+    rotate = sub.add_parser("rotate-secrets", help="Re-encrypt stored secrets with the active key")
+    rotate.set_defaults(func=cmd_rotate_secrets)
+
+    superadmin = sub.add_parser("create-superadmin", help="Grant instance administration to a user")
+    superadmin.add_argument("email")
+    superadmin.set_defaults(func=cmd_create_superadmin)
+
+    seed = sub.add_parser("seed-demo", help="Create the demo account and sample workspace")
+    seed.add_argument(
+        "--offline", action="store_true", help="only scripted runs (no provider calls)"
+    )
+    seed.set_defaults(func=cmd_seed_demo)
 
     check = sub.add_parser("check-config", help="Verify configuration (never prints secret values)")
     check.add_argument("--live", action="store_true", help="also call providers (read-only)")

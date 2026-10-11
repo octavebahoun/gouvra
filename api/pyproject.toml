@@ -82,6 +82,7 @@ ignore = [
 "tests/**" = ["S101", "S105", "S106", "PLR0915", "ANN", "S311"]
 "src/gouvra/migrations/**" = ["E501"]
 "src/gouvra/modules/notifications/templates.py" = ["E501"]  # inline-styled e-mail HTML
+"src/gouvra/seed.py" = ["E501"]  # demo content (sentences kept whole for readability)
 
 [tool.ruff.lint.flake8-bugbear]
 extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Header", "fastapi.Path", "fastapi.Body", "fastapi.Cookie", "fastapi.Security"]

@@ -257,3 +257,34 @@ def test_base_url_validation() -> None:
         with pytest.raises(ValidationFailed):
             validate_base_url(bad)
     assert validate_base_url("http://localhost:11434/v1", allow_private=True)
+
+
+async def test_secret_rotation_command(lab, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]
+    from sqlalchemy import select
+
+    from gouvra.core.db import get_sessionmaker
+    from gouvra.core.rotation import rotate_secrets
+    from gouvra.modules.providers.models import ProviderConfig
+    from tests.helpers import create_provider
+
+    await create_provider(
+        lab["owner"], lab["ws"]["id"], "deepseek", name="Keyed", api_key="sk-rotate-me-0123456789"
+    )
+    settings = get_settings()
+    old_ring = settings.encryption_keys.get_secret_value()
+    monkeypatch.setattr(
+        settings,
+        "encryption_keys",
+        type(settings.encryption_keys)("k2026:" + "C" * 43 + "," + old_ring),
+    )
+    report = await rotate_secrets()
+    assert (report.rotated, report.failed) == (1, 0)
+    async with get_sessionmaker()() as db:
+        row = (
+            await db.execute(select(ProviderConfig).where(ProviderConfig.name == "Keyed"))
+        ).scalar_one()
+        assert row.secret_key_id == "k2026"
+    from gouvra.modules.providers.service import provider_secret
+
+    assert provider_secret(row) == "sk-rotate-me-0123456789"
+    assert (await rotate_secrets()).rotated == 0  # idempotent
