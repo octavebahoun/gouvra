@@ -6,10 +6,14 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, StringConstraints
+from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, StringConstraints
+
+from gouvra.core.text import single_line
 
 WorkspaceName = Annotated[
-    str, StringConstraints(strip_whitespace=True, min_length=2, max_length=80)
+    str,
+    StringConstraints(strip_whitespace=True, min_length=2, max_length=80),
+    AfterValidator(single_line),
 ]
 Slug = Annotated[
     str,

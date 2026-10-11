@@ -40,6 +40,8 @@ async def test_slug_rules(make_client, outbox: Outbox) -> None:  # type: ignore[
     assert (
         await owner.client.post("/api/v1/workspaces", json={"name": "Bad", "slug": "Not Valid!"})
     ).status_code == 422
+    multiline = await owner.client.post("/api/v1/workspaces", json={"name": "Acme\nBcc: x"})
+    assert multiline.status_code == 422
     ok = await owner.client.post("/api/v1/workspaces", json={"name": "Été Studio"})
     assert ok.json()["slug"] == "ete-studio"
     taken = await owner.client.post(

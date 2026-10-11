@@ -6,11 +6,17 @@ import uuid
 from datetime import datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, StringConstraints
+from pydantic import AfterValidator, BaseModel, ConfigDict, EmailStr, Field, StringConstraints
+
+from gouvra.core.text import single_line
 
 Locale = Literal["en", "fr"]
 Theme = Literal["light", "dark", "system"]
-DisplayName = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=80)]
+DisplayName = Annotated[
+    str,
+    StringConstraints(strip_whitespace=True, min_length=1, max_length=80),
+    AfterValidator(single_line),
+]
 Password = Annotated[str, Field(min_length=1, max_length=256)]
 Token = Annotated[str, StringConstraints(strip_whitespace=True, min_length=16, max_length=128)]
 

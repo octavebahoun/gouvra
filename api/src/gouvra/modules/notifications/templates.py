@@ -5,6 +5,7 @@ Every user-provided value is HTML-escaped. Links carry one-time tokens in the UR
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from html import escape
 from typing import Any
@@ -224,6 +225,14 @@ def _fmt(text: str, values: dict[str, str]) -> str:
     return text.format(**values)
 
 
+_CONTROL = re.compile(r"[\x00-\x1f\x7f]+")
+
+
+def _one_line(text: str) -> str:
+    """A header value: control characters (line breaks included) become single spaces."""
+    return " ".join(_CONTROL.sub(" ", text).split())
+
+
 def render(
     template: str, locale: str, context: dict[str, Any], action_url: str | None
 ) -> RenderedEmail:
@@ -235,7 +244,7 @@ def render(
         raw["role"] = ROLE_NAMES[lang].get(raw["role"], raw["role"])
     safe = {k: escape(v) for k, v in raw.items()}
 
-    subject = _fmt(copy.subject, raw)
+    subject = _one_line(_fmt(copy.subject, raw))
     title_html = _fmt(copy.title, safe)
     paragraphs_html = "".join(
         f'<p style="margin:0 0 14px;font-size:15px;line-height:1.6;color:{INK}">{_fmt(p, safe)}</p>'

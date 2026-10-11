@@ -65,6 +65,17 @@ def test_user_content_is_escaped() -> None:
     assert 'a"onmouseover' not in rendered.html
 
 
+def test_subjects_stay_on_one_line() -> None:
+    """Names can come from OAuth profiles: a line break must never reach a mail header."""
+    rendered = render(
+        "alert",
+        "en",
+        {"title": "Acme\r\nBcc: victim@example.com\x00", "body": "b", "workspace": "Acme"},
+        "https://app.example/w/acme/usage",
+    )
+    assert rendered.subject == "[Gouvra] Acme Bcc: victim@example.com"
+
+
 def test_french_role_names() -> None:
     rendered = render(
         "invitation",
