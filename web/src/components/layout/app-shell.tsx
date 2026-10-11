@@ -12,7 +12,11 @@ import { Sidebar } from "./sidebar";
 
 const COLLAPSE_KEY = "gouvra.sidebar.collapsed";
 
-/** Route content with a short cross-fade; keyed by section so tabs inside a page don't re-animate. */
+/**
+ * Route content that fades in when the section changes (keyed by section, so tabs inside a page
+ * don't re-animate). No exit animation: the next page mounts at once. Waiting for the previous
+ * page to finish leaving could leave the content empty when that exit never completed.
+ */
 export function AnimatedOutlet({ depth = 3 }: { depth?: number }) {
   const location = useLocation();
   const outlet = useOutlet();
@@ -20,18 +24,17 @@ export function AnimatedOutlet({ depth = 3 }: { depth?: number }) {
     .split("/")
     .slice(0, depth + 1)
     .join("/");
+  // The page the app opened on appears without a fade, like a first paint.
+  const [firstKey] = useState(key);
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={key}
-        initial={{ opacity: 0, y: 6 }}
-        animate={{ opacity: 1, y: 0, transition: { duration: duration.base, ease: ease.standard } }}
-        exit={{ opacity: 0, transition: { duration: 0.1, ease: ease.exit } }}
-        className="min-h-full"
-      >
-        {outlet}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={key}
+      initial={key === firstKey ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0, transition: { duration: duration.base, ease: ease.standard } }}
+      className="min-h-full"
+    >
+      {outlet}
+    </motion.div>
   );
 }
 
