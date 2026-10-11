@@ -6,7 +6,7 @@ import base64
 import binascii
 from enum import StrEnum
 from functools import lru_cache
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
@@ -79,6 +79,10 @@ class Settings(BaseSettings):
     resend_api_key: SecretStr = SecretStr("")
     smtp_host: str = "localhost"
     smtp_port: int = 1025
+    smtp_username: str = ""
+    smtp_password: SecretStr = SecretStr("")
+    # none (local relay such as Mailpit) | starttls (port 587) | ssl (implicit TLS, port 465)
+    smtp_security: Literal["none", "starttls", "ssl"] = "none"
 
     # Model providers used by tests and the demo seed (workspaces store their own keys).
     deepseek_api_key: SecretStr = SecretStr("")
@@ -141,6 +145,13 @@ class Settings(BaseSettings):
                 problems.append("COOKIE_SECURE must be true")
             if self.email_provider is EmailProvider.CONSOLE:
                 problems.append("EMAIL_PROVIDER must not be 'console'")
+            if (
+                self.email_provider is EmailProvider.RESEND
+                and not self.resend_api_key.get_secret_value()
+            ):
+                problems.append("EMAIL_PROVIDER=resend requires RESEND_API_KEY")
+            if self.email_provider is EmailProvider.SMTP and self.smtp_security == "none":
+                problems.append("SMTP_SECURITY must be 'starttls' or 'ssl'")
             if not self.app_url.startswith("https://"):
                 problems.append("APP_URL must use https://")
             if problems:

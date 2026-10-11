@@ -1,0 +1,63 @@
+# Gouvra in production: HTTPS (automatic certificates), the SPA and the API on one origin.
+# Used by docker-compose.prod.yml — DOMAIN and ACME_EMAIL come from the environment.
+{
+	admin off
+	email {$ACME_EMAIL}
+	# Clients reach Caddy directly: only private networks may claim to be proxies.
+	servers {
+		trusted_proxies static private_ranges
+		protocols h1 h2 h3
+	}
+}
+
+(security_headers) {
+	header {
+		Strict-Transport-Security "max-age=63072000; includeSubDomains"
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'; upgrade-insecure-requests"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Frame-Options "DENY"
+		Cross-Origin-Opener-Policy "same-origin"
+		Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+		-Server
+	}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# API (and its live streams: no buffering).
+	# The API sets its own security headers (HSTS included in production).
+	handle /api/* {
+		reverse_proxy api:8000 {
+			flush_interval -1
+			header_up X-Request-ID {http.request.header.X-Request-ID}
+		}
+	}
+
+	# Health of the whole chain for an external monitor (proxy → API → database).
+	handle /readyz {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		import security_headers
+		root * /srv
+		@immutable path /assets/*
+		header @immutable Cache-Control "public, max-age=31536000, immutable"
+		@html path / /index.html
+		header @html Cache-Control "no-cache"
+		try_files {path} /index.html
+		file_server
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
+
+# Liveness of the proxy itself, for the container health check only (this port is not published).
+:8081 {
+	respond /healthz 200
+}

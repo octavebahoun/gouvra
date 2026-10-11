@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import smtplib
+import ssl
 from dataclasses import dataclass, field
 from email.message import EmailMessage
 from email.utils import formataddr, make_msgid, parseaddr
@@ -58,10 +59,31 @@ class ConsoleEmailSender:
 class SmtpEmailSender:
     name = "smtp"
 
-    def __init__(self, host: str, port: int, sender: str) -> None:
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        sender: str,
+        *,
+        username: str = "",
+        password: str = "",
+        security: str = "none",
+    ) -> None:
         self.host = host
         self.port = port
         self.sender = sender
+        self.username = username
+        self.password = password
+        self.security = security
+
+    def _connect(self) -> smtplib.SMTP:
+        context = ssl.create_default_context()
+        if self.security == "ssl":
+            return smtplib.SMTP_SSL(self.host, self.port, timeout=10, context=context)
+        smtp = smtplib.SMTP(self.host, self.port, timeout=10)
+        if self.security == "starttls":
+            smtp.starttls(context=context)
+        return smtp
 
     def _send_sync(self, email: OutgoingEmail) -> str:
         message = EmailMessage()
@@ -73,7 +95,9 @@ class SmtpEmailSender:
         message["Message-ID"] = message_id
         message.set_content(email.text)
         message.add_alternative(email.html, subtype="html")
-        with smtplib.SMTP(self.host, self.port, timeout=10) as smtp:
+        with self._connect() as smtp:
+            if self.username:
+                smtp.login(self.username, self.password)
             smtp.send_message(message)
         return message_id
 
@@ -139,7 +163,14 @@ def build_sender(settings: Settings) -> EmailSender:
     if settings.email_provider is EmailProvider.RESEND:
         return ResendEmailSender(settings.resend_api_key.get_secret_value(), settings.email_from)
     if settings.email_provider is EmailProvider.SMTP:
-        return SmtpEmailSender(settings.smtp_host, settings.smtp_port, settings.email_from)
+        return SmtpEmailSender(
+            settings.smtp_host,
+            settings.smtp_port,
+            settings.email_from,
+            username=settings.smtp_username,
+            password=settings.smtp_password.get_secret_value(),
+            security=settings.smtp_security,
+        )
     return ConsoleEmailSender()
 
 

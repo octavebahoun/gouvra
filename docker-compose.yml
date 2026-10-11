@@ -24,6 +24,7 @@ x-app: &app
     RESEND_API_KEY: ${RESEND_API_KEY:-}
     SMTP_HOST: mailpit
     SMTP_PORT: "1025"
+    SMTP_SECURITY: none # Mailpit, local only
     DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
     GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}

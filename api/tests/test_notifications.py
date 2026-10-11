@@ -216,3 +216,58 @@ async def test_resend_real_delivery() -> None:
         )
     )
     assert message_id
+
+
+def test_smtp_adapter_secures_and_authenticates(monkeypatch: pytest.MonkeyPatch) -> None:
+    calls: list[str] = []
+
+    class FakeSMTP:
+        def __init__(self, host: str, port: int, timeout: float, **_: object) -> None:
+            calls.append(f"connect {host}:{port}")
+
+        def __enter__(self) -> FakeSMTP:
+            return self
+
+        def __exit__(self, *exc: object) -> None:
+            calls.append("quit")
+
+        def starttls(self, context: object) -> None:
+            calls.append("starttls")
+
+        def login(self, user: str, password: str) -> None:
+            calls.append(f"login {user}")
+
+        def send_message(self, message: object) -> None:
+            calls.append("send")
+
+    monkeypatch.setattr("smtplib.SMTP", FakeSMTP)
+    sender = SmtpEmailSender(
+        "smtp.example.com",
+        587,
+        "Gouvra <noreply@example.com>",
+        username="relay-user",
+        password="relay-pass",
+        security="starttls",
+    )
+    sender._send_sync(
+        OutgoingEmail(
+            to="a@example.com", subject="Hi", text="t", html="<p>t</p>", idempotency_key="k1"
+        )
+    )
+    assert calls == ["connect smtp.example.com:587", "starttls", "login relay-user", "send", "quit"]
+
+
+def test_production_refuses_insecure_email(monkeypatch: pytest.MonkeyPatch) -> None:
+    from gouvra.core.config import Settings
+
+    base = {
+        "app_env": "production",
+        "app_url": "https://gouvra.example.com",
+        "cookie_secure": True,
+        "session_secret": "x" * 48,
+        "encryption_keys": "k1:" + "A" * 43,
+    }
+    with pytest.raises(ValueError, match="SMTP_SECURITY"):
+        Settings(**base, email_provider="smtp", smtp_security="none")  # type: ignore[arg-type]
+    with pytest.raises(ValueError, match="RESEND_API_KEY"):
+        Settings(**base, email_provider="resend", resend_api_key="")  # type: ignore[arg-type]

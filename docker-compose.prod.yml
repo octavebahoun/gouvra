@@ -1,0 +1,169 @@
+# Gouvra — production. See docs/operations.md.
+#
+#   cp .env.example .env && scripts/gen-secrets   # then set DOMAIN, ACME_EMAIL, APP_URL, e-mail
+#   docker compose -f docker-compose.prod.yml up -d --build
+#
+# One public entry point: Caddy on 80/443 (automatic HTTPS) serving the interface and proxying
+# the API. PostgreSQL and Valkey sit on a network with no outside access; nothing else is published.
+name: gouvra-prod
+
+x-logging: &logging
+  driver: json-file
+  options:
+    max-size: "20m"
+    max-file: "5"
+
+x-app: &app
+  image: gouvra/api:${GOUVRA_VERSION:-latest}
+  build:
+    context: ./api
+  restart: unless-stopped
+  logging: *logging
+  environment:
+    APP_ENV: production
+    APP_URL: ${APP_URL:?set APP_URL, e.g. https://gouvra.example.com}
+    API_PUBLIC_URL: ${APP_URL}
+    LOG_FORMAT: json
+    LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    DATABASE_URL: postgresql+asyncpg://gouvra:${POSTGRES_PASSWORD:?run scripts/gen-secrets}@postgres:5432/gouvra
+    REDIS_URL: redis://:${VALKEY_PASSWORD:?run scripts/gen-secrets}@valkey:6379/0
+    SESSION_SECRET: ${SESSION_SECRET:?run scripts/gen-secrets}
+    ENCRYPTION_KEYS: ${ENCRYPTION_KEYS:?run scripts/gen-secrets}
+    COOKIE_SECURE: "true"
+    SIGNUP_ENABLED: ${SIGNUP_ENABLED:-true}
+    EMAIL_PROVIDER: ${EMAIL_PROVIDER:-resend}
+    EMAIL_FROM: ${EMAIL_FROM:?set EMAIL_FROM}
+    RESEND_API_KEY: ${RESEND_API_KEY:-}
+    SMTP_HOST: ${SMTP_HOST:-}
+    SMTP_PORT: ${SMTP_PORT:-587}
+    SMTP_USERNAME: ${SMTP_USERNAME:-}
+    SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+    SMTP_SECURITY: ${SMTP_SECURITY:-starttls}
+    DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+    ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
+    GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
+    GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    BILLING_PROVIDER: ${BILLING_PROVIDER:-none}
+    STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+    STRIPE_PUBLISHABLE_KEY: ${STRIPE_PUBLISHABLE_KEY:-}
+    STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+    SANDBOX_URL: http://sandbox:8090
+    SANDBOX_TOKEN: ${SANDBOX_TOKEN:?run scripts/gen-secrets}
+    # Caddy is the only proxy in front of the API.
+    TRUSTED_PROXY_HOPS: "1"
+    CORS_ORIGINS: ""
+  networks: [data, edge]
+
+services:
+  postgres:
+    image: postgres:17.11-alpine
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      POSTGRES_USER: gouvra
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?run scripts/gen-secrets}
+      POSTGRES_DB: gouvra
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gouvra -d gouvra"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [data]
+
+  valkey:
+    image: valkey/valkey:8.1-alpine
+    restart: unless-stopped
+    logging: *logging
+    command: ["valkey-server", "--requirepass", "${VALKEY_PASSWORD:?run scripts/gen-secrets}", "--appendonly", "yes"]
+    environment:
+      VALKEY_PASSWORD: ${VALKEY_PASSWORD}
+    volumes:
+      - valkeydata:/data
+    healthcheck:
+      test: ["CMD-SHELL", "valkey-cli -a \"$$VALKEY_PASSWORD\" --no-auth-warning ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+    networks: [data]
+
+  migrate:
+    <<: *app
+    restart: "no"
+    command: ["gouvra", "migrate"]
+    healthcheck:
+      disable: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  api:
+    <<: *app
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      valkey:
+        condition: service_healthy
+
+  # Separate process: executions, e-mails and gradings never run in the API.
+  worker:
+    <<: *app
+    command: ["python", "-m", "gouvra.worker"]
+    stop_grace_period: 40s
+    healthcheck:
+      test: ["CMD", "python", "-c", "import os,sys,time; p=os.environ['WORKER_HEARTBEAT_FILE']; sys.exit(0 if time.time()-os.path.getmtime(p) < 45 else 1)"]
+      interval: 15s
+      timeout: 4s
+      start_period: 20s
+      retries: 3
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+      valkey:
+        condition: service_healthy
+
+  # Caddy: TLS certificates, the static interface and the API, on one origin.
+  web:
+    image: gouvra/web:${GOUVRA_VERSION:-latest}
+    build:
+      context: ./web
+    restart: unless-stopped
+    logging: *logging
+    environment:
+      DOMAIN: ${DOMAIN:?set DOMAIN, e.g. gouvra.example.com}
+      ACME_EMAIL: ${ACME_EMAIL:?set ACME_EMAIL for certificate notices}
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      - "${HTTP_PORT:-80}:80"
+      - "${HTTPS_PORT:-443}:443"
+      - "${HTTPS_PORT:-443}:443/udp"
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8081/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    depends_on:
+      api:
+        condition: service_healthy
+    networks: [edge]
+
+volumes:
+  pgdata:
+  valkeydata:
+  caddy_data:
+  caddy_config:
+
+networks:
+  # PostgreSQL and Valkey: no route to the outside world.
+  data:
+    internal: true
+  # Caddy, the API and the worker: published ports (Caddy only) and outbound calls to model,
+  # e-mail and OAuth providers.
+  edge:
