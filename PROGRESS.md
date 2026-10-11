@@ -4,8 +4,27 @@
 
 ## État
 
-- **Phase en cours : 1 — Fondations**
-- **Tâche suivante :** squelette backend (config, logs, DB, erreurs, health), squelette web (tokens, shell, composants de base), Docker Compose, CI.
+- **Phase en cours : 2 — Identité**
+- **Tâche suivante :** modèles identité/workspaces, sessions + CSRF, e-mails (Resend/SMTP/console), rate limiting, couche d'autorisation centrale, routes auth/workspaces/invitations, OAuth GitHub, écrans B–F, Q (membres), R.
+
+## Brief mis à jour — 2026-10-11 03:56 (relu en entier)
+
+- Changements intégrés : OAuth GitHub + Google avec callbacks sur `http://localhost:8000` (D-053), variables OAuth dans la liste officielle, bouton masqué si une variable manque.
+- Variables vérifiées dans le conteneur API avec `gouvra check-config --live` (valeurs jamais affichées) :
+
+| Variable | Lue | Format | Contrôle réel (lecture seule) |
+|---|---|---|---|
+| RESEND_API_KEY | oui | ok | clé valide, domaine expéditeur **verified** |
+| EMAIL_FROM | oui | ok | — |
+| DEEPSEEK_API_KEY | oui | ok | valide, 2 modèles (`deepseek-flash`, `deepseek-v4-pro`), solde disponible |
+| STRIPE_SECRET_KEY | oui | ok (sk_test_) | valide, `livemode=false` |
+| STRIPE_PUBLISHABLE_KEY | oui | ok (pk_test_) | — |
+| GITHUB_CLIENT_ID / SECRET | oui | ok | client id reconnu par GitHub |
+| GOOGLE_CLIENT_ID / SECRET | oui | ok | — (testé au premier parcours OAuth) |
+| STRIPE_WEBHOOK_SECRET | non | — | à obtenir via Stripe CLI (phase 9) |
+| ANTHROPIC_API_KEY | non (optionnel) | — | adaptateur testé par contrat (D-052) |
+
+- Plan adapté : phase 2 inclut OAuth GitHub **et** Google de bout en bout.
 
 ## Étape 0 — fait (2026-10-11)
 
@@ -17,8 +36,8 @@
 
 | # | Phase | État | Critère de sortie |
 |---|---|---|---|
-| 1 | Fondations | en cours | `docker compose up` démarre tout, CI verte |
-| 2 | Identité | à faire | Tests des flux + isolation inter-workspace verts |
+| 1 | Fondations | **fait** (2026-10-11) | `docker compose up` démarre tout, CI verte |
+| 2 | Identité | en cours | Tests des flux + isolation inter-workspace verts |
 | 3 | Agent simple | à faire | Une exécution réelle, tracée de bout en bout |
 | 4 | Exploitation | à faire | Diagnostic d'un échec depuis l'UI |
 | 5 | Stabilisation du socle | à faire | Section 9 du brief validée sur le socle |
@@ -30,9 +49,15 @@
 
 ## Problèmes ouverts
 
-- Démon Docker arrêté sur la machine (besoin de `sudo`) — en attente de l'utilisateur.
+- Swagger UI (`/api/docs`) charge ses assets depuis un CDN : à auto-héberger (phase 5).
 - `pandoc`, `stripe` CLI absents du système : pandoc récupéré via `pypandoc_binary` (lien `~/.local/bin/pandoc`) ; Stripe CLI à télécharger (phase 9).
 
 ## Journal de vérification
 
-_(rempli à chaque fin de phase : lint, typage, tests, couverture, compose à froid, E2E, captures, axe, audits dépendances, relecture sécurité)_
+### Phase 1 — 2026-10-11
+- API : ruff format/check ✔, mypy strict ✔ (25 fichiers), pytest 14/14 ✔ sur PostgreSQL 17 + Valkey réels, couverture 90 %.
+- Web : prettier ✔, eslint (strict type-checked + jsx-a11y strict) ✔ 0 avertissement, tsc ✔, vitest 8/8 ✔, build ✔.
+- Audits : pip-audit « No known vulnerabilities », pnpm audit (high) « No known vulnerabilities ».
+- `docker compose up -d` : postgres, valkey, mailpit, migrate (exit 0), api (healthy, /readyz = ready, migrations à jour), worker (healthy, heartbeat), web (healthy, CSP stricte, fallback SPA).
+- Captures design system clair/sombre + landing mobile relues : bug `asChild` (fragment) corrigé, police inlinée en data: bloquée par la CSP corrigée (`assetsInlineLimit: 0`).
+- CI GitHub Actions écrite ; rejouée en local à l'identique via `scripts/ci-local` (pas de dépôt distant, D-052).
