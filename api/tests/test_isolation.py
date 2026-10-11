@@ -67,6 +67,11 @@ ROUTES: list[Route] = [
     Route("POST", "/workspaces/{ws}/agents", {"name": "Intruder"}),
     Route("GET", "/workspaces/{ws}/executions"),
     Route("GET", "/workspaces/{ws}/stream"),
+    Route("GET", "/workspaces/{ws}/overview"),
+    Route("GET", "/workspaces/{ws}/usage"),
+    Route("GET", "/workspaces/{ws}/audit-events"),
+    Route("GET", "/workspaces/{ws}/settings"),
+    Route("PATCH", "/workspaces/{ws}/settings", {"max_concurrent_executions": 1}),
 ]
 
 # Routes addressing one resource by id (the workspace is derived from the resource).
@@ -94,6 +99,9 @@ RESOURCE_ROUTES: list[Route] = [
     Route("GET", "/executions/{execution}/stream"),
     Route("POST", "/executions/{execution}/cancel"),
     Route("POST", "/executions/{execution}/retry"),
+    Route("GET", "/executions/{execution}/export"),
+    Route("GET", "/agents/{agent}/stats"),
+    Route("GET", "/tools/{tool}/calls"),
 ]
 
 

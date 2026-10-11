@@ -7,8 +7,7 @@ from decimal import Decimal
 import pytest
 
 from gouvra.core.config import get_settings
-from tests.helpers import Outbox, create_builtin_tool, create_workspace, signup
-from tests.test_executions import drain, events_of
+from tests.helpers import Outbox, create_builtin_tool, create_workspace, drain, events_of, signup
 
 pytestmark = [pytest.mark.real, pytest.mark.usefixtures("outbox")]
 

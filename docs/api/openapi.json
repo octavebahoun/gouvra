@@ -925,6 +925,100 @@
         }
       }
     },
+    "/api/v1/workspaces/{workspace_id}/settings": {
+      "get": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "Operational settings (limits)",
+        "operationId": "workspaces_get_settings_",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceSettingsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "workspaces"
+        ],
+        "summary": "Change operational settings",
+        "operationId": "workspaces_update_settings",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WorkspaceSettingsIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceSettingsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/workspaces/{workspace_id}/members": {
       "get": {
         "tags": [
@@ -2235,6 +2329,65 @@
         }
       }
     },
+    "/api/v1/tools/{tool_id}/calls": {
+      "get": {
+        "tags": [
+          "tools"
+        ],
+        "summary": "Recent calls of this tool (usage history)",
+        "operationId": "tools_tool_calls",
+        "parameters": [
+          {
+            "name": "tool_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Tool Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "default": 25,
+              "title": "Limit"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ToolCallOut"
+                  },
+                  "title": "Response Tools Tool Calls"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/workspaces/{workspace_id}/agents": {
       "get": {
         "tags": [
@@ -3420,6 +3573,349 @@
           }
         }
       }
+    },
+    "/api/v1/executions/{execution_id}/export": {
+      "get": {
+        "tags": [
+          "executions"
+        ],
+        "summary": "Download the execution and its full trace as JSON",
+        "operationId": "executions_export_execution",
+        "parameters": [
+          {
+            "name": "execution_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Execution Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Attachment `execution-<id>.json`",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/overview": {
+      "get": {
+        "tags": [
+          "usage"
+        ],
+        "summary": "Workspace overview",
+        "operationId": "usage_overview",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/usage": {
+      "get": {
+        "tags": [
+          "usage"
+        ],
+        "summary": "Tokens, costs and executions over a period",
+        "operationId": "usage_usage",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          },
+          {
+            "name": "granularity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "hour",
+                "day",
+                "week"
+              ],
+              "type": "string",
+              "default": "day",
+              "title": "Granularity"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/gouvra__modules__usage__routes__UsageOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/{agent_id}/stats": {
+      "get": {
+        "tags": [
+          "usage"
+        ],
+        "summary": "Agent statistics over the last days",
+        "operationId": "usage_agent_stats",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Agent Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 90,
+              "minimum": 1,
+              "default": 30,
+              "title": "Days"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentStatsOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/audit-events": {
+      "get": {
+        "tags": [
+          "audit"
+        ],
+        "summary": "Audit log (who did what, when)",
+        "operationId": "audit_list_audit_events",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "action",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 64
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Exact action or prefix ending with '.' (e.g. 'agent.')",
+              "title": "Action"
+            },
+            "description": "Exact action or prefix ending with '.' (e.g. 'agent.')"
+          },
+          {
+            "name": "actor_user_id",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor User Id"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (max 100)",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size (max 100)"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "Cursor"
+            },
+            "description": "`next_cursor` of the previous page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_AuditEventOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -3831,6 +4327,70 @@
           "version"
         ],
         "title": "AgentRef"
+      },
+      "AgentStatsOut": {
+        "properties": {
+          "window_days": {
+            "type": "integer",
+            "title": "Window Days"
+          },
+          "executions": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Executions"
+          },
+          "success_rate": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Success Rate"
+          },
+          "duration": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Duration"
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/TokenSummary"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/CostSummary"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/TimePoint"
+            },
+            "type": "array",
+            "title": "Series"
+          }
+        },
+        "type": "object",
+        "required": [
+          "window_days",
+          "executions",
+          "success_rate",
+          "duration",
+          "tokens",
+          "cost",
+          "series"
+        ],
+        "title": "AgentStatsOut"
       },
       "AgentUpdateIn": {
         "properties": {
@@ -4257,6 +4817,230 @@
         ],
         "title": "ApiKeyOut"
       },
+      "AuditEventOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "actor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor"
+          },
+          "actor_user_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor User Id"
+          },
+          "actor_api_key_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Api Key Id"
+          },
+          "target_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Type"
+          },
+          "target_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Id"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "request_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Request Id"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "actor",
+          "actor_user_id",
+          "actor_api_key_id",
+          "target_type",
+          "target_id",
+          "data",
+          "ip_address",
+          "request_id",
+          "created_at"
+        ],
+        "title": "AuditEventOut"
+      },
+      "BreakdownRow": {
+        "properties": {
+          "agent_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Id"
+          },
+          "agent_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Name"
+          },
+          "provider_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Kind"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "input_tokens": {
+            "type": "integer",
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "title": "Output Tokens"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "cost_source": {
+            "type": "string",
+            "enum": [
+              "provider_reported",
+              "estimated",
+              "unavailable"
+            ],
+            "title": "Cost Source"
+          },
+          "partial": {
+            "type": "boolean",
+            "title": "Partial"
+          },
+          "model_calls": {
+            "type": "integer",
+            "title": "Model Calls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_tokens",
+          "output_tokens",
+          "cost",
+          "currency",
+          "cost_source",
+          "partial",
+          "model_calls"
+        ],
+        "title": "BreakdownRow"
+      },
       "BuiltinToolOut": {
         "properties": {
           "key": {
@@ -4419,6 +5203,71 @@
           "partial"
         ],
         "title": "CostOut"
+      },
+      "CostSummary": {
+        "properties": {
+          "amount": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Amount"
+          },
+          "currency": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Currency"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "provider_reported",
+              "estimated",
+              "unavailable"
+            ],
+            "title": "Source"
+          },
+          "partial": {
+            "type": "boolean",
+            "title": "Partial"
+          },
+          "priced_calls": {
+            "type": "integer",
+            "title": "Priced Calls"
+          },
+          "unpriced_calls": {
+            "type": "integer",
+            "title": "Unpriced Calls"
+          },
+          "by_source": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object",
+            "title": "By Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "amount",
+          "currency",
+          "source",
+          "partial",
+          "priced_calls",
+          "unpriced_calls",
+          "by_source"
+        ],
+        "title": "CostSummary"
       },
       "EmailChangeIn": {
         "properties": {
@@ -4737,7 +5586,7 @@
             "title": "Duration Ms"
           },
           "usage": {
-            "$ref": "#/components/schemas/UsageOut"
+            "$ref": "#/components/schemas/gouvra__modules__executions__schemas__UsageOut"
           },
           "cost": {
             "$ref": "#/components/schemas/CostOut"
@@ -4983,7 +5832,7 @@
             "title": "Duration Ms"
           },
           "usage": {
-            "$ref": "#/components/schemas/UsageOut"
+            "$ref": "#/components/schemas/gouvra__modules__executions__schemas__UsageOut"
           },
           "cost": {
             "$ref": "#/components/schemas/CostOut"
@@ -5223,6 +6072,34 @@
         ],
         "title": "LastExecution"
       },
+      "LimitsOut": {
+        "properties": {
+          "max_concurrent_executions": {
+            "type": "integer",
+            "title": "Max Concurrent Executions"
+          },
+          "executions_per_minute": {
+            "type": "integer",
+            "title": "Executions Per Minute"
+          },
+          "max_execution_timeout_s": {
+            "type": "integer",
+            "title": "Max Execution Timeout S"
+          },
+          "max_input_bytes": {
+            "type": "integer",
+            "title": "Max Input Bytes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "max_concurrent_executions",
+          "executions_per_minute",
+          "max_execution_timeout_s",
+          "max_input_bytes"
+        ],
+        "title": "LimitsOut"
+      },
       "LoginIn": {
         "properties": {
           "email": {
@@ -5456,6 +6333,112 @@
         ],
         "title": "OnboardingStep"
       },
+      "OverviewOut": {
+        "properties": {
+          "generated_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Generated At"
+          },
+          "agents_active": {
+            "type": "integer",
+            "title": "Agents Active"
+          },
+          "providers_configured": {
+            "type": "integer",
+            "title": "Providers Configured"
+          },
+          "providers_in_error": {
+            "type": "integer",
+            "title": "Providers In Error"
+          },
+          "running_now": {
+            "type": "integer",
+            "title": "Running Now"
+          },
+          "queued_now": {
+            "type": "integer",
+            "title": "Queued Now"
+          },
+          "executions_24h": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Executions 24H"
+          },
+          "executions_7d": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Executions 7D"
+          },
+          "success_rate_7d": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Success Rate 7D"
+          },
+          "duration_7d": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Duration 7D"
+          },
+          "month_tokens": {
+            "$ref": "#/components/schemas/TokenSummary"
+          },
+          "month_cost": {
+            "$ref": "#/components/schemas/CostSummary"
+          },
+          "recent_executions": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionSummary"
+            },
+            "type": "array",
+            "title": "Recent Executions"
+          },
+          "recent_failures": {
+            "items": {
+              "$ref": "#/components/schemas/ExecutionSummary"
+            },
+            "type": "array",
+            "title": "Recent Failures"
+          }
+        },
+        "type": "object",
+        "required": [
+          "generated_at",
+          "agents_active",
+          "providers_configured",
+          "providers_in_error",
+          "running_now",
+          "queued_now",
+          "executions_24h",
+          "executions_7d",
+          "success_rate_7d",
+          "duration_7d",
+          "month_tokens",
+          "month_cost",
+          "recent_executions",
+          "recent_failures"
+        ],
+        "title": "OverviewOut"
+      },
       "Page_AgentOut_": {
         "properties": {
           "data": {
@@ -5487,6 +6470,38 @@
           "data"
         ],
         "title": "Page[AgentOut]"
+      },
+      "Page_AuditEventOut_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEventOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "title": "Page[AuditEventOut]"
       },
       "Page_ExecutionSummary_": {
         "properties": {
@@ -6220,6 +7235,67 @@
         ],
         "title": "SessionOut"
       },
+      "TimePoint": {
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Start"
+          },
+          "input_tokens": {
+            "type": "integer",
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "title": "Output Tokens"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost"
+          },
+          "unpriced_calls": {
+            "type": "integer",
+            "title": "Unpriced Calls"
+          },
+          "model_calls": {
+            "type": "integer",
+            "title": "Model Calls"
+          },
+          "executions": {
+            "type": "integer",
+            "title": "Executions"
+          },
+          "succeeded": {
+            "type": "integer",
+            "title": "Succeeded"
+          },
+          "failed": {
+            "type": "integer",
+            "title": "Failed"
+          }
+        },
+        "type": "object",
+        "required": [
+          "start",
+          "input_tokens",
+          "output_tokens",
+          "cost",
+          "unpriced_calls",
+          "model_calls",
+          "executions",
+          "succeeded",
+          "failed"
+        ],
+        "title": "TimePoint"
+      },
       "TokenIn": {
         "properties": {
           "token": {
@@ -6234,6 +7310,107 @@
           "token"
         ],
         "title": "TokenIn"
+      },
+      "TokenSummary": {
+        "properties": {
+          "input_tokens": {
+            "type": "integer",
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "title": "Output Tokens"
+          },
+          "cached_tokens": {
+            "type": "integer",
+            "title": "Cached Tokens"
+          },
+          "reasoning_tokens": {
+            "type": "integer",
+            "title": "Reasoning Tokens"
+          },
+          "model_calls": {
+            "type": "integer",
+            "title": "Model Calls"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_tokens",
+          "output_tokens",
+          "cached_tokens",
+          "reasoning_tokens",
+          "model_calls"
+        ],
+        "title": "TokenSummary"
+      },
+      "ToolCallOut": {
+        "properties": {
+          "execution_id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Execution Id"
+          },
+          "agent_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agent Name"
+          },
+          "called_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Called At"
+          },
+          "ok": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ok"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "duration_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Duration Ms"
+          }
+        },
+        "type": "object",
+        "required": [
+          "execution_id",
+          "agent_name",
+          "called_at",
+          "ok",
+          "error_code",
+          "duration_ms"
+        ],
+        "title": "ToolCallOut"
       },
       "ToolCreateIn": {
         "properties": {
@@ -6669,39 +7846,6 @@
         ],
         "title": "TransferOwnershipIn"
       },
-      "UsageOut": {
-        "properties": {
-          "input_tokens": {
-            "type": "integer",
-            "title": "Input Tokens"
-          },
-          "output_tokens": {
-            "type": "integer",
-            "title": "Output Tokens"
-          },
-          "cached_tokens": {
-            "type": "integer",
-            "title": "Cached Tokens"
-          },
-          "reasoning_tokens": {
-            "type": "integer",
-            "title": "Reasoning Tokens"
-          },
-          "total_tokens": {
-            "type": "integer",
-            "title": "Total Tokens"
-          }
-        },
-        "type": "object",
-        "required": [
-          "input_tokens",
-          "output_tokens",
-          "cached_tokens",
-          "reasoning_tokens",
-          "total_tokens"
-        ],
-        "title": "UsageOut"
-      },
       "UserOut": {
         "properties": {
           "id": {
@@ -6910,6 +8054,43 @@
         ],
         "title": "WorkspaceOut"
       },
+      "WorkspaceSettingsIn": {
+        "properties": {
+          "max_concurrent_executions": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 50.0,
+                "minimum": 1.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Concurrent Executions"
+          }
+        },
+        "type": "object",
+        "title": "WorkspaceSettingsIn"
+      },
+      "WorkspaceSettingsOut": {
+        "properties": {
+          "max_concurrent_executions": {
+            "type": "integer",
+            "title": "Max Concurrent Executions"
+          },
+          "max_concurrent_executions_limit": {
+            "type": "integer",
+            "title": "Max Concurrent Executions Limit"
+          }
+        },
+        "type": "object",
+        "required": [
+          "max_concurrent_executions",
+          "max_concurrent_executions_limit"
+        ],
+        "title": "WorkspaceSettingsOut"
+      },
       "WorkspaceSummary": {
         "properties": {
           "id": {
@@ -6976,6 +8157,113 @@
         },
         "type": "object",
         "title": "WorkspaceUpdateIn"
+      },
+      "gouvra__modules__executions__schemas__UsageOut": {
+        "properties": {
+          "input_tokens": {
+            "type": "integer",
+            "title": "Input Tokens"
+          },
+          "output_tokens": {
+            "type": "integer",
+            "title": "Output Tokens"
+          },
+          "cached_tokens": {
+            "type": "integer",
+            "title": "Cached Tokens"
+          },
+          "reasoning_tokens": {
+            "type": "integer",
+            "title": "Reasoning Tokens"
+          },
+          "total_tokens": {
+            "type": "integer",
+            "title": "Total Tokens"
+          }
+        },
+        "type": "object",
+        "required": [
+          "input_tokens",
+          "output_tokens",
+          "cached_tokens",
+          "reasoning_tokens",
+          "total_tokens"
+        ],
+        "title": "UsageOut"
+      },
+      "gouvra__modules__usage__routes__UsageOut": {
+        "properties": {
+          "since": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Since"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Until"
+          },
+          "granularity": {
+            "type": "string",
+            "enum": [
+              "hour",
+              "day",
+              "week"
+            ],
+            "title": "Granularity"
+          },
+          "tokens": {
+            "$ref": "#/components/schemas/TokenSummary"
+          },
+          "cost": {
+            "$ref": "#/components/schemas/CostSummary"
+          },
+          "executions": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Executions"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/TimePoint"
+            },
+            "type": "array",
+            "title": "Series"
+          },
+          "by_agent": {
+            "items": {
+              "$ref": "#/components/schemas/BreakdownRow"
+            },
+            "type": "array",
+            "title": "By Agent"
+          },
+          "by_model": {
+            "items": {
+              "$ref": "#/components/schemas/BreakdownRow"
+            },
+            "type": "array",
+            "title": "By Model"
+          },
+          "limits": {
+            "$ref": "#/components/schemas/LimitsOut"
+          }
+        },
+        "type": "object",
+        "required": [
+          "since",
+          "until",
+          "granularity",
+          "tokens",
+          "cost",
+          "executions",
+          "series",
+          "by_agent",
+          "by_model",
+          "limits"
+        ],
+        "title": "UsageOut"
       }
     }
   }

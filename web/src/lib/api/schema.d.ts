@@ -370,6 +370,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/workspaces/{workspace_id}/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Operational settings (limits) */
+        get: operations["workspaces_get_settings_"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change operational settings */
+        patch: operations["workspaces_update_settings"];
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspace_id}/members": {
         parameters: {
             query?: never;
@@ -719,6 +737,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/tools/{tool_id}/calls": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recent calls of this tool (usage history) */
+        get: operations["tools_tool_calls"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/workspaces/{workspace_id}/agents": {
         parameters: {
             query?: never;
@@ -994,6 +1029,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/executions/{execution_id}/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download the execution and its full trace as JSON */
+        get: operations["executions_export_execution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Workspace overview */
+        get: operations["usage_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tokens, costs and executions over a period */
+        get: operations["usage_usage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/agents/{agent_id}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Agent statistics over the last days */
+        get: operations["usage_agent_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/workspaces/{workspace_id}/audit-events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Audit log (who did what, when) */
+        get: operations["audit_list_audit_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1158,6 +1278,25 @@ export interface components {
             /** Version */
             version: number | null;
         };
+        /** AgentStatsOut */
+        AgentStatsOut: {
+            /** Window Days */
+            window_days: number;
+            /** Executions */
+            executions: {
+                [key: string]: number;
+            };
+            /** Success Rate */
+            success_rate: number | null;
+            /** Duration */
+            duration: {
+                [key: string]: number | null;
+            };
+            tokens: components["schemas"]["TokenSummary"];
+            cost: components["schemas"]["CostSummary"];
+            /** Series */
+            series: components["schemas"]["TimePoint"][];
+        };
         /** AgentUpdateIn */
         AgentUpdateIn: {
             /** Name */
@@ -1280,6 +1419,67 @@ export interface components {
             /** Revoked At */
             revoked_at: string | null;
         };
+        /** AuditEventOut */
+        AuditEventOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Action */
+            action: string;
+            /** Actor */
+            actor: string | null;
+            /** Actor User Id */
+            actor_user_id: string | null;
+            /** Actor Api Key Id */
+            actor_api_key_id: string | null;
+            /** Target Type */
+            target_type: string | null;
+            /** Target Id */
+            target_id: string | null;
+            /** Data */
+            data: {
+                [key: string]: unknown;
+            };
+            /** Ip Address */
+            ip_address: string | null;
+            /** Request Id */
+            request_id: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** BreakdownRow */
+        BreakdownRow: {
+            /** Agent Id */
+            agent_id?: string | null;
+            /** Agent Name */
+            agent_name?: string | null;
+            /** Provider Kind */
+            provider_kind?: string | null;
+            /** Model */
+            model?: string | null;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Cost */
+            cost: string | null;
+            /** Currency */
+            currency: string | null;
+            /**
+             * Cost Source
+             * @enum {string}
+             */
+            cost_source: "provider_reported" | "estimated" | "unavailable";
+            /** Partial */
+            partial: boolean;
+            /** Model Calls */
+            model_calls: number;
+        };
         /** BuiltinToolOut */
         BuiltinToolOut: {
             /** Key */
@@ -1336,6 +1536,28 @@ export interface components {
             source: "provider_reported" | "estimated" | "unavailable";
             /** Partial */
             partial: boolean;
+        };
+        /** CostSummary */
+        CostSummary: {
+            /** Amount */
+            amount: string | null;
+            /** Currency */
+            currency: string | null;
+            /**
+             * Source
+             * @enum {string}
+             */
+            source: "provider_reported" | "estimated" | "unavailable";
+            /** Partial */
+            partial: boolean;
+            /** Priced Calls */
+            priced_calls: number;
+            /** Unpriced Calls */
+            unpriced_calls: number;
+            /** By Source */
+            by_source: {
+                [key: string]: string;
+            };
         };
         /** EmailChangeIn */
         EmailChangeIn: {
@@ -1458,7 +1680,7 @@ export interface components {
             finished_at: string | null;
             /** Duration Ms */
             duration_ms: number | null;
-            usage: components["schemas"]["UsageOut"];
+            usage: components["schemas"]["gouvra__modules__executions__schemas__UsageOut"];
             cost: components["schemas"]["CostOut"];
             /** Error Code */
             error_code: string | null;
@@ -1531,7 +1753,7 @@ export interface components {
             finished_at: string | null;
             /** Duration Ms */
             duration_ms: number | null;
-            usage: components["schemas"]["UsageOut"];
+            usage: components["schemas"]["gouvra__modules__executions__schemas__UsageOut"];
             cost: components["schemas"]["CostOut"];
             /** Error Code */
             error_code: string | null;
@@ -1625,6 +1847,17 @@ export interface components {
             created_at: string;
             /** Duration Ms */
             duration_ms: number | null;
+        };
+        /** LimitsOut */
+        LimitsOut: {
+            /** Max Concurrent Executions */
+            max_concurrent_executions: number;
+            /** Executions Per Minute */
+            executions_per_minute: number;
+            /** Max Execution Timeout S */
+            max_execution_timeout_s: number;
+            /** Max Input Bytes */
+            max_input_bytes: number;
         };
         /** LoginIn */
         LoginIn: {
@@ -1722,10 +1955,60 @@ export interface components {
              */
             optional: boolean;
         };
+        /** OverviewOut */
+        OverviewOut: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Agents Active */
+            agents_active: number;
+            /** Providers Configured */
+            providers_configured: number;
+            /** Providers In Error */
+            providers_in_error: number;
+            /** Running Now */
+            running_now: number;
+            /** Queued Now */
+            queued_now: number;
+            /** Executions 24H */
+            executions_24h: {
+                [key: string]: number;
+            };
+            /** Executions 7D */
+            executions_7d: {
+                [key: string]: number;
+            };
+            /** Success Rate 7D */
+            success_rate_7d: number | null;
+            /** Duration 7D */
+            duration_7d: {
+                [key: string]: number | null;
+            };
+            month_tokens: components["schemas"]["TokenSummary"];
+            month_cost: components["schemas"]["CostSummary"];
+            /** Recent Executions */
+            recent_executions: components["schemas"]["ExecutionSummary"][];
+            /** Recent Failures */
+            recent_failures: components["schemas"]["ExecutionSummary"][];
+        };
         /** Page[AgentOut] */
         Page_AgentOut_: {
             /** Data */
             data: components["schemas"]["AgentOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+            /**
+             * Has More
+             * @default false
+             */
+            has_more: boolean;
+        };
+        /** Page[AuditEventOut] */
+        Page_AuditEventOut_: {
+            /** Data */
+            data: components["schemas"]["AuditEventOut"][];
             /** Next Cursor */
             next_cursor?: string | null;
             /**
@@ -1982,10 +2265,68 @@ export interface components {
             /** Workspaces */
             workspaces: components["schemas"]["WorkspaceSummary"][];
         };
+        /** TimePoint */
+        TimePoint: {
+            /**
+             * Start
+             * Format: date-time
+             */
+            start: string;
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Cost */
+            cost: string | null;
+            /** Unpriced Calls */
+            unpriced_calls: number;
+            /** Model Calls */
+            model_calls: number;
+            /** Executions */
+            executions: number;
+            /** Succeeded */
+            succeeded: number;
+            /** Failed */
+            failed: number;
+        };
         /** TokenIn */
         TokenIn: {
             /** Token */
             token: string;
+        };
+        /** TokenSummary */
+        TokenSummary: {
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Cached Tokens */
+            cached_tokens: number;
+            /** Reasoning Tokens */
+            reasoning_tokens: number;
+            /** Model Calls */
+            model_calls: number;
+        };
+        /** ToolCallOut */
+        ToolCallOut: {
+            /**
+             * Execution Id
+             * Format: uuid
+             */
+            execution_id: string;
+            /** Agent Name */
+            agent_name: string | null;
+            /**
+             * Called At
+             * Format: date-time
+             */
+            called_at: string;
+            /** Ok */
+            ok: boolean | null;
+            /** Error Code */
+            error_code: string | null;
+            /** Duration Ms */
+            duration_ms: number | null;
         };
         /** ToolCreateIn */
         ToolCreateIn: {
@@ -2146,19 +2487,6 @@ export interface components {
              */
             user_id: string;
         };
-        /** UsageOut */
-        UsageOut: {
-            /** Input Tokens */
-            input_tokens: number;
-            /** Output Tokens */
-            output_tokens: number;
-            /** Cached Tokens */
-            cached_tokens: number;
-            /** Reasoning Tokens */
-            reasoning_tokens: number;
-            /** Total Tokens */
-            total_tokens: number;
-        };
         /** UserOut */
         UserOut: {
             /**
@@ -2242,6 +2570,18 @@ export interface components {
             /** Permissions */
             permissions: string[];
         };
+        /** WorkspaceSettingsIn */
+        WorkspaceSettingsIn: {
+            /** Max Concurrent Executions */
+            max_concurrent_executions?: number | null;
+        };
+        /** WorkspaceSettingsOut */
+        WorkspaceSettingsOut: {
+            /** Max Concurrent Executions */
+            max_concurrent_executions: number;
+            /** Max Concurrent Executions Limit */
+            max_concurrent_executions_limit: number;
+        };
         /** WorkspaceSummary */
         WorkspaceSummary: {
             /**
@@ -2264,6 +2604,50 @@ export interface components {
             name?: string | null;
             /** Slug */
             slug?: string | null;
+        };
+        /** UsageOut */
+        gouvra__modules__executions__schemas__UsageOut: {
+            /** Input Tokens */
+            input_tokens: number;
+            /** Output Tokens */
+            output_tokens: number;
+            /** Cached Tokens */
+            cached_tokens: number;
+            /** Reasoning Tokens */
+            reasoning_tokens: number;
+            /** Total Tokens */
+            total_tokens: number;
+        };
+        /** UsageOut */
+        gouvra__modules__usage__routes__UsageOut: {
+            /**
+             * Since
+             * Format: date-time
+             */
+            since: string;
+            /**
+             * Until
+             * Format: date-time
+             */
+            until: string;
+            /**
+             * Granularity
+             * @enum {string}
+             */
+            granularity: "hour" | "day" | "week";
+            tokens: components["schemas"]["TokenSummary"];
+            cost: components["schemas"]["CostSummary"];
+            /** Executions */
+            executions: {
+                [key: string]: number;
+            };
+            /** Series */
+            series: components["schemas"]["TimePoint"][];
+            /** By Agent */
+            by_agent: components["schemas"]["BreakdownRow"][];
+            /** By Model */
+            by_model: components["schemas"]["BreakdownRow"][];
+            limits: components["schemas"]["LimitsOut"];
         };
     };
     responses: never;
@@ -2955,6 +3339,72 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    workspaces_get_settings_: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceSettingsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    workspaces_update_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WorkspaceSettingsIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WorkspaceSettingsOut"];
+                };
             };
             /** @description Validation Error */
             422: {
@@ -3877,6 +4327,39 @@ export interface operations {
             };
         };
     };
+    tools_tool_calls: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                tool_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ToolCallOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     agents_list_agents: {
         parameters: {
             query?: {
@@ -4507,6 +4990,175 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    executions_export_execution: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                execution_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachment `execution-<id>.json` */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    usage_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    usage_usage: {
+        parameters: {
+            query?: {
+                since?: string | null;
+                until?: string | null;
+                granularity?: "hour" | "day" | "week";
+            };
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["gouvra__modules__usage__routes__UsageOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    usage_agent_stats: {
+        parameters: {
+            query?: {
+                days?: number;
+            };
+            header?: never;
+            path: {
+                agent_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AgentStatsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    audit_list_audit_events: {
+        parameters: {
+            query?: {
+                /** @description Exact action or prefix ending with '.' (e.g. 'agent.') */
+                action?: string | null;
+                actor_user_id?: string | null;
+                /** @description Page size (max 100) */
+                limit?: number;
+                /** @description `next_cursor` of the previous page */
+                cursor?: string | null;
+            };
+            header?: never;
+            path: {
+                workspace_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AuditEventOut_"];
                 };
             };
             /** @description Validation Error */

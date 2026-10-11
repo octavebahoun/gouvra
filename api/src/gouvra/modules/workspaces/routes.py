@@ -6,6 +6,7 @@ import uuid
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, status
+from pydantic import BaseModel, Field
 from sqlalchemy import select
 
 from gouvra.core import ratelimit
@@ -129,6 +130,52 @@ async def delete_workspace(
     ctx: Annotated[Ctx, workspace_access(Permission.WORKSPACE_DELETE)],
 ) -> None:
     await service.delete_workspace(db, ctx, payload.confirm_name)
+
+
+class WorkspaceSettingsIn(BaseModel):
+    max_concurrent_executions: int | None = Field(default=None, ge=1, le=50)
+
+
+class WorkspaceSettingsOut(BaseModel):
+    max_concurrent_executions: int
+    max_concurrent_executions_limit: int
+
+
+@router.get("/{workspace_id}/settings", summary="Operational settings (limits)")
+async def get_settings_(
+    db: DbSession, ctx: Annotated[Ctx, workspace_access(Permission.WORKSPACE_READ)]
+) -> WorkspaceSettingsOut:
+    from gouvra.modules.executions.queue import workspace_concurrency_limit
+
+    return WorkspaceSettingsOut(
+        max_concurrent_executions=await workspace_concurrency_limit(db, ctx.workspace_id),
+        max_concurrent_executions_limit=50,
+    )
+
+
+@router.patch("/{workspace_id}/settings", summary="Change operational settings")
+async def update_settings(
+    payload: WorkspaceSettingsIn,
+    db: DbSession,
+    ctx: Annotated[Ctx, workspace_access(Permission.WORKSPACE_UPDATE)],
+) -> WorkspaceSettingsOut:
+    from gouvra.modules.audit.service import record_for
+
+    settings = dict(ctx.workspace.settings or {})
+    if payload.max_concurrent_executions is not None:
+        settings["max_concurrent_executions"] = payload.max_concurrent_executions
+    ctx.workspace.settings = settings
+    await record_for(
+        db,
+        ctx.actor,
+        "workspace.settings_updated",
+        workspace_id=ctx.workspace_id,
+        target_type="workspace",
+        target_id=ctx.workspace_id,
+        data=payload.model_dump(exclude_none=True),
+    )
+    await db.commit()
+    return await get_settings_(db, ctx)
 
 
 @router.get("/{workspace_id}/members", summary="List members")

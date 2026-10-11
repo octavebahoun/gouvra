@@ -199,3 +199,36 @@ def outbox() -> object:
     from tests.helpers import Outbox
 
     return Outbox()
+
+
+@pytest.fixture
+async def lab(make_client: object, outbox: object) -> dict[str, object]:
+    """Workspace with a scripted provider, two tools and an agent allowed the calculator."""
+    from tests.helpers import (
+        create_agent,
+        create_builtin_tool,
+        create_provider,
+        create_workspace,
+        signup,
+    )
+
+    owner = await signup(make_client(), outbox, "runner@example.com")  # type: ignore[operator, arg-type]
+    ws = await create_workspace(owner, "Runs")
+    provider = await create_provider(owner, ws["id"])
+    calc = await create_builtin_tool(owner, ws["id"], "calculator")
+    clock = await create_builtin_tool(owner, ws["id"], "current_time")
+    agent = await create_agent(
+        owner,
+        ws["id"],
+        provider["id"],
+        tool_ids=[calc["id"]],
+        limits={"max_steps": 4, "max_tool_calls": 3, "timeout_s": 30},
+    )
+    return {
+        "owner": owner,
+        "ws": ws,
+        "provider": provider,
+        "agent": agent,
+        "calc": calc,
+        "clock": clock,
+    }

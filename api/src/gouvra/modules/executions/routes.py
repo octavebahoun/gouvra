@@ -378,3 +378,54 @@ async def stream_workspace(workspace_id: uuid.UUID, request: Request) -> Streami
 
 
 _ = TERMINAL
+
+
+@router.get(
+    "/executions/{execution_id}/export",
+    summary="Download the execution and its full trace as JSON",
+    responses={
+        200: {
+            "content": {"application/json": {}},
+            "description": "Attachment `execution-<id>.json`",
+        }
+    },
+)
+async def export_execution(execution_id: uuid.UUID, actor: CurrentActor, db: DbSession) -> Response:
+    from gouvra.modules.audit.service import record_for
+
+    execution, ctx = await load_in_workspace(
+        db, Execution, execution_id, actor, Permission.EXPORTS_CREATE
+    )
+    detail = await service.detail(db, execution)
+    events = list(
+        (
+            await db.execute(
+                select(ExecutionEvent)
+                .where(ExecutionEvent.execution_id == execution.id)
+                .order_by(ExecutionEvent.seq)
+            )
+        ).scalars()
+    )
+    payload = {
+        "format": "gouvra.execution.v1",
+        "exported_at": datetime.now().astimezone().isoformat(),
+        "execution": detail.model_dump(mode="json"),
+        "events": [
+            ExecutionEventOut.model_validate(e, from_attributes=True).model_dump(mode="json")
+            for e in events
+        ],
+    }
+    await record_for(
+        db,
+        actor,
+        "execution.exported",
+        workspace_id=ctx.workspace_id,
+        target_type="execution",
+        target_id=execution.id,
+    )
+    await db.commit()
+    return Response(
+        content=orjson.dumps(payload, option=orjson.OPT_INDENT_2),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="execution-{execution.id}.json"'},
+    )

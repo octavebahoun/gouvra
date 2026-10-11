@@ -13,76 +13,12 @@ from sqlalchemy import select, update
 from gouvra.core.config import get_settings
 from gouvra.core.db import get_sessionmaker, utcnow
 from gouvra.modules.executions.engine import run_execution
-from gouvra.modules.executions.models import Execution, ExecutionEvent, UsageRecord
+from gouvra.modules.executions.models import Execution, UsageRecord
 from gouvra.modules.executions.queue import claim_next, reap_expired
 from gouvra.modules.executions.worker import execution_service
-from tests.helpers import (
-    Account,
-    Outbox,
-    add_member,
-    create_agent,
-    create_builtin_tool,
-    create_provider,
-    create_workspace,
-    signup,
-)
+from tests.helpers import Outbox, add_member, drain, events_of, launch, signup
 
 pytestmark = pytest.mark.usefixtures("outbox")
-
-
-async def drain() -> int:
-    """Run every queued execution to completion, like the worker would."""
-    count = 0
-    while (claimed := await claim_next("test-worker")) is not None:
-        await run_execution(claimed, worker_id="test-worker")
-        count += 1
-    return count
-
-
-async def events_of(execution_id: str) -> list[ExecutionEvent]:
-    async with get_sessionmaker()() as db:
-        return list(
-            (
-                await db.execute(
-                    select(ExecutionEvent)
-                    .where(ExecutionEvent.execution_id == execution_id)
-                    .order_by(ExecutionEvent.seq)
-                )
-            ).scalars()
-        )
-
-
-@pytest.fixture
-async def lab(make_client, outbox: Outbox) -> dict[str, Any]:  # type: ignore[no-untyped-def]
-    owner = await signup(make_client(), outbox, "runner@example.com")
-    ws = await create_workspace(owner, "Runs")
-    provider = await create_provider(owner, ws["id"])
-    calc = await create_builtin_tool(owner, ws["id"], "calculator")
-    clock = await create_builtin_tool(owner, ws["id"], "current_time")
-    agent = await create_agent(
-        owner,
-        ws["id"],
-        provider["id"],
-        tool_ids=[calc["id"]],
-        limits={"max_steps": 4, "max_tool_calls": 3, "timeout_s": 30},
-    )
-    return {
-        "owner": owner,
-        "ws": ws,
-        "provider": provider,
-        "agent": agent,
-        "calc": calc,
-        "clock": clock,
-    }
-
-
-async def launch(owner: Account, agent_id: str, text: Any, **extra: Any) -> dict[str, Any]:
-    response = await owner.client.post(
-        f"/api/v1/agents/{agent_id}/executions", json={"input": text, **extra}
-    )
-    assert response.status_code == 202, response.text
-    body: dict[str, Any] = response.json()
-    return body
 
 
 async def test_simple_execution_is_traced_end_to_end(lab: dict[str, Any]) -> None:

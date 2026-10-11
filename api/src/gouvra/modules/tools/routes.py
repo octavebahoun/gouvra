@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import uuid
+from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Query, status
+from pydantic import BaseModel
 from sqlalchemy import func, select
 
 from gouvra.core import ratelimit
@@ -146,3 +148,76 @@ async def test_tool(
     result = await run_tool(tool, payload.arguments)
     result.for_model()  # applies the same truncation the model would see
     return ToolTestOut(**result.as_dict())
+
+
+class ToolCallOut(BaseModel):
+    execution_id: uuid.UUID
+    agent_name: str | None
+    called_at: datetime
+    ok: bool | None
+    error_code: str | None
+    duration_ms: int | None
+
+
+@router.get("/tools/{tool_id}/calls", summary="Recent calls of this tool (usage history)")
+async def tool_calls(
+    tool_id: uuid.UUID,
+    actor: CurrentActor,
+    db: DbSession,
+    limit: Annotated[int, Query(ge=1, le=100)] = 25,
+) -> list[ToolCallOut]:
+    from gouvra.modules.agents.models import Agent
+    from gouvra.modules.executions.models import Execution, ExecutionEvent
+
+    tool, ctx = await load_in_workspace(db, Tool, tool_id, actor, Permission.TOOLS_READ)
+    calls = list(
+        (
+            await db.execute(
+                select(ExecutionEvent)
+                .where(
+                    ExecutionEvent.workspace_id == ctx.workspace_id,
+                    ExecutionEvent.type == "tool.call",
+                    ExecutionEvent.data["tool_id"].astext == str(tool.id),
+                )
+                .order_by(ExecutionEvent.id.desc())
+                .limit(limit)
+            )
+        ).scalars()
+    )
+    if not calls:
+        return []
+    execution_ids = {c.execution_id for c in calls}
+    results = {
+        (r.execution_id, r.data.get("call_id")): r
+        for r in (
+            await db.execute(
+                select(ExecutionEvent).where(
+                    ExecutionEvent.execution_id.in_(execution_ids),
+                    ExecutionEvent.type == "tool.result",
+                )
+            )
+        ).scalars()
+    }
+    agents = dict(
+        (
+            await db.execute(
+                select(Execution.id, Agent.name)
+                .join(Agent, Agent.id == Execution.agent_id)
+                .where(Execution.id.in_(execution_ids))
+            )
+        ).all()
+    )
+    out: list[ToolCallOut] = []
+    for call in calls:
+        result = results.get((call.execution_id, call.data.get("call_id")))
+        out.append(
+            ToolCallOut(
+                execution_id=call.execution_id,
+                agent_name=agents.get(call.execution_id),
+                called_at=call.created_at,
+                ok=result.data.get("ok") if result else None,
+                error_code=result.data.get("error_code") if result else None,
+                duration_ms=result.duration_ms if result else None,
+            )
+        )
+    return out

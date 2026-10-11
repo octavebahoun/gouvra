@@ -128,3 +128,39 @@ async def create_agent(
     assert response.status_code == 201, response.text
     body: dict[str, Any] = response.json()
     return body
+
+
+async def drain() -> int:
+    """Run every queued execution to completion, like the worker would."""
+    from gouvra.modules.executions.engine import run_execution
+    from gouvra.modules.executions.queue import claim_next
+
+    count = 0
+    while (claimed := await claim_next("test-worker")) is not None:
+        await run_execution(claimed, worker_id="test-worker")
+        count += 1
+    return count
+
+
+async def events_of(execution_id: str) -> list[Any]:
+    from sqlalchemy import select
+
+    from gouvra.core.db import get_sessionmaker
+    from gouvra.modules.executions.models import ExecutionEvent
+
+    async with get_sessionmaker()() as db:
+        query = (
+            select(ExecutionEvent)
+            .where(ExecutionEvent.execution_id == execution_id)
+            .order_by(ExecutionEvent.seq)
+        )
+        return list((await db.execute(query)).scalars())
+
+
+async def launch(owner: Account, agent_id: str, text: Any, **extra: Any) -> dict[str, Any]:
+    response = await owner.client.post(
+        f"/api/v1/agents/{agent_id}/executions", json={"input": text, **extra}
+    )
+    assert response.status_code == 202, response.text
+    body: dict[str, Any] = response.json()
+    return body
