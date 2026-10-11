@@ -83,6 +83,15 @@ class RequestContextMiddleware:
                 )
 
 
+API_CSP = "default-src 'none'; frame-ancestors 'none'"
+# Vendored API reference: same-origin scripts only; Swagger UI needs inline styles, data: icons.
+DOCS_CSP = (
+    "default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-ancestors 'none'; "
+    "base-uri 'none'; form-action 'none'"
+)
+
+
 class SecurityHeadersMiddleware:
     """Defensive headers for every API response (the SPA's CSP is set by Caddy)."""
 
@@ -94,7 +103,9 @@ class SecurityHeadersMiddleware:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
-        is_docs = scope.get("path", "").startswith(("/api/docs", "/api/redoc"))
+        path = scope.get("path", "")
+        is_docs = path.startswith("/api/docs")
+        is_docs_asset = path.startswith("/api/docs/assets/")
 
         async def send_wrapper(message: Message) -> None:
             if message["type"] == "http.response.start":
@@ -105,11 +116,10 @@ class SecurityHeadersMiddleware:
                 h.setdefault("cross-origin-opener-policy", "same-origin")
                 h.setdefault("cross-origin-resource-policy", "same-origin")
                 h.setdefault("permissions-policy", "camera=(), microphone=(), geolocation=()")
-                if not is_docs:
-                    h.setdefault(
-                        "content-security-policy", "default-src 'none'; frame-ancestors 'none'"
-                    )
-                h.setdefault("cache-control", "no-store")
+                h.setdefault("content-security-policy", DOCS_CSP if is_docs else API_CSP)
+                h.setdefault(
+                    "cache-control", "public, max-age=86400" if is_docs_asset else "no-store"
+                )
                 if self.hsts:
                     h.setdefault("strict-transport-security", "max-age=63072000; includeSubDomains")
             await send(message)

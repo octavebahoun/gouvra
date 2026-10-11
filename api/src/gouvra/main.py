@@ -4,10 +4,13 @@ from __future__ import annotations
 
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
 from fastapi.routing import APIRoute
+from fastapi.staticfiles import StaticFiles
 
 from gouvra.api import api_router
 from gouvra.core.config import Settings, get_settings
@@ -58,6 +61,30 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         log.info("api_stopped")
 
 
+DOCS_DIR = Path(__file__).parent / "static" / "docs"
+DOCS_HTML = """<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gouvra API reference</title>
+    <link rel="icon" href="/api/docs/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/api/docs/assets/swagger-ui.css" />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+    <script src="/api/docs/assets/swagger-ui-bundle.js"></script>
+    <script src="/api/docs/assets/init.js"></script>
+  </body>
+</html>
+"""
+
+
+async def api_docs() -> HTMLResponse:
+    """Interactive API reference (Swagger UI, vendored: works offline, no third-party code)."""
+    return HTMLResponse(DOCS_HTML)
+
+
 def create_app(settings: Settings | None = None) -> FastAPI:
     import gouvra.models  # noqa: F401 - registers every table before any query
 
@@ -68,13 +95,16 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         version=settings.app_version,
         description=API_DESCRIPTION,
         openapi_url="/api/v1/openapi.json",
-        docs_url="/api/docs",
-        redoc_url="/api/redoc",
+        # The reference is served from this instance below (no CDN, strict CSP).
+        docs_url=None,
+        redoc_url=None,
         lifespan=lifespan,
         generate_unique_id_function=_operation_id,
         license_info={"name": "Apache-2.0", "url": "https://www.apache.org/licenses/LICENSE-2.0"},
     )
     register_error_handlers(app)
+    app.mount("/api/docs/assets", StaticFiles(directory=DOCS_DIR), name="docs-assets")
+    app.add_api_route("/api/docs", api_docs, include_in_schema=False, methods=["GET"])
     app.include_router(health_router)
     app.include_router(api_router, prefix="/api/v1")
 

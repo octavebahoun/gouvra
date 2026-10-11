@@ -213,3 +213,16 @@ def test_key_ring_parsing() -> None:
     assert [kid for kid, _ in ring] == ["new", "old"]
     assert all(len(key) == 32 for _, key in ring)
     assert settings.cors_origins == ["https://a.example", "https://b.example"]
+
+
+async def test_api_reference_is_self_hosted_under_a_strict_csp(app_client) -> None:  # type: ignore[no-untyped-def]
+    page = await app_client.get("/api/docs")
+    assert page.status_code == 200
+    assert "http" not in page.text.replace("http-equiv", "")  # no third-party URL at all
+    csp = page.headers["content-security-policy"]
+    assert "script-src 'self'" in csp
+    assert "cdn" not in csp
+    asset = await app_client.get("/api/docs/assets/swagger-ui-bundle.js")
+    assert asset.status_code == 200
+    assert asset.headers["cache-control"] == "public, max-age=86400"
+    assert (await app_client.get("/api/redoc")).status_code == 404
