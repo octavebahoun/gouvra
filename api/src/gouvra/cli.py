@@ -138,6 +138,8 @@ def main(argv: list[str] | None = None) -> int:
     sandbox.set_defaults(func=cmd_sandbox)
 
     args = parser.parse_args(argv)
+    import gouvra.models  # noqa: F401 - every table, so any write resolves its foreign keys
+
     result: int = args.func(args)
     return result
 

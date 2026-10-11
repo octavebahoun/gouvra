@@ -314,6 +314,9 @@ async def create_invitation(
     ).scalar_one()
     if already_member:
         raise Conflict("This person is already a member.", code="already_member")
+    from gouvra.modules.usage.limits import require_capacity
+
+    await require_capacity(db, ctx.workspace_id, "members")
     # A new invitation supersedes any pending one for the same address ("re-invite").
     await db.execute(
         update(Invitation)

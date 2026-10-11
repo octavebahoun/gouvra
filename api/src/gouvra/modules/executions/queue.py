@@ -28,11 +28,13 @@ def workspace_lock_key(workspace_id: uuid.UUID) -> int:
 
 async def workspace_concurrency_limit(db: AsyncSession, workspace_id: uuid.UUID) -> int:
     """Running executions allowed at once for a workspace (plans may lower or raise it)."""
+    from gouvra.modules.billing.service import plan_of
     from gouvra.modules.workspaces.models import Workspace
 
     workspace = await db.get(Workspace, workspace_id)
     configured = (workspace.settings or {}).get("max_concurrent_executions") if workspace else None
-    return int(configured or get_settings().default_workspace_concurrency)
+    wanted = int(configured or get_settings().default_workspace_concurrency)
+    return min(wanted, (await plan_of(db, workspace_id)).concurrency)
 
 
 async def notify_queue(db: AsyncSession) -> None:

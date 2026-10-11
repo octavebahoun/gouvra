@@ -20,7 +20,7 @@ from gouvra.core.authz import (
     workspace_access,
 )
 from gouvra.core.context import current_client_ip
-from gouvra.core.errors import Forbidden
+from gouvra.core.errors import Forbidden, ValidationFailed
 from gouvra.modules.identity.auth import check_origin
 from gouvra.modules.identity.models import User
 from gouvra.modules.identity.schemas import TokenIn
@@ -134,22 +134,36 @@ async def delete_workspace(
 
 class WorkspaceSettingsIn(BaseModel):
     max_concurrent_executions: int | None = Field(default=None, ge=1, le=50)
+    retention_days: int | None = Field(
+        default=None, ge=7, le=3650, description="Runs, deliveries and alerts kept this long"
+    )
+    audit_retention_days: int | None = Field(default=None, ge=90, le=3650)
 
 
 class WorkspaceSettingsOut(BaseModel):
     max_concurrent_executions: int
     max_concurrent_executions_limit: int
+    retention_days: int
+    retention_days_max: int = Field(description="The most the plan allows")
+    audit_retention_days: int
 
 
-@router.get("/{workspace_id}/settings", summary="Operational settings (limits)")
+@router.get("/{workspace_id}/settings", summary="Operational settings (limits, retention)")
 async def get_settings_(
     db: DbSession, ctx: Annotated[Ctx, workspace_access(Permission.WORKSPACE_READ)]
 ) -> WorkspaceSettingsOut:
+    from gouvra.modules.billing.service import plan_of
     from gouvra.modules.executions.queue import workspace_concurrency_limit
+    from gouvra.modules.retention.service import retention_of
 
+    plan = await plan_of(db, ctx.workspace_id)
+    keep, audit = retention_of(ctx.workspace, plan)
     return WorkspaceSettingsOut(
         max_concurrent_executions=await workspace_concurrency_limit(db, ctx.workspace_id),
-        max_concurrent_executions_limit=50,
+        max_concurrent_executions_limit=min(50, plan.concurrency),
+        retention_days=keep,
+        retention_days_max=plan.retention_days_max,
+        audit_retention_days=audit,
     )
 
 
@@ -160,10 +174,29 @@ async def update_settings(
     ctx: Annotated[Ctx, workspace_access(Permission.WORKSPACE_UPDATE)],
 ) -> WorkspaceSettingsOut:
     from gouvra.modules.audit.service import record_for
+    from gouvra.modules.billing.service import plan_of
 
     settings = dict(ctx.workspace.settings or {})
     if payload.max_concurrent_executions is not None:
         settings["max_concurrent_executions"] = payload.max_concurrent_executions
+    if payload.retention_days is not None or payload.audit_retention_days is not None:
+        ctx.require(Permission.RETENTION_MANAGE)
+        plan = await plan_of(db, ctx.workspace_id)
+        if payload.retention_days is not None:
+            if payload.retention_days > plan.retention_days_max:
+                raise ValidationFailed(
+                    errors=[
+                        {
+                            "field": "retention_days",
+                            "code": "plan_limit",
+                            "message": f"The {plan.name} plan keeps data up to "
+                            f"{plan.retention_days_max} days.",
+                        }
+                    ]
+                )
+            settings["retention_days"] = payload.retention_days
+        if payload.audit_retention_days is not None:
+            settings["audit_retention_days"] = payload.audit_retention_days
     ctx.workspace.settings = settings
     await record_for(
         db,

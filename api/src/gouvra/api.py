@@ -11,14 +11,18 @@ api_router = APIRouter()
 
 
 def _include_modules() -> None:
+    from gouvra.modules.admin.routes import router as admin_router
     from gouvra.modules.agents.routes import router as agents_router
     from gouvra.modules.api_keys.routes import router as api_keys_router
     from gouvra.modules.audit.routes import router as audit_router
     from gouvra.modules.automations.routes import hooks_router
     from gouvra.modules.automations.routes import router as automations_router
+    from gouvra.modules.billing.routes import router as billing_router
+    from gouvra.modules.budgets.routes import router as budgets_router
     from gouvra.modules.connectors.routes import router as connectors_router
     from gouvra.modules.evaluations.routes import router as evaluations_router
     from gouvra.modules.executions.routes import router as executions_router
+    from gouvra.modules.exports.routes import router as exports_router
     from gouvra.modules.identity.routes import me_router
     from gouvra.modules.identity.routes import router as auth_router
     from gouvra.modules.providers.routes import router as providers_router
@@ -47,6 +51,10 @@ def _include_modules() -> None:
         hooks_router,
         connectors_router,
         registry_router,
+        billing_router,
+        budgets_router,
+        exports_router,
+        admin_router,
     ):
         api_router.include_router(router)
 

@@ -204,6 +204,9 @@ async def create(
     db: AsyncSession, ctx: WorkspaceContext, payload: AutomationCreateIn
 ) -> tuple[Automation, str | None]:
     ctx.require(Permission.AUTOMATIONS_MANAGE)
+    from gouvra.modules.usage.limits import require_capacity
+
+    await require_capacity(db, ctx.workspace_id, "automations")
     await _check_target(
         db, ctx.workspace_id, payload.target_type, payload.agent_id, payload.workflow_id
     )

@@ -7,6 +7,8 @@ from gouvra.modules.agents.models import Agent, AgentVersion
 from gouvra.modules.api_keys.models import ApiKey
 from gouvra.modules.audit.models import AuditEvent
 from gouvra.modules.automations.models import Automation, AutomationFire
+from gouvra.modules.billing.models import BillingEvent, Subscription
+from gouvra.modules.budgets.models import Alert, Budget
 from gouvra.modules.connectors.models import Connection
 from gouvra.modules.evaluations.models import EvalCase, EvalResult, EvalRun, EvalSuite
 from gouvra.modules.executions.models import Execution, ExecutionEvent, UsageRecord
@@ -20,11 +22,14 @@ from gouvra.modules.workspaces.models import Invitation, Membership, Workspace
 __all__ = [
     "Agent",
     "AgentVersion",
+    "Alert",
     "ApiKey",
     "AuditEvent",
     "Automation",
     "AutomationFire",
     "Base",
+    "BillingEvent",
+    "Budget",
     "Connection",
     "EmailOutbox",
     "EmailToken",
@@ -38,6 +43,7 @@ __all__ = [
     "Membership",
     "OAuthAccount",
     "ProviderConfig",
+    "Subscription",
     "Tool",
     "UsageRecord",
     "User",

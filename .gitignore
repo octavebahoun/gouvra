@@ -31,10 +31,10 @@ web/playwright-report/
 web/blob-report/
 web/e2e/.auth/
 
-# Runtime data
-var/
-data/
-exports/
+# Runtime data (at the root only: `modules/exports/` is source code)
+/var/
+/data/
+/exports/
 
 # OS / editors
 .DS_Store

@@ -930,7 +930,7 @@
         "tags": [
           "workspaces"
         ],
-        "summary": "Operational settings (limits)",
+        "summary": "Operational settings (limits, retention)",
         "operationId": "workspaces_get_settings_",
         "parameters": [
           {
@@ -6403,6 +6403,968 @@
           }
         }
       }
+    },
+    "/api/v1/billing/plans": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Plans offered by this instance",
+        "operationId": "billing_plans",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PlansOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing": {
+      "get": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Plan, subscription and usage",
+        "operationId": "billing_billing",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing/checkout": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Start subscribing to a paid plan (returns where to send the browser)",
+        "operationId": "billing_checkout",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing/portal": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Open the billing portal (payment method, invoices, plan changes, cancellation)",
+        "operationId": "billing_portal",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedirectOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing/simulated/confirm": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Confirm a simulated payment (instances without a payment provider)",
+        "operationId": "billing_simulated_confirm",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SimulatedConfirmIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/billing/simulated/cancel": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Cancel a simulated subscription at the end of its period",
+        "operationId": "billing_simulated_cancel",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/billing/stripe/webhook": {
+      "post": {
+        "tags": [
+          "billing"
+        ],
+        "summary": "Stripe events (signature verified; each event applied once)",
+        "operationId": "billing_stripe_webhook",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "type": "object",
+                  "title": "Response Billing Stripe Webhook"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing or invalid Stripe-Signature"
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/budget": {
+      "get": {
+        "tags": [
+          "budgets"
+        ],
+        "summary": "Monthly budget and what was spent",
+        "operationId": "budgets_get_budget",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "budgets"
+        ],
+        "summary": "Set, change or remove the budget",
+        "operationId": "budgets_put_budget",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BudgetIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BudgetOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/alerts": {
+      "get": {
+        "tags": [
+          "budgets"
+        ],
+        "summary": "Recent alerts (budget, quota, payment)",
+        "operationId": "budgets_list_alerts",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AlertOut"
+                  },
+                  "title": "Response Budgets List Alerts"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/alerts/{alert_id}/dismiss": {
+      "post": {
+        "tags": [
+          "budgets"
+        ],
+        "summary": "Dismiss an alert",
+        "operationId": "budgets_dismiss_alert",
+        "parameters": [
+          {
+            "name": "alert_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Alert Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/exports/configuration": {
+      "get": {
+        "tags": [
+          "exports"
+        ],
+        "summary": "Agents, tools, workflows, evaluations and automations as JSON (no secret)",
+        "operationId": "exports_export_configuration",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/exports/executions.csv": {
+      "get": {
+        "tags": [
+          "exports"
+        ],
+        "summary": "Executions as CSV (default: the last 30 days)",
+        "operationId": "exports_export_executions",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "text/csv": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/workspaces/{workspace_id}/exports/usage.csv": {
+      "get": {
+        "tags": [
+          "exports"
+        ],
+        "summary": "Usage per day, agent and model as CSV (default: the last 30 days)",
+        "operationId": "exports_export_usage",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          },
+          {
+            "name": "since",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Since"
+            }
+          },
+          {
+            "name": "until",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "format": "date"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Until"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              },
+              "text/csv": {}
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/overview": {
+      "get": {
+        "tags": [
+          "administration"
+        ],
+        "summary": "The instance at a glance",
+        "operationId": "administration_overview",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceOverviewOut"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/workspaces": {
+      "get": {
+        "tags": [
+          "administration"
+        ],
+        "summary": "Every workspace (organisation) of the instance",
+        "operationId": "administration_workspaces",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 80
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminWorkspaceOut"
+                  },
+                  "title": "Response Administration Workspaces"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/workspaces/{workspace_id}": {
+      "patch": {
+        "tags": [
+          "administration"
+        ],
+        "summary": "Suspend or restore a workspace; grant a plan",
+        "operationId": "administration_update_workspace",
+        "parameters": [
+          {
+            "name": "workspace_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Workspace Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminWorkspaceIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminWorkspaceOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "tags": [
+          "administration"
+        ],
+        "summary": "Every account of the instance",
+        "operationId": "administration_users",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 120
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUserOut"
+                  },
+                  "title": "Response Administration Users"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{user_id}": {
+      "patch": {
+        "tags": [
+          "administration"
+        ],
+        "summary": "Disable or re-enable an account (signs it out)",
+        "operationId": "administration_update_user",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "User Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminUserIn"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUserOut"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/admin/audit-events": {
+      "get": {
+        "tags": [
+          "administration"
+        ],
+        "summary": "The instance-wide audit log",
+        "operationId": "administration_audit_events",
+        "parameters": [
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 100,
+              "minimum": 1,
+              "description": "Page size (max 100)",
+              "default": 25,
+              "title": "Limit"
+            },
+            "description": "Page size (max 100)"
+          },
+          {
+            "name": "cursor",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string",
+                  "maxLength": 200
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` of the previous page",
+              "title": "Cursor"
+            },
+            "description": "`next_cursor` of the previous page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page_AdminAuditOut_"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -6426,6 +7388,287 @@
           "message"
         ],
         "title": "Accepted"
+      },
+      "AdminAuditOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "action": {
+            "type": "string",
+            "title": "Action"
+          },
+          "actor_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Label"
+          },
+          "workspace_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workspace Id"
+          },
+          "target_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Type"
+          },
+          "target_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Id"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          },
+          "ip_address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip Address"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "action",
+          "actor_label",
+          "workspace_id",
+          "target_type",
+          "target_id",
+          "data",
+          "ip_address",
+          "created_at"
+        ],
+        "title": "AdminAuditOut"
+      },
+      "AdminUserIn": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "disabled"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "AdminUserIn"
+      },
+      "AdminUserOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "email": {
+            "type": "string",
+            "title": "Email"
+          },
+          "display_name": {
+            "type": "string",
+            "title": "Display Name"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_superadmin": {
+            "type": "boolean",
+            "title": "Is Superadmin"
+          },
+          "email_verified": {
+            "type": "boolean",
+            "title": "Email Verified"
+          },
+          "workspaces": {
+            "type": "integer",
+            "title": "Workspaces"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "email",
+          "display_name",
+          "status",
+          "is_superadmin",
+          "email_verified",
+          "workspaces",
+          "created_at"
+        ],
+        "title": "AdminUserOut"
+      },
+      "AdminWorkspaceIn": {
+        "properties": {
+          "status": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "suspended"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "free",
+                  "team",
+                  "business"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Plan",
+            "description": "Grant a plan without payment (or back to Free)"
+          }
+        },
+        "type": "object",
+        "title": "AdminWorkspaceIn"
+      },
+      "AdminWorkspaceOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "slug": {
+            "type": "string",
+            "title": "Slug"
+          },
+          "owner_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Owner Email"
+          },
+          "members": {
+            "type": "integer",
+            "title": "Members"
+          },
+          "plan": {
+            "type": "string",
+            "title": "Plan"
+          },
+          "subscription_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subscription Status"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "is_demo": {
+            "type": "boolean",
+            "title": "Is Demo"
+          },
+          "executions_30d": {
+            "type": "integer",
+            "title": "Executions 30D"
+          },
+          "spend_30d": {
+            "type": "string",
+            "title": "Spend 30D"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "owner_email",
+          "members",
+          "plan",
+          "subscription_status",
+          "status",
+          "is_demo",
+          "executions_30d",
+          "spend_30d",
+          "created_at"
+        ],
+        "title": "AdminWorkspaceOut"
       },
       "AgentCreateIn": {
         "properties": {
@@ -7265,6 +8508,55 @@
           "is_current"
         ],
         "title": "AgentVersionOut"
+      },
+      "AlertOut": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "kind": {
+            "type": "string",
+            "title": "Kind"
+          },
+          "level": {
+            "type": "string",
+            "title": "Level"
+          },
+          "data": {
+            "additionalProperties": true,
+            "type": "object",
+            "title": "Data"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Created At"
+          },
+          "dismissed_at": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dismissed At"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "level",
+          "data",
+          "created_at",
+          "dismissed_at"
+        ],
+        "title": "AlertOut"
       },
       "ApiKeyCreateIn": {
         "properties": {
@@ -8486,6 +9778,67 @@
         "type": "object",
         "title": "AutomationUpdateIn"
       },
+      "BillingOut": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "provider": {
+            "type": "string",
+            "enum": [
+              "none",
+              "simulated",
+              "stripe"
+            ],
+            "title": "Provider"
+          },
+          "test_mode": {
+            "type": "boolean",
+            "title": "Test Mode",
+            "description": "Stripe test keys: no real charge"
+          },
+          "plan": {
+            "$ref": "#/components/schemas/PlanOut"
+          },
+          "subscription": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SubscriptionOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "usage": {
+            "$ref": "#/components/schemas/UsageCounts"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/PlanOut"
+            },
+            "type": "array",
+            "title": "Plans"
+          },
+          "can_manage": {
+            "type": "boolean",
+            "title": "Can Manage"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "provider",
+          "test_mode",
+          "plan",
+          "subscription",
+          "usage",
+          "plans",
+          "can_manage"
+        ],
+        "title": "BillingOut"
+      },
       "BreakdownRow": {
         "properties": {
           "agent_id": {
@@ -8596,6 +9949,108 @@
           "model_calls"
         ],
         "title": "BreakdownRow"
+      },
+      "BudgetIn": {
+        "properties": {
+          "monthly_limit": {
+            "anyOf": [
+              {
+                "type": "number",
+                "minimum": 0.0
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Monthly Limit",
+            "description": "None removes the budget"
+          },
+          "thresholds": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "maxItems": 10,
+            "title": "Thresholds"
+          },
+          "hard_stop": {
+            "type": "boolean",
+            "title": "Hard Stop",
+            "default": false
+          }
+        },
+        "type": "object",
+        "title": "BudgetIn"
+      },
+      "BudgetOut": {
+        "properties": {
+          "budget": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BudgetSettings"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "spent": {
+            "type": "string",
+            "title": "Spent"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "budget",
+          "spent",
+          "period_start",
+          "period_end"
+        ],
+        "title": "BudgetOut"
+      },
+      "BudgetSettings": {
+        "properties": {
+          "monthly_limit": {
+            "type": "string",
+            "title": "Monthly Limit"
+          },
+          "currency": {
+            "type": "string",
+            "title": "Currency"
+          },
+          "thresholds": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Thresholds"
+          },
+          "hard_stop": {
+            "type": "boolean",
+            "title": "Hard Stop"
+          }
+        },
+        "type": "object",
+        "required": [
+          "monthly_limit",
+          "currency",
+          "thresholds",
+          "hard_stop"
+        ],
+        "title": "BudgetSettings"
       },
       "BuiltinToolOut": {
         "properties": {
@@ -9090,6 +10545,23 @@
           "message"
         ],
         "title": "CheckOut"
+      },
+      "CheckoutIn": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "team",
+              "business"
+            ],
+            "title": "Plan"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan"
+        ],
+        "title": "CheckoutIn"
       },
       "ComparisonOut": {
         "properties": {
@@ -10918,6 +12390,57 @@
         ],
         "title": "HookAcceptedOut"
       },
+      "InstanceOverviewOut": {
+        "properties": {
+          "users": {
+            "type": "integer",
+            "title": "Users"
+          },
+          "workspaces": {
+            "type": "integer",
+            "title": "Workspaces"
+          },
+          "suspended_workspaces": {
+            "type": "integer",
+            "title": "Suspended Workspaces"
+          },
+          "executions_24h": {
+            "type": "integer",
+            "title": "Executions 24H"
+          },
+          "executions_30d": {
+            "type": "integer",
+            "title": "Executions 30D"
+          },
+          "spend_30d": {
+            "type": "string",
+            "title": "Spend 30D"
+          },
+          "plans": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object",
+            "title": "Plans"
+          },
+          "billing_provider": {
+            "type": "string",
+            "title": "Billing Provider"
+          }
+        },
+        "type": "object",
+        "required": [
+          "users",
+          "workspaces",
+          "suspended_workspaces",
+          "executions_24h",
+          "executions_30d",
+          "spend_30d",
+          "plans",
+          "billing_provider"
+        ],
+        "title": "InstanceOverviewOut"
+      },
       "InvitationCreateIn": {
         "properties": {
           "email": {
@@ -11579,6 +13102,40 @@
         ],
         "title": "OverviewOut"
       },
+      "Page_AdminAuditOut_": {
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AdminAuditOut"
+            },
+            "type": "array",
+            "title": "Data"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "has_more": {
+            "type": "boolean",
+            "title": "Has More",
+            "default": false
+          }
+        },
+        "type": "object",
+        "required": [
+          "data",
+          "next_cursor",
+          "has_more"
+        ],
+        "title": "Page[AdminAuditOut]"
+      },
       "Page_AgentOut_": {
         "properties": {
           "data": {
@@ -11782,6 +13339,113 @@
           "has_more"
         ],
         "title": "Page[WorkflowRunSummaryOut]"
+      },
+      "PlanOut": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "price_monthly": {
+            "type": "string",
+            "title": "Price Monthly"
+          },
+          "executions_per_month": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Executions Per Month"
+          },
+          "members": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Members"
+          },
+          "agents": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agents"
+          },
+          "automations": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Automations"
+          },
+          "concurrency": {
+            "type": "integer",
+            "title": "Concurrency"
+          },
+          "retention_days_max": {
+            "type": "integer",
+            "title": "Retention Days Max"
+          },
+          "paid": {
+            "type": "boolean",
+            "title": "Paid"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "price_monthly",
+          "executions_per_month",
+          "members",
+          "agents",
+          "automations",
+          "concurrency",
+          "retention_days_max",
+          "paid"
+        ],
+        "title": "PlanOut"
+      },
+      "PlansOut": {
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "title": "Enabled"
+          },
+          "plans": {
+            "items": {
+              "$ref": "#/components/schemas/PlanOut"
+            },
+            "type": "array",
+            "title": "Plans"
+          }
+        },
+        "type": "object",
+        "required": [
+          "enabled",
+          "plans"
+        ],
+        "title": "PlansOut"
       },
       "Position": {
         "properties": {
@@ -12328,6 +13992,19 @@
         },
         "type": "object",
         "title": "ProviderUpdateIn"
+      },
+      "RedirectOut": {
+        "properties": {
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "title": "RedirectOut"
       },
       "Ref": {
         "properties": {
@@ -13461,6 +15138,29 @@
         ],
         "title": "SessionOut"
       },
+      "SimulatedConfirmIn": {
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "team",
+              "business"
+            ],
+            "title": "Plan"
+          },
+          "token": {
+            "type": "string",
+            "maxLength": 200,
+            "title": "Token"
+          }
+        },
+        "type": "object",
+        "required": [
+          "plan",
+          "token"
+        ],
+        "title": "SimulatedConfirmIn"
+      },
       "StartNode": {
         "properties": {
           "id": {
@@ -13503,6 +15203,47 @@
           "label"
         ],
         "title": "StartNode"
+      },
+      "SubscriptionOut": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "provider": {
+            "type": "string",
+            "title": "Provider"
+          },
+          "current_period_end": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Period End"
+          },
+          "cancel_at_period_end": {
+            "type": "boolean",
+            "title": "Cancel At Period End"
+          },
+          "granted_by_admin": {
+            "type": "boolean",
+            "title": "Granted By Admin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "provider",
+          "current_period_end",
+          "cancel_at_period_end",
+          "granted_by_admin"
+        ],
+        "title": "SubscriptionOut"
       },
       "SuiteCreateIn": {
         "properties": {
@@ -14521,6 +16262,46 @@
           "template"
         ],
         "title": "TransformNode"
+      },
+      "UsageCounts": {
+        "properties": {
+          "executions": {
+            "type": "integer",
+            "title": "Executions"
+          },
+          "members": {
+            "type": "integer",
+            "title": "Members"
+          },
+          "agents": {
+            "type": "integer",
+            "title": "Agents"
+          },
+          "automations": {
+            "type": "integer",
+            "title": "Automations"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period Start"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date-time",
+            "title": "Period End"
+          }
+        },
+        "type": "object",
+        "required": [
+          "executions",
+          "members",
+          "agents",
+          "automations",
+          "period_start",
+          "period_end"
+        ],
+        "title": "UsageCounts"
       },
       "UsageReportOut": {
         "properties": {
@@ -15866,6 +17647,33 @@
               }
             ],
             "title": "Max Concurrent Executions"
+          },
+          "retention_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3650.0,
+                "minimum": 7.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Retention Days",
+            "description": "Runs, deliveries and alerts kept this long"
+          },
+          "audit_retention_days": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "maximum": 3650.0,
+                "minimum": 90.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Audit Retention Days"
           }
         },
         "type": "object",
@@ -15880,12 +17688,28 @@
           "max_concurrent_executions_limit": {
             "type": "integer",
             "title": "Max Concurrent Executions Limit"
+          },
+          "retention_days": {
+            "type": "integer",
+            "title": "Retention Days"
+          },
+          "retention_days_max": {
+            "type": "integer",
+            "title": "Retention Days Max",
+            "description": "The most the plan allows"
+          },
+          "audit_retention_days": {
+            "type": "integer",
+            "title": "Audit Retention Days"
           }
         },
         "type": "object",
         "required": [
           "max_concurrent_executions",
-          "max_concurrent_executions_limit"
+          "max_concurrent_executions_limit",
+          "retention_days",
+          "retention_days_max",
+          "audit_retention_days"
         ],
         "title": "WorkspaceSettingsOut"
       },

@@ -128,6 +128,9 @@ async def _new_version(
 
 
 async def create_agent(db: AsyncSession, ctx: WorkspaceContext, payload: AgentCreateIn) -> Agent:
+    from gouvra.modules.usage.limits import require_capacity
+
+    await require_capacity(db, ctx.workspace_id, "agents")
     provider = await _check_provider(db, ctx.workspace_id, payload.provider_id)
     await _check_tools(db, ctx.workspace_id, payload.tool_ids)
     _check_limits(payload.limits)
@@ -241,6 +244,9 @@ async def _free_copy_name(db: AsyncSession, workspace_id: uuid.UUID, base: str) 
 async def duplicate_agent(
     db: AsyncSession, ctx: WorkspaceContext, agent: Agent, name: str | None
 ) -> Agent:
+    from gouvra.modules.usage.limits import require_capacity
+
+    await require_capacity(db, ctx.workspace_id, "agents")
     current = await current_version(db, agent)
     copy = Agent(
         id=uuid7(),
@@ -285,6 +291,10 @@ async def set_archived(
     if archived:
         agent.archived_at = utcnow()
     else:
+        from gouvra.modules.usage.limits import require_capacity
+
+        if agent.archived_at is not None:
+            await require_capacity(db, ctx.workspace_id, "agents")
         clash = (
             await db.execute(
                 select(func.count())

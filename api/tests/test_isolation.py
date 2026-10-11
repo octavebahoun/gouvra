@@ -14,6 +14,7 @@ from dataclasses import dataclass
 from typing import Any
 
 import pytest
+from sqlalchemy import select
 
 from tests.helpers import (
     Account,
@@ -79,6 +80,19 @@ ROUTES: list[Route] = [
     Route("POST", "/workspaces/{ws}/workflows", {"name": "Stolen flow"}),
     Route("GET", "/workspaces/{ws}/workflow-runs"),
     Route("GET", "/workspaces/{ws}/registry"),
+    Route("GET", "/workspaces/{ws}/billing"),
+    Route("POST", "/workspaces/{ws}/billing/checkout", {"plan": "team"}),
+    Route("POST", "/workspaces/{ws}/billing/portal"),
+    Route("POST", "/workspaces/{ws}/billing/simulated/confirm", {"plan": "team", "token": "x"}),
+    Route("POST", "/workspaces/{ws}/billing/simulated/cancel"),
+    Route("GET", "/workspaces/{ws}/budget"),
+    Route("PUT", "/workspaces/{ws}/budget", {"monthly_limit": "1"}),
+    Route("GET", "/workspaces/{ws}/alerts"),
+    Route("GET", "/workspaces/{ws}/exports/configuration"),
+    Route("GET", "/workspaces/{ws}/exports/executions.csv"),
+    Route("GET", "/workspaces/{ws}/exports/usage.csv"),
+    # Instance administration: anyone but a super-admin gets 404, owner of the workspace or not.
+    Route("PATCH", "/admin/workspaces/{ws}", {"status": "suspended"}),
     Route("GET", "/workspaces/{ws}/connections"),
     Route(
         "POST",
@@ -169,6 +183,7 @@ RESOURCE_ROUTES: list[Route] = [
     Route("PATCH", "/connections/{connection}", {"name": "pwned"}),
     Route("DELETE", "/connections/{connection}"),
     Route("POST", "/connections/{connection}/check"),
+    Route("POST", "/alerts/{alert}/dismiss"),
 ]
 
 
@@ -240,6 +255,16 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
         f"/api/v1/workspaces/{workspace['id']}/automations",
         json={"name": "Hook", "kind": "webhook", "target_type": "agent", "agent_id": agent["id"]},
     )
+    from gouvra.core.db import get_sessionmaker
+    from gouvra.modules.budgets.models import Alert
+    from gouvra.modules.budgets.service import raise_alert
+
+    async with get_sessionmaker()() as db:
+        await raise_alert(db, workspace["id"], kind="quota", key=f"probe:{prefix}", level="warning")
+        await db.commit()
+        alert = (
+            await db.execute(select(Alert).where(Alert.workspace_id == workspace["id"]))
+        ).scalar_one()
     return Tenant(
         owner=owner,
         member=member,
@@ -259,6 +284,7 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
             "wfrun": wfrun.json()["id"],
             "automation": automation.json()["id"],
             "connection": connection.json()["id"],
+            "alert": str(alert.id),
         },
     )
 
@@ -385,6 +411,7 @@ def _normalise(path: str) -> str:
         "{wfrun}": "{run_id}",
         "{automation}": "{automation_id}",
         "{connection}": "{connection_id}",
+        "{alert}": "{alert_id}",
         "/versions/1": "/versions/{number}",
     }
     path = path.split("?", 1)[0]
@@ -411,6 +438,8 @@ NOT_WORKSPACE_RESOURCES = {
     ("DELETE", "/me/sessions/{session_id}"),
     # Public inbound webhooks: addressed by an unguessable token, authenticated by signature.
     ("POST", "/hooks/{token}"),
+    # Instance administration (super-admins only), covered by test_saas.
+    ("PATCH", "/admin/users/{user_id}"),
 }
 
 
