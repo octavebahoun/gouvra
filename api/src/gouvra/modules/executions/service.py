@@ -36,7 +36,7 @@ from gouvra.modules.executions.schemas import (
     ErrorOut,
     ExecutionOut,
     ExecutionSummary,
-    UsageOut,
+    ExecutionUsageOut,
 )
 from gouvra.modules.identity.models import User
 
@@ -238,6 +238,10 @@ async def cancel(db: AsyncSession, ctx: WorkspaceContext, execution: Execution) 
             "execution.cancelled", {"error": execution.error, "duration_ms": 0}, level="warning"
         )
         await publish_status(execution)
+        if execution.workflow_run_id is not None:
+            from gouvra.modules.workflows.orchestrator import notify_workflows
+
+            await notify_workflows(execution.workflow_run_id)
     return execution
 
 
@@ -348,7 +352,7 @@ def _summary_fields(
         "started_at": e.started_at,
         "finished_at": e.finished_at,
         "duration_ms": e.duration_ms,
-        "usage": UsageOut(
+        "usage": ExecutionUsageOut(
             input_tokens=e.input_tokens,
             output_tokens=e.output_tokens,
             cached_tokens=e.cached_tokens,

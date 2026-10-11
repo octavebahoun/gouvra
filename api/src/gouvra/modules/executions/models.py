@@ -85,7 +85,9 @@ class Execution(Base, IdMixin, TimestampMixin):
     parent_execution_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("executions.id", ondelete="SET NULL"), index=True
     )
-    workflow_run_id: Mapped[uuid.UUID | None] = mapped_column(index=True)
+    workflow_run_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("workflow_runs.id", ondelete="SET NULL"), index=True
+    )
     trigger: Mapped[str] = mapped_column(String(16))
     triggered_by_user_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("users.id", ondelete="SET NULL")

@@ -12,6 +12,7 @@ from gouvra.modules.identity.models import EmailToken, OAuthAccount, User, UserS
 from gouvra.modules.notifications.models import EmailOutbox
 from gouvra.modules.providers.models import ProviderConfig
 from gouvra.modules.tools.models import Tool
+from gouvra.modules.workflows.models import Workflow, WorkflowRun, WorkflowStep, WorkflowVersion
 from gouvra.modules.workspaces.models import Invitation, Membership, Workspace
 
 __all__ = [
@@ -36,5 +37,9 @@ __all__ = [
     "UsageRecord",
     "User",
     "UserSession",
+    "Workflow",
+    "WorkflowRun",
+    "WorkflowStep",
+    "WorkflowVersion",
     "Workspace",
 ]

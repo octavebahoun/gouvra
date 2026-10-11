@@ -75,6 +75,9 @@ ROUTES: list[Route] = [
     Route("GET", "/workspaces/{ws}/evaluations/suites"),
     Route("POST", "/workspaces/{ws}/evaluations/suites", {"name": "Stolen suite"}),
     Route("GET", "/workspaces/{ws}/evaluations/runs"),
+    Route("GET", "/workspaces/{ws}/workflows"),
+    Route("POST", "/workspaces/{ws}/workflows", {"name": "Stolen flow"}),
+    Route("GET", "/workspaces/{ws}/workflow-runs"),
 ]
 
 # Routes addressing one resource by id (the workspace is derived from the resource).
@@ -119,6 +122,19 @@ RESOURCE_ROUTES: list[Route] = [
     Route("GET", "/evaluations/runs/{run}"),
     Route("POST", "/evaluations/runs/{run}/cancel"),
     Route("GET", "/evaluations/compare?base={run}&candidate={run}"),
+    Route("GET", "/workflows/{workflow}"),
+    Route("PATCH", "/workflows/{workflow}", {"name": "pwned"}),
+    Route("PUT", "/workflows/{workflow}/draft", {"graph": {"nodes": []}, "revision": 1}),
+    Route("POST", "/workflows/{workflow}/publish", {}),
+    Route("GET", "/workflows/{workflow}/versions"),
+    Route("POST", "/workflows/{workflow}/versions/1/restore"),
+    Route("POST", "/workflows/{workflow}/archive"),
+    Route("POST", "/workflows/{workflow}/restore"),
+    Route("DELETE", "/workflows/{workflow}"),
+    Route("POST", "/workflows/{workflow}/runs", {"input": "steal"}),
+    Route("GET", "/workflow-runs/{wfrun}"),
+    Route("POST", "/workflow-runs/{wfrun}/cancel"),
+    Route("GET", "/workflow-runs/{wfrun}/stream"),
 ]
 
 
@@ -158,6 +174,26 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
         "/api/v1/evaluations/runs",
         json={"suite_id": suite.json()["id"], "agent_id": agent["id"]},
     )
+    workflow = await owner.client.post(
+        f"/api/v1/workspaces/{workspace['id']}/workflows",
+        json={
+            "name": "Flow",
+            "graph": {
+                "nodes": [
+                    {"id": "start", "type": "start", "label": "Input"},
+                    {"id": "ask", "type": "agent", "label": "Ask", "agent_id": agent["id"]},
+                    {"id": "end", "type": "end", "label": "Output"},
+                ],
+                "edges": [
+                    {"id": "a", "source": "start", "target": "ask"},
+                    {"id": "b", "source": "ask", "target": "end"},
+                ],
+            },
+        },
+    )
+    flow_id = workflow.json()["id"]
+    await owner.client.post(f"/api/v1/workflows/{flow_id}/publish", json={})
+    wfrun = await owner.client.post(f"/api/v1/workflows/{flow_id}/runs", json={"input": "hi"})
     return Tenant(
         owner=owner,
         member=member,
@@ -173,6 +209,8 @@ async def _tenant(make_client: Any, outbox: Outbox, prefix: str, name: str) -> T
             "suite": suite.json()["id"],
             "case": case.json()["id"],
             "run": run.json()["id"],
+            "workflow": flow_id,
+            "wfrun": wfrun.json()["id"],
         },
     )
 
@@ -295,6 +333,8 @@ def _normalise(path: str) -> str:
         "{suite}": "{suite_id}",
         "{case}": "{case_id}",
         "{run}": "{run_id}",
+        "{workflow}": "{workflow_id}",
+        "{wfrun}": "{run_id}",
         "/versions/1": "/versions/{number}",
     }
     path = path.split("?", 1)[0]

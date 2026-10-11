@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { client, unwrap, type Schemas } from "@/lib/api/client";
 
 export type Overview = Schemas["OverviewOut"];
-export type Usage = Schemas["gouvra__modules__usage__routes__UsageOut"];
+export type Usage = Schemas["UsageReportOut"];
 export type UsagePeriod = "24h" | "7d" | "30d" | "90d";
 
 export const usageKeys = {

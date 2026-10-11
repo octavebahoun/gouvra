@@ -21,6 +21,7 @@ def _include_modules() -> None:
     from gouvra.modules.providers.routes import router as providers_router
     from gouvra.modules.tools.routes import router as tools_router
     from gouvra.modules.usage.routes import router as usage_router
+    from gouvra.modules.workflows.routes import router as workflows_router
     from gouvra.modules.workspaces.routes import invitations_router
     from gouvra.modules.workspaces.routes import router as workspaces_router
 
@@ -37,6 +38,7 @@ def _include_modules() -> None:
         usage_router,
         audit_router,
         evaluations_router,
+        workflows_router,
     ):
         api_router.include_router(router)
 

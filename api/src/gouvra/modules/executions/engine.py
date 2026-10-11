@@ -561,6 +561,10 @@ async def _finish(
         from gouvra.modules.evaluations.service import notify_evaluations
 
         await notify_evaluations()
+    if snapshot.workflow_run_id is not None:
+        from gouvra.modules.workflows.orchestrator import notify_workflows
+
+        await notify_workflows(snapshot.workflow_run_id)
     if snapshot.agent_id is not None:
         from gouvra.modules.agents.models import Agent
 

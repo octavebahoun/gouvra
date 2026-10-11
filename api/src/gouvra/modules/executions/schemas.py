@@ -37,7 +37,7 @@ class CostOut(BaseModel):
     partial: bool
 
 
-class UsageOut(BaseModel):
+class ExecutionUsageOut(BaseModel):
     input_tokens: int
     output_tokens: int
     cached_tokens: int
@@ -64,7 +64,7 @@ class ExecutionSummary(BaseModel):
     started_at: datetime | None
     finished_at: datetime | None
     duration_ms: int | None
-    usage: UsageOut
+    usage: ExecutionUsageOut
     cost: CostOut
     error_code: str | None
     input_preview: str

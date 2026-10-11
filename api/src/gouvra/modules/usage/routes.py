@@ -103,7 +103,7 @@ class LimitsOut(BaseModel):
     max_input_bytes: int
 
 
-class UsageOut(BaseModel):
+class UsageReportOut(BaseModel):
     since: datetime
     until: datetime
     granularity: Literal["hour", "day", "week"]
@@ -225,7 +225,7 @@ async def usage(
     since: datetime | None = None,
     until: datetime | None = None,
     granularity: Annotated[Literal["hour", "day", "week"], Query()] = "day",
-) -> UsageOut:
+) -> UsageReportOut:
     now = utcnow()
     until = until or now + timedelta(seconds=1)
     since = since or service.month_start(now)
@@ -240,7 +240,7 @@ async def usage(
     from gouvra.core import ratelimit
     from gouvra.modules.executions.queue import workspace_concurrency_limit
 
-    return UsageOut(
+    return UsageReportOut(
         since=since,
         until=until,
         granularity=granularity,
