@@ -4,8 +4,8 @@
 
 ## État
 
-- **Phase en cours : 2 — Identité**
-- **Tâche suivante :** modèles identité/workspaces, sessions + CSRF, e-mails (Resend/SMTP/console), rate limiting, couche d'autorisation centrale, routes auth/workspaces/invitations, OAuth GitHub, écrans B–F, Q (membres), R.
+- **Phases en cours : 2 (écrans web — sous-agent) et 3 (écrans web)**. Backend des phases 2 et 3 terminé et commité.
+- **Tâche suivante :** relire le travail web du sous-agent (captures, a11y), puis écrans phase 3 : Providers (O), Tools (N), Agents (H, I, J), lancement (K), Executions (L) et détail d'exécution animé (M).
 
 ## Brief mis à jour — 2026-10-11 03:56 (relu en entier)
 
@@ -37,8 +37,8 @@
 | # | Phase | État | Critère de sortie |
 |---|---|---|---|
 | 1 | Fondations | **fait** (2026-10-11) | `docker compose up` démarre tout, CI verte |
-| 2 | Identité | en cours | Tests des flux + isolation inter-workspace verts |
-| 3 | Agent simple | à faire | Une exécution réelle, tracée de bout en bout |
+| 2 | Identité | backend **fait** ; web en cours | Tests des flux + isolation inter-workspace verts |
+| 3 | Agent simple | backend **fait** (exécution réelle DeepSeek OK) ; web à faire | Une exécution réelle, tracée de bout en bout |
 | 4 | Exploitation | à faire | Diagnostic d'un échec depuis l'UI |
 | 5 | Stabilisation du socle | à faire | Section 9 du brief validée sur le socle |
 | 6 | Évaluations | à faire | Comparaison de deux versions d'agent |
@@ -61,3 +61,14 @@
 - `docker compose up -d` : postgres, valkey, mailpit, migrate (exit 0), api (healthy, /readyz = ready, migrations à jour), worker (healthy, heartbeat), web (healthy, CSP stricte, fallback SPA).
 - Captures design system clair/sombre + landing mobile relues : bug `asChild` (fragment) corrigé, police inlinée en data: bloquée par la CSP corrigée (`assetsInlineLimit: 0`).
 - CI GitHub Actions écrite ; rejouée en local à l'identique via `scripts/ci-local` (pas de dépôt distant, D-052).
+
+### Phase 2 (backend) — 2026-10-11
+- 102 tests : flux d'inscription non énumérable, vérification, connexion/déconnexion, cookies `__Host-` HttpOnly/Secure/SameSite, CSRF + Origin (dont « login CSRF »), rotation de session avec délai de grâce, révocation, mot de passe oublié/réinitialisation (sessions révoquées + avertissement), changement d'e-mail, limitation de débit (login, reset), absence de secrets/e-mails dans les logs, OAuth GitHub/Google simulés (PKCE, state, protection contre la pré-inscription), workspaces, rôles, invitations, transfert de propriété, clés de service, audit.
+- Isolation : chaque route de workspace testée par un propriétaire d'un autre workspace ⇒ 404 ; garde-fou qui échoue si une nouvelle route n'est pas couverte.
+- E-mail réel via Resend vers `delivered@resend.dev` ✔ ; SMTP → Mailpit ✔ ; chaîne complète en Docker (API → outbox → worker → Mailpit) ✔.
+
+### Phase 3 (backend) — 2026-10-11
+- 213 tests (hors réels), couverture 86 %, mypy strict 101 fichiers, ruff ✔, migrations montée/descente/remontée ✔ et `alembic check` ✔.
+- Tests réels : appel d'outil DeepSeek avec et sans réflexion + streaming ✔ ; exécution complète via le moteur (fournisseur testé, agent + calculatrice, résultat 7006652, coût estimé USD > 0, trace ordonnée) ✔.
+- Stack Docker : exécution réelle traitée par le worker conteneurisé, SSE en direct (événements + 7 fragments de texte), coût 0,00016 $ ✔. Bug trouvé et corrigé à cette occasion : le worker n'importait pas tous les modèles (clé étrangère non résolue) ; le « reaper » avait bien rattrapé l'exécution. Test de démarrage de processus ajouté.
+- Isolation étendue : 55 tests anti-IDOR (routes de workspace, routes par ressource fournisseurs/outils/agents/exécutions, mélange d'identifiants, clés de service d'un autre workspace) + garde-fous de couverture.
