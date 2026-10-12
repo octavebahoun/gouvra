@@ -519,11 +519,14 @@ async def test_scheduler_service_and_secret_rotation(
     stop = asyncio.Event()
     task = asyncio.create_task(automation_service(stop))
     try:
-        for _ in range(100):
-            if await _fires(owner, schedule["id"]):
+        # A fire is committed as pending with its execution, then marked launched: wait for that.
+        for _ in range(200):
+            fires = await _fires(owner, schedule["id"])
+            if fires and fires[0]["status"] != "pending":
                 break
             await asyncio.sleep(0.05)
-        assert (await _fires(owner, schedule["id"]))[0]["status"] == "launched"
+        assert fires
+        assert fires[0]["status"] == "launched"
     finally:
         stop.set()
         with contextlib.suppress(asyncio.CancelledError):
