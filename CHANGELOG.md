@@ -6,6 +6,11 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0] — 2026-10-12
+
+First release — see [RELEASE_NOTES.md](RELEASE_NOTES.md) for what was verified and the known
+limitations.
+
 ### Added
 - Accounts: sign-up without account enumeration, e-mail confirmation, sign-in with e-mail,
   GitHub or Google, password reset, sessions you can review and revoke, profile and preferences.
@@ -40,3 +45,5 @@ All notable changes are documented here. The format follows
   (disable) and the instance-wide audit log.
 - Public site, English and French interface, light and dark themes, accessibility audits.
 - Production deployment with automatic HTTPS, backups and restores, secret rotation commands.
+- A labelled demo workspace, seeded at start-up, that shows every part of the product (agents,
+  executions, an evaluation suite, a workflow, automations, a budget) on the offline model.
