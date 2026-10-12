@@ -85,6 +85,7 @@ Configuration, backups and restores, secret rotation and upgrades are described 
   model.
 - [Operations](docs/operations.md) — configuration, deployment, backups, rotation, upgrades.
 - [Automations](docs/automations.md) — schedules, signing webhooks, idempotency, connectors.
+- [Community outreach](docs/community-outreach.md) — priority audiences, messages and launch plan.
 - [API reference](docs/api/openapi.json) — OpenAPI 3.1, also served at `/api/docs`.
 - [Security policy](SECURITY.md) · [Contributing](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
