@@ -36,6 +36,17 @@ test("capture README images", async ({ browser }) => {
     (e) => e.model === "deepseek-flash" && e.status === "succeeded",
   );
   const failed = executions.data.find((e) => e.status === "failed");
+  const auth = { headers: { Cookie: cookies.map((c) => `${c.name}=${c.value}`).join("; ") } };
+  const demoId = await workspaceId();
+  const flowRuns = (await (
+    await fetch(`${API_URL}/api/v1/workspaces/${demoId}/workflow-runs?limit=10`, auth)
+  ).json()) as { data: { id: string; status: string }[] };
+  const flowRun = flowRuns.data.find((r) => r.status === "succeeded");
+  const evalRuns = (await (
+    await fetch(`${API_URL}/api/v1/workspaces/${demoId}/evaluations/runs?limit=10`, auth)
+  ).json()) as { data: { id: string; label: string }[] };
+  const baseline = evalRuns.data.find((r) => r.label === "Baseline");
+  const candidate = evalRuns.data.find((r) => r.label === "Shorter instructions");
 
   async function workspaceId(): Promise<string> {
     const session = (await (
@@ -68,6 +79,16 @@ test("capture README images", async ({ browser }) => {
     },
     { file: "agents.png", path: "/w/demo/agents", theme: "light" },
     { file: "usage-dark.png", path: "/w/demo/usage?period=30d", theme: "dark" },
+    {
+      file: "workflow-run.png",
+      path: `/w/demo/workflows/runs/${flowRun?.id ?? ""}`,
+      theme: "light",
+    },
+    {
+      file: "evaluation-compare-dark.png",
+      path: `/w/demo/evaluations/compare?base=${baseline?.id ?? ""}&candidate=${candidate?.id ?? ""}`,
+      theme: "dark",
+    },
     {
       file: "mobile-execution.png",
       path: `/w/demo/executions/${real?.id ?? ""}`,

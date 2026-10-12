@@ -11,6 +11,11 @@ tool calls, tokens, costs and errors. When something fails, Gouvra tells you why
   <img src="docs/images/usage-dark.png" width="49%" alt="Usage with cost provenance, dark mode" />
 </p>
 
+<p align="center">
+  <img src="docs/images/workflow-run.png" width="49%" alt="A workflow run drawn on its graph: the urgent branch taken" />
+  <img src="docs/images/evaluation-compare-dark.png" width="49%" alt="Two evaluation runs compared case by case, dark mode" />
+</p>
+
 ## Why Gouvra?
 
 Gouvra is the control room you host yourself. When a run fails, it tells you why in plain
