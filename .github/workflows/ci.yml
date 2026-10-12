@@ -113,7 +113,11 @@ jobs:
       - name: Generate secrets
         run: cp .env.example .env && scripts/gen-secrets
       - name: Start the stack
-        run: docker compose up -d --build --wait
+        # `--wait` cannot wait on the one-shot seed (it has no health check): wait for the
+        # long-running services, then run the seed to completion (it must succeed too).
+        run: |
+          docker compose up -d --build --wait postgres valkey mailpit api worker sandbox docker-proxy web
+          docker compose run --rm seed
       - uses: pnpm/action-setup@v4
         with:
           version: 10.34.5
