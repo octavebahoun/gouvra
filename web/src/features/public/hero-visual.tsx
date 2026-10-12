@@ -11,14 +11,17 @@ import {
   AnimatePresence,
   motion,
   useInView,
+  useMotionValue,
   useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
 } from "motion/react";
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/cn";
+import { useMediaQuery } from "@/lib/use-media-query";
+import { DialMark } from "./landing-shared";
 
 type StepKey = "started" | "model" | "tool" | "answer" | "done";
 const STEPS: { key: StepKey; Icon: LucideIcon; tone: string }[] = [
@@ -65,8 +68,10 @@ function Rolling({
 }
 
 function RollingValue({ to, format }: { to: number; format: (v: number) => string }) {
+  const reduced = useReducedMotion();
   const [value, setValue] = useState(0);
   useEffect(() => {
+    if (reduced) return undefined;
     const start = performance.now();
     let frame = 0;
     const tick = (now: number) => {
@@ -76,8 +81,8 @@ function RollingValue({ to, format }: { to: number; format: (v: number) => strin
     };
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [to]);
-  return <span className="tabular-nums">{format(value)}</span>;
+  }, [reduced, to]);
+  return <span className="tabular-nums">{format(reduced ? to : value)}</span>;
 }
 
 function TypedText({ text, active }: { text: string; active: boolean }) {
@@ -85,17 +90,19 @@ function TypedText({ text, active }: { text: string; active: boolean }) {
 }
 
 function Typing({ text }: { text: string }) {
+  const reduced = useReducedMotion();
   const [count, setCount] = useState(0);
   useEffect(() => {
+    if (reduced) return undefined;
     const timer = window.setInterval(() => {
       setCount((c) => Math.min(text.length, c + 2));
     }, 28);
     return () => window.clearInterval(timer);
-  }, [text]);
+  }, [reduced, text]);
   return (
     <>
-      {text.slice(0, count)}
-      {count < text.length ? (
+      {text.slice(0, reduced ? text.length : count)}
+      {!reduced && count < text.length ? (
         <span className="ml-0.5 inline-block h-3 w-1 translate-y-0.5 animate-pulse rounded-[1px] bg-brand" />
       ) : null}
     </>
@@ -107,75 +114,132 @@ function Typing({ text }: { text: string }) {
  * scroll, with floating instruments at different depths. Decorative (aria-hidden); the
  * sentence in `visualLabel` describes it for assistive technologies.
  */
-export function HeroVisual({ target }: { target: RefObject<HTMLElement | null> }) {
+export function HeroVisual({
+  target,
+  className,
+}: {
+  target: RefObject<HTMLElement | null>;
+  className?: string;
+}) {
   const { t } = useTranslation("site");
   const reduced = useReducedMotion() ?? false;
+  const fine = useMediaQuery("(pointer: fine)");
   const ref = useRef<HTMLDivElement>(null);
   const step = usePlayback(ref, reduced);
   const done = step >= STEPS.length;
   const running = step > 0 && !done;
+  const tiltOn = fine && !reduced;
+  const rawTiltX = useMotionValue(0);
+  const rawTiltY = useMotionValue(0);
+  const tiltX = useSpring(rawTiltX, { stiffness: 140, damping: 20, mass: 0.35 });
+  const tiltY = useSpring(rawTiltY, { stiffness: 140, damping: 20, mass: 0.35 });
 
   const { scrollYProgress } = useScroll({ target, offset: ["start start", "end start"] });
   const smooth = useSpring(scrollYProgress, { stiffness: 120, damping: 30, mass: 0.4 });
-  const rotateX = useTransform(smooth, [0, 0.5], reduced ? [0, 0] : [16, 0]);
-  const scale = useTransform(smooth, [0, 0.5], reduced ? [1, 1] : [0.94, 1]);
-  const lift = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, -60]);
-  const farY = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, -140]);
-  const nearY = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, 90]);
+  const scrollRotate = useTransform(smooth, [0, 0.55], reduced ? [0, 0] : [8, 0]);
+  const rotateX = useTransform(() => scrollRotate.get() + tiltX.get());
+  const rotateY = useTransform(() => tiltY.get());
+  const scale = useTransform(smooth, [0, 0.55], reduced ? [1, 1] : [0.96, 1]);
+  const lift = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, -48]);
+  const farY = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, -28]);
+  const midY = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, -16]);
+  const nearY = useTransform(smooth, [0, 1], reduced ? [0, 0] : [0, 20]);
+
+  const onPointerMove = tiltOn
+    ? (event: PointerEvent<HTMLDivElement>) => {
+        const rect = event.currentTarget.getBoundingClientRect();
+        const px = (event.clientX - rect.left) / rect.width - 0.5;
+        const py = (event.clientY - rect.top) / rect.height - 0.5;
+        rawTiltY.set(px * 7);
+        rawTiltX.set(py * -5);
+        event.currentTarget.style.setProperty("--px", `${event.clientX - rect.left}px`);
+        event.currentTarget.style.setProperty("--py", `${event.clientY - rect.top}px`);
+      }
+    : undefined;
 
   return (
     <div
       ref={ref}
       aria-hidden
       data-decorative
-      className="relative mx-auto w-full max-w-4xl [perspective:1600px]"
+      onPointerMove={onPointerMove}
+      onPointerLeave={
+        tiltOn
+          ? () => {
+              rawTiltX.set(0);
+              rawTiltY.set(0);
+            }
+          : undefined
+      }
+      style={{ ["--px" as string]: "70%", ["--py" as string]: "18%" }}
+      className={cn("relative mx-auto w-full max-w-4xl [perspective:1600px]", className)}
     >
-      {/* Floating instruments, at their own depth. */}
+      <DialMark className="pointer-events-none absolute top-1/2 left-1/2 z-0 h-[26rem] w-[26rem] -translate-x-1/2 -translate-y-1/2 text-brand opacity-[0.11]" />
       <motion.div
-        style={{ y: farY }}
-        className="absolute -top-12 -left-14 z-20 hidden w-44 rounded-card border border-line bg-surface/95 p-3 shadow-lg backdrop-blur md:block"
-      >
-        <p className="text-[11px] font-medium text-muted">{t("visual.success")}</p>
-        <div className="mt-2 flex items-center gap-3">
-          <svg viewBox="0 0 36 36" className="size-10 -rotate-90">
-            <circle
-              cx="18"
-              cy="18"
-              r="15"
-              fill="none"
-              stroke="var(--gv-surface-2)"
-              strokeWidth="4"
-            />
-            <motion.circle
-              cx="18"
-              cy="18"
-              r="15"
-              fill="none"
-              stroke="var(--gv-success)"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray={94.2}
-              initial={{ strokeDashoffset: 94.2 }}
-              animate={{ strokeDashoffset: 94.2 * 0.04 }}
-              transition={{ duration: reduced ? 0 : 1.6, ease: [0.2, 0, 0, 1], delay: 0.6 }}
-            />
-          </svg>
-          <span className="text-xl font-semibold text-ink tabular-nums">96%</span>
-        </div>
-      </motion.div>
-      <motion.div
-        style={{ y: nearY }}
-        className="absolute -right-14 -bottom-8 z-20 hidden w-48 rounded-card border border-line bg-surface/95 p-3 shadow-lg backdrop-blur md:block"
-      >
-        <p className="text-[11px] font-medium text-muted">{t("visual.cost")}</p>
-        <p className="mt-1 text-xl font-semibold text-ink tabular-nums">≈ $0.0002</p>
-        <p className="text-[11px] text-muted">{t("visual.estimated")} · deepseek-flash</p>
-      </motion.div>
+        animate={{ opacity: running ? 0.85 : 0.35 }}
+        transition={{ duration: 0.6 }}
+        className="pointer-events-none absolute -inset-10 z-0 rounded-[36px] bg-[radial-gradient(closest-side,color-mix(in_srgb,var(--gv-brand)_28%,transparent),transparent)] blur-2xl"
+      />
+      {/* Instruments sit above and below the window, in flow, so they never cover the trace. */}
+      <div className="mb-3 hidden items-end justify-between gap-3 xl:flex">
+        <motion.div
+          style={{ y: farY }}
+          className="w-40 rounded-card border border-line bg-surface/95 p-3 shadow-lg backdrop-blur"
+        >
+          <p className="text-[11px] font-medium text-muted">{t("visual.success")}</p>
+          <div className="mt-2 flex items-center gap-3">
+            <svg viewBox="0 0 36 36" className="size-10 -rotate-90">
+              <circle
+                cx="18"
+                cy="18"
+                r="15"
+                fill="none"
+                stroke="var(--gv-surface-2)"
+                strokeWidth="4"
+              />
+              <motion.circle
+                cx="18"
+                cy="18"
+                r="15"
+                fill="none"
+                stroke="var(--gv-success)"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeDasharray={94.2}
+                initial={{ strokeDashoffset: 94.2 }}
+                animate={{ strokeDashoffset: 94.2 * 0.04 }}
+                transition={{ duration: reduced ? 0 : 1.6, ease: [0.2, 0, 0, 1], delay: 0.6 }}
+              />
+            </svg>
+            <span className="text-xl font-semibold text-ink tabular-nums">96%</span>
+          </div>
+        </motion.div>
+        <motion.div
+          style={{ y: midY }}
+          className="w-36 rounded-card border border-line bg-surface/95 p-3 shadow-lg backdrop-blur"
+        >
+          <p className="text-[11px] font-medium text-muted">{t("visual.tokens")}</p>
+          <p className="mt-1 text-xl font-semibold text-ink tabular-nums">
+            <Rolling to={450} active={step > 1} format={(v) => Math.round(v).toLocaleString()} />
+          </p>
+        </motion.div>
+      </div>
 
       <motion.div
-        style={{ rotateX, scale, y: lift, transformOrigin: "50% 0%" }}
+        style={{ rotateX, rotateY, scale, y: lift, transformOrigin: "50% 28%" }}
         className="relative z-10 overflow-hidden rounded-panel border border-line bg-surface shadow-[0_40px_120px_-30px_color-mix(in_srgb,var(--gv-brand)_45%,transparent)]"
       >
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-0 z-0"
+          style={{
+            background:
+              "radial-gradient(420px circle at var(--px) var(--py), color-mix(in srgb, var(--gv-brand) 16%, transparent), transparent 62%)",
+          }}
+        />
+        {!reduced ? (
+          <span className="pointer-events-none absolute inset-x-0 top-0 z-20 h-24 animate-scan bg-gradient-to-b from-transparent via-brand/10 to-transparent" />
+        ) : null}
         {/* Window chrome */}
         <div className="flex items-center gap-3 border-b border-line bg-surface-2/60 px-4 py-3">
           <span className="flex gap-1.5">
@@ -213,6 +277,14 @@ export function HeroVisual({ target }: { target: RefObject<HTMLElement | null> }
               </motion.span>
             </AnimatePresence>
           </span>
+        </div>
+        <div className="h-0.5 bg-surface-2">
+          <motion.div
+            className="h-full origin-left bg-brand"
+            initial={false}
+            animate={{ scaleX: step / STEPS.length }}
+            transition={{ duration: reduced ? 0 : 0.45, ease: [0.2, 0, 0, 1] }}
+          />
         </div>
 
         {/* Counters */}
@@ -280,6 +352,16 @@ export function HeroVisual({ target }: { target: RefObject<HTMLElement | null> }
           })}
         </ol>
       </motion.div>
+      <div className="mt-3 hidden justify-end xl:flex">
+        <motion.div
+          style={{ y: nearY }}
+          className="w-44 rounded-card border border-line bg-surface/95 p-3 shadow-lg backdrop-blur"
+        >
+          <p className="text-[11px] font-medium text-muted">{t("visual.cost")}</p>
+          <p className="mt-1 text-xl font-semibold text-ink tabular-nums">≈ $0.0002</p>
+          <p className="text-[11px] text-muted">{t("visual.estimated")} · deepseek-flash</p>
+        </motion.div>
+      </div>
     </div>
   );
 }

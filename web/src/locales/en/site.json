@@ -23,7 +23,8 @@
     "subtitle": "Gouvra connects the models you choose to the tools you trust, runs every agent in the background and shows each step live — model calls, tool calls, tokens, costs and errors.",
     "primary": "Get started — it's free",
     "secondary": "View on GitHub",
-    "visualLabel": "Illustration: an execution trace building live, from a model call to a tool call to the answer."
+    "visualLabel": "Illustration: an execution trace building live, from a model call to a tool call to the answer.",
+    "scroll": "See how it works"
   },
   "visual": {
     "agent": "Support triage",

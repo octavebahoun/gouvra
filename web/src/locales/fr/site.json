@@ -23,7 +23,8 @@
     "subtitle": "Gouvra relie les modèles que vous choisissez aux outils de confiance, exécute chaque agent en arrière-plan et montre chaque étape en direct — appels au modèle, appels d'outils, tokens, coûts et erreurs.",
     "primary": "Commencer — c'est gratuit",
     "secondary": "Voir sur GitHub",
-    "visualLabel": "Illustration : une trace d'exécution qui se construit en direct, d'un appel au modèle à un appel d'outil jusqu'à la réponse."
+    "visualLabel": "Illustration : une trace d'exécution qui se construit en direct, d'un appel au modèle à un appel d'outil jusqu'à la réponse.",
+    "scroll": "Voir le fonctionnement"
   },
   "visual": {
     "agent": "Tri du support",

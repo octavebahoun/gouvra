@@ -72,6 +72,9 @@
   --animate-dash: gv-dash 1.2s linear infinite;
   --animate-spin-slow: spin 2.4s linear infinite;
   --animate-pop-in: gv-pop-in 160ms cubic-bezier(0.2, 0, 0, 1);
+  --animate-marquee: gv-marquee 36s linear infinite;
+  --animate-scan: gv-scan 8s linear infinite;
+  --animate-bus: gv-bus 6.5s linear infinite;
 }
 
 @keyframes gv-pop-in {
@@ -182,6 +185,65 @@
   }
   to {
     offset-distance: 100%;
+    opacity: 0;
+  }
+}
+
+@keyframes gv-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* The hero verb arrives from below; the previous one leaves upward. */
+@keyframes gv-roll {
+  from {
+    opacity: 0;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes gv-roll-out {
+  from {
+    opacity: 1;
+    transform: none;
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-110%);
+  }
+}
+
+/* A scanner crossing the "works with" rail: the connections are live. */
+@keyframes gv-bus {
+  from {
+    transform: translate3d(-100%, 0, 0);
+  }
+  to {
+    transform: translate3d(500%, 0, 0);
+  }
+}
+
+@keyframes gv-scan {
+  0% {
+    transform: translate3d(0, -10%, 0);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.7;
+  }
+  88% {
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate3d(0, 210%, 0);
     opacity: 0;
   }
 }

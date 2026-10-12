@@ -6,6 +6,7 @@ import { AnimatedOutlet } from "@/components/layout/app-shell";
 import { LanguageMenu } from "@/components/layout/language-menu";
 import { ConnectionBanner, ThemeToggle } from "@/components/layout/shell-parts";
 import { ControlRoomVisual } from "./components/control-room-visual";
+import { REPOSITORY_URL } from "@/lib/links";
 
 /**
  * Sign-in, sign-up, recovery and e-mail link screens. Desktop: the form column next to the
@@ -49,7 +50,7 @@ export function AuthLayout() {
               {t("layout.apiDocs")}
             </a>
             <a
-              href="https://github.com/gouvra/gouvra"
+              href={REPOSITORY_URL}
               className="inline-flex items-center gap-1.5 rounded-sm hover:text-ink hover:underline"
             >
               <GitHubIcon className="size-3.5" />
