@@ -4,7 +4,7 @@
 only the tools they need, run them in the background and watch every step live — model calls,
 tool calls, tokens, costs and errors. When something fails, Gouvra tells you why and what to do.
 
-![Gouvra — an execution followed live, in dark mode](docs/images/execution-live-dark.png)
+![Gouvra — a real agent run followed live, in dark mode: each model call and tool call appears as it happens, with its tokens and cost](docs/images/execution-live.gif)
 
 <p align="center">
   <img src="docs/images/overview.png" width="49%" alt="Overview with live metrics" />

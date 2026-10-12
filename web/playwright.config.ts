@@ -30,7 +30,7 @@ export default defineConfig({
   projects: [
     {
       name: "desktop",
-      testIgnore: /screenshots\.spec\.ts/,
+      testIgnore: /(screenshots|readme-gif)\.spec\.ts/,
       use: { ...chrome, viewport: { width: 1440, height: 900 } },
     },
     {
@@ -45,7 +45,7 @@ export default defineConfig({
     },
     {
       name: "screenshots",
-      testMatch: /screenshots\.spec\.ts/,
+      testMatch: /(screenshots|readme-gif)\.spec\.ts/,
       timeout: 600_000,
       use: { ...chrome, viewport: { width: 1440, height: 900 } },
     },
