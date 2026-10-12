@@ -68,7 +68,11 @@ def _check_base_url(kind: str, base_url: str | None) -> str | None:
         )
     if not base_url:
         return None
-    return validate_base_url(base_url, allow_private=get_settings().provider_allow_private_networks)
+    return validate_base_url(
+        base_url,
+        allow_private=get_settings().provider_allow_private_networks,
+        setting="PROVIDER_ALLOW_PRIVATE_NETWORKS",
+    )
 
 
 async def create_provider(

@@ -7,6 +7,9 @@ x-app: &app
   build:
     context: ./api
   restart: unless-stopped
+  # `host.docker.internal` is the host machine (e.g. Ollama), on Linux too; it is only
+  # reachable when private networks are allowed above.
+  extra_hosts: ["host.docker.internal:host-gateway"]
   environment: &app-env
     APP_ENV: ${APP_ENV:-development}
     APP_URL: ${APP_URL:-http://localhost:8080}
@@ -27,6 +30,10 @@ x-app: &app
     SMTP_SECURITY: none # Mailpit, local only
     DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
     ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+    # A model or a service on your own network (Ollama, LM Studio, vLLM…): off by default.
+    # Even when on, link-local and cloud metadata addresses stay blocked.
+    PROVIDER_ALLOW_PRIVATE_NETWORKS: ${PROVIDER_ALLOW_PRIVATE_NETWORKS:-false}
+    HTTP_TOOL_ALLOW_PRIVATE_NETWORKS: ${HTTP_TOOL_ALLOW_PRIVATE_NETWORKS:-false}
     GITHUB_CLIENT_ID: ${GITHUB_CLIENT_ID:-}
     GITHUB_CLIENT_SECRET: ${GITHUB_CLIENT_SECRET:-}
     GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}

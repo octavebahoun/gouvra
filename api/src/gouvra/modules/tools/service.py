@@ -67,6 +67,7 @@ def _validate_config(kind: str, builtin_key: str | None, config: dict[str, Any])
             f"{parts.scheme}://{parts.netloc}",
             allow_private=get_settings().http_tool_allow_private_networks,
             field="config.url",
+            setting="HTTP_TOOL_ALLOW_PRIVATE_NETWORKS",
         )
     return parsed.model_dump()
 

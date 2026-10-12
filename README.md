@@ -25,8 +25,10 @@ language. When it shows a cost, the number comes from the provider or from a pub
 
 - **Agents with versions** — instructions, model, parameters, tools and limits; every change is a
   version you can restore; readiness checks before a run.
-- **Model providers** — DeepSeek (official API), Anthropic, any OpenAI-compatible API, and an
-  offline scripted model for demos and tests. Keys are encrypted at rest and never shown again.
+- **Model providers** — DeepSeek (official API), Anthropic, any OpenAI-compatible API (hosted,
+  or [a model on your own network](docs/operations.md#a-model-on-your-own-network-ollama-lm-studio-vllm)
+  such as Ollama), and an offline scripted model for demos and tests. Keys are encrypted at rest
+  and never shown again.
 - **Safe tools** — built-ins (calculator, clock, dates, JSON, text, HTTP to allow-listed hosts),
   custom HTTP tools with strict JSON Schemas and server-side credentials, code tools (Python,
   JavaScript) run in a throwaway container without network, a test console and a call history.

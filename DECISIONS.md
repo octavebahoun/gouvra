@@ -152,3 +152,7 @@ Priorité en cas de conflit : `BRIEF.md` > `docs/ui.md` / `docs/conception.md` >
 - **D-132 — Une démo qui montre tout** : le seed crée aussi une suite d'évaluation (deux runs, un cas en échec volontaire), un workflow publié et son run, une planification, un webhook et un budget, sur le modèle hors ligne (coût nul) ; les runs sont mis en file et terminés par le worker au démarrage.
 - **D-133 — Listes longues** : seules les douze premières lignes (celles à l'écran) s'animent, le reste apparaît d'un coup ; l'audit axe attend la fin des animations finies (pas des indicateurs en boucle) pour juger l'état réellement vu.
 - **D-134 — Version 0.1.0** : première release publique (SemVer), API et interface au même numéro ; `RELEASE_NOTES.md` dit ce qui est livré, vérifié, et ce qui ne l'est pas.
+
+## Après la release
+
+- **D-135 — Réseau privé sur option, jamais les métadonnées** : `PROVIDER_ALLOW_PRIVATE_NETWORKS` et `HTTP_TOOL_ALLOW_PRIVATE_NETWORKS` existaient sans atteindre les conteneurs ; Compose les transmet désormais (défaut `false`) et `host.docker.internal` désigne la machine hôte, y compris sous Linux, pour un modèle servi localement (Ollama, LM Studio, vLLM). Même activées, elles n'ouvrent jamais les adresses link-local et de métadonnées cloud (`169.254.0.0/16`, `fd00:ec2::254`, `100.100.100.200`), multicast ni réservées. Un refus nomme le réglage qui l'autoriserait.

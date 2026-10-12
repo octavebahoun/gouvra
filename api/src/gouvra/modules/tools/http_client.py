@@ -64,9 +64,12 @@ async def _vet(url: str, allowed_hosts: list[str] | None) -> tuple[httpx.URL, st
         )
     except BlockedDestination as exc:
         raise ToolInputError(
-            f"Host {host} resolves to a private or reserved address."
-            if exc.reason == "private_address"
-            else f"Host {host} does not resolve."
+            {
+                "private_address": f"Host {host} resolves to a private address, which this"
+                " instance does not allow (HTTP_TOOL_ALLOW_PRIVATE_NETWORKS=true).",
+                "forbidden_address": f"Host {host} resolves to a link-local, metadata or"
+                " reserved address, which is never allowed.",
+            }.get(exc.reason, f"Host {host} does not resolve.")
         ) from exc
     ip = addresses[0]
     netloc_ip = f"[{ip}]" if ":" in ip else ip

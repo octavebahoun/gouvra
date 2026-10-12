@@ -2,16 +2,24 @@
 
 from __future__ import annotations
 
+import socket
 import uuid
 from datetime import UTC, datetime
 from decimal import Decimal
+from typing import Any
 
 import pytest
 
 from gouvra.core.config import get_settings
 from gouvra.core.crypto import SecretDecryptionError, decrypt_secret, encrypt_secret
 from gouvra.core.errors import ValidationFailed
-from gouvra.core.netguard import BlockedDestination, _is_public, resolve_public, validate_base_url
+from gouvra.core.netguard import (
+    BlockedDestination,
+    _is_public,
+    _never_allowed,
+    resolve_public,
+    validate_base_url,
+)
 from gouvra.modules.providers.catalog import find_model
 from gouvra.modules.providers.gateway.types import Usage
 from gouvra.modules.providers.pricing import Cost, CostSource, combine, estimate
@@ -238,10 +246,43 @@ def test_public_address_classification(address: str, public: bool) -> None:
     assert _is_public(address) is public
 
 
-async def test_resolution_refuses_private_targets() -> None:
+@pytest.mark.parametrize(
+    ("address", "never"),
+    [
+        ("169.254.169.254", True),  # cloud metadata (AWS, GCP, Azure…)
+        ("::ffff:169.254.169.254", True),
+        ("fd00:ec2::254", True),  # AWS metadata over IPv6
+        ("100.100.100.200", True),  # Alibaba Cloud metadata
+        ("fe80::1", True),
+        ("224.0.0.1", True),
+        ("240.0.0.1", True),
+        ("0.0.0.0", True),  # noqa: S104 - an address under test, not a bind
+        ("127.0.0.1", False),
+        ("::1", False),  # loopback, though inside IPv6's reserved ::/8
+        ("192.168.1.10", False),
+        ("172.17.0.1", False),  # Docker's host gateway
+        ("100.64.0.1", False),  # carrier-grade NAT, e.g. a Tailscale peer
+        ("fd00::1", False),
+        ("8.8.8.8", False),
+    ],
+)
+def test_addresses_no_setting_opens(address: str, never: bool) -> None:
+    assert _never_allowed(address) is never
+
+
+async def test_resolution_refuses_private_targets(monkeypatch: pytest.MonkeyPatch) -> None:
     with pytest.raises(BlockedDestination):
         await resolve_public("localhost", 80)
     assert await resolve_public("localhost", 80, allow_private=True)
+
+    # Allowing private networks never opens the cloud metadata endpoint.
+    def metadata(host: str, port: int, *args: object, **kwargs: object) -> list[tuple[Any, ...]]:
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("169.254.169.254", port))]
+
+    monkeypatch.setattr(socket, "getaddrinfo", metadata)
+    with pytest.raises(BlockedDestination) as blocked:
+        await resolve_public("metadata.google.internal", 80, allow_private=True)
+    assert blocked.value.reason == "forbidden_address"
 
 
 def test_base_url_validation() -> None:
@@ -257,6 +298,15 @@ def test_base_url_validation() -> None:
         with pytest.raises(ValidationFailed):
             validate_base_url(bad)
     assert validate_base_url("http://localhost:11434/v1", allow_private=True)
+    assert validate_base_url("http://host.docker.internal:11434/v1", allow_private=True)
+    with pytest.raises(ValidationFailed):
+        validate_base_url("http://169.254.169.254/latest", allow_private=True)
+    # The message names the setting that would allow a private host.
+    with pytest.raises(ValidationFailed) as refused:
+        validate_base_url("http://192.168.1.10:11434/v1", setting="PROVIDER_ALLOW_PRIVATE_NETWORKS")
+    assert all(
+        "PROVIDER_ALLOW_PRIVATE_NETWORKS=true" in error["message"] for error in refused.value.errors
+    )
 
 
 async def test_secret_rotation_command(lab, monkeypatch: pytest.MonkeyPatch) -> None:  # type: ignore[no-untyped-def]

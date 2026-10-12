@@ -6,6 +6,16 @@ All notable changes are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+- `PROVIDER_ALLOW_PRIVATE_NETWORKS` and `HTTP_TOOL_ALLOW_PRIVATE_NETWORKS` now reach the
+  containers, so a model served on your own network (Ollama, LM Studio, vLLM) can be used with
+  Docker Compose; the *Ollama* preset points at the host machine (`host.docker.internal`).
+- A refused private address names the setting that would allow it.
+
+### Security
+- Allowing private networks never opens link-local, cloud metadata, multicast or reserved
+  addresses.
+
 ## [0.1.0] — 2026-10-12
 
 First release — see [RELEASE_NOTES.md](RELEASE_NOTES.md) for what was verified and the known

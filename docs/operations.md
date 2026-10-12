@@ -63,6 +63,8 @@ All settings are environment variables, documented in [`.env.example`](../.env.e
 | `DOCKER_SOCKET` | Docker socket given (read-only) to the filtering proxy used by the code sandbox. Default `/var/run/docker.sock`; rootless Docker: `$XDG_RUNTIME_DIR/docker.sock`. |
 | `SANDBOX_ALLOW_NETWORK` | `true` lets code tools that ask for it reach the network (default: no network at all). |
 | `SANDBOX_RUNTIME` | Container runtime for code tools, e.g. `runsc` when gVisor is installed. |
+| `PROVIDER_ALLOW_PRIVATE_NETWORKS` | `true` lets providers use a private or local address: a model served on your own network (see below). Link-local and cloud metadata addresses stay blocked. Default `false`. |
+| `HTTP_TOOL_ALLOW_PRIVATE_NETWORKS` | The same for HTTP tools, e.g. a service on your network. Default `false`. |
 
 Check a configuration without revealing any value:
 
@@ -70,6 +72,26 @@ Check a configuration without revealing any value:
 docker compose run --rm api gouvra check-config          # presence and format
 docker compose run --rm api gouvra check-config --live   # plus a read-only call to each provider
 ```
+
+### A model on your own network (Ollama, LM Studio, vLLM)
+
+Providers may only reach public addresses until you allow private ones:
+
+1. In `.env`, set `PROVIDER_ALLOW_PRIVATE_NETWORKS=true`, then `docker compose up -d` (the API
+   and the worker restart with it).
+2. Make the model server listen beyond `localhost` — inside the containers, `localhost` is the
+   container itself. Ollama: start it with `OLLAMA_HOST=0.0.0.0` (it then answers your whole
+   network, without authentication: keep it behind your firewall).
+3. In *Providers*, add an *OpenAI-compatible* provider. Base URL: the *Ollama* preset
+   (`http://host.docker.internal:11434/v1`, the host machine), LM Studio's
+   `http://host.docker.internal:1234/v1`, or the server's LAN address. These servers ignore the
+   API key: enter any value.
+4. *Test connection* lists the models it serves. Agents that use tools need a model that supports
+   tool calling.
+
+Every workspace can then point a provider at your network, so allow it only on an instance whose
+users you trust. Link-local and cloud metadata addresses (such as `169.254.169.254`) stay
+blocked whatever the setting.
 
 ## Production
 

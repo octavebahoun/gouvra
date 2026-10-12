@@ -63,7 +63,9 @@ KINDS: dict[str, ProviderKind] = {
             Preset("Groq", "https://api.groq.com/openai/v1"),
             Preset("Mistral", "https://api.mistral.ai/v1"),
             Preset("Together AI", "https://api.together.xyz/v1"),
-            Preset("Ollama (self-hosted)", "http://localhost:11434/v1"),
+            # Inside the containers `localhost` is the container itself: the host machine is
+            # host.docker.internal (PROVIDER_ALLOW_PRIVATE_NETWORKS=true is needed).
+            Preset("Ollama (self-hosted)", "http://host.docker.internal:11434/v1"),
         ),
     ),
     "test": ProviderKind(
@@ -92,12 +94,13 @@ async def build_adapter(
                 allow_private=get_settings().provider_allow_private_networks,
             )
         except BlockedDestination as exc:
-            raise GatewayError(
-                GatewayErrorCode.MISCONFIGURED,
-                "The provider URL resolves to a private or unreachable address."
-                if exc.reason == "private_address"
-                else "The provider host name does not resolve.",
-            ) from exc
+            message = {
+                "private_address": "The provider URL resolves to a private address, which this"
+                " instance does not allow (PROVIDER_ALLOW_PRIVATE_NETWORKS=true).",
+                "forbidden_address": "The provider URL resolves to a link-local, metadata or"
+                " reserved address, which is never allowed.",
+            }.get(exc.reason, "The provider host name does not resolve.")
+            raise GatewayError(GatewayErrorCode.MISCONFIGURED, message) from exc
     if kind == "deepseek":
         return DeepSeekAdapter(api_key=api_key, base_url=base_url, timeout_s=timeout_s)
     if kind == "anthropic":
